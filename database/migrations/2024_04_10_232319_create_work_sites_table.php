@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\WorkSiteStatusesEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -21,11 +22,11 @@ return new class extends Migration
             $table->decimal('starting_budget', 8, 2);
             $table->decimal('cost', 8, 2);
             $table->unsignedInteger('address')->nullable();
-            $table->integer('workers_count');
-            $table->date('receipt_date');
-            $table->date('starting_date');
-            $table->date('deliver_date');
-            $table->tinyInteger('status_on_receive');
+            $table->integer('workers_count')->default(0);
+            $table->date('receipt_date')->nullable();
+            $table->date('starting_date')->nullable();
+            $table->date('deliver_date')->nullable();
+            $table->tinyInteger('status_on_receive')->default(WorkSiteStatusesEnum::SCRATCH->value);
 
             $table->softDeletes();
             $table->timestamps();

@@ -3,6 +3,8 @@
 namespace App\Mapper;
 
 use App\DTO\WorkSiteCreateDTO;
+use App\Enums\PaymentTypesEnum;
+use Carbon\Carbon;
 
 class CreateWorkSiteMapper extends \Spatie\LaravelData\Data
 {
@@ -43,16 +45,15 @@ class CreateWorkSiteMapper extends \Spatie\LaravelData\Data
 
     }
 
-    public static function toPaymentEloquent(WorkSiteCreateDTO $workSiteDTO, $id): array
+    public static function toPaymentEloquent(WorkSiteCreateDTO $workSiteDTO): array
     {
         $result = [];
         if ($workSiteDTO->payments && count($workSiteDTO->payments) > 0) {
             foreach ($workSiteDTO->payments as $payment) {
                 $item = [
-                    'work_site_id' => $id,
                     'amount' => $payment['payment_amount'],
-                    'payment_date' => $payment['payment_date'],
-                    'payment_type' => 1,
+                    'payment_date' => Carbon::parse($payment['payment_date']),
+                    'payment_type' => PaymentTypesEnum::CASH->value,
                 ];
                 $result[] = $item;
             }

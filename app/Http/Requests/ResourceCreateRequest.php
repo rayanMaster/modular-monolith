@@ -12,7 +12,9 @@ class ResourceCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string',
+            'description' => 'sometimes|string',
+            'resource_category_id' => 'required|exists:resource_categories,id',
         ];
     }
 

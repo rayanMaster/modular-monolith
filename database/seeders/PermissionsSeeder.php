@@ -49,5 +49,14 @@ class PermissionsSeeder extends Seeder
         // WorkSite Resource
         $this->addPermission('Work Site Resource', 'ws-resource', ['list', 'show', 'add', 'update', 'delete']);
 
+        // Customer
+        $this->addPermission('Customer', 'customer', ['list', 'show', 'add', 'update', 'delete']);
+
+        // Customer
+        $this->addPermission('Payment', 'payment', ['list', 'show', 'add']);
+
+        //Worker
+        $this->addPermission('Worker', 'worker', ['list', 'show', 'add', 'update', 'delete']);
+
     }
 }

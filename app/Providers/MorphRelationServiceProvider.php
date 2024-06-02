@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Providers;
+
+use App\Models\WorkSite;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\ServiceProvider;
+
+class MorphRelationServiceProvider extends ServiceProvider
+{
+    /**
+     * Register services.
+     */
+    public function register(): void
+    {
+        //
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        Relation::morphMap([
+            'worksite' => Worksite::class,
+        ]);
+    }
+}

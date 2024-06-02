@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class WorkSite extends Model
 {
@@ -25,7 +26,7 @@ class WorkSite extends Model
 
     public function resources(): BelongsToMany
     {
-        return $this->belongsToMany(Resource::class)->withPivot(['quantity','price']);
+        return $this->belongsToMany(Resource::class)->withPivot(['quantity', 'price']);
     }
 
     public function category(): BelongsTo
@@ -38,8 +39,13 @@ class WorkSite extends Model
         return $this->belongsTo(Customer::class);
     }
 
-    public function last_payment(): HasOne
+    public function lastPayment(): MorphOne
     {
-        return $this->hasOne(Payment::class)->latest('id');
+        return $this->morphOne(Payment::class, 'payable')->latest('id');
+    }
+
+    public function payments(): MorphMany
+    {
+        return $this->morphMany(Payment::class, 'payable');
     }
 }

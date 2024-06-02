@@ -6,11 +6,12 @@ use App\DTO\WorkSiteCreateDTO;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
 use App\Http\Requests\WorkSiteCreateRequest;
+use App\Http\Resources\WorkSiteListResource;
 use App\Mapper\CreateWorkSiteMapper;
-use App\Models\Payment;
 use App\Models\WorkSite;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Drivers\Gd\Driver;
 
@@ -22,45 +23,59 @@ class WorkSiteController extends Controller
     //    {
     //    }
 
+    public function list()
+    {
+        $workSites = WorkSite::query()->with('payments')->get();
+
+        return ApiResponseHelper::sendResponse(new Result(WorkSiteListResource::collection($workSites)));
+    }
+
     /**
      * Show the form for creating a new resource.
+     *
+     * @throws \Throwable
      */
     public function create(WorkSiteCreateRequest $request)
     {
+        DB::transaction(
+            callback: function () use ($request) {
+                $data = WorkSiteCreateDTO::fromRequest($request->validated());
 
-        $data = WorkSiteCreateDTO::fromRequest($request->validated());
+                $workSiteData = CreateWorkSiteMapper::toWorkSiteEloquent($data);
 
-        $workSiteData = CreateWorkSiteMapper::toWorkSiteEloquent($data);
+                $workSite = WorkSite::query()->create($workSiteData);
 
-        $workSite = WorkSite::query()->create($workSiteData);
+                $resourcesData = CreateWorkSiteMapper::toWorkSiteResourcesEloquent($data);
+                $workSite->resources()->syncWithoutDetaching($resourcesData);
 
-        $resourcesData = CreateWorkSiteMapper::toWorkSiteResourcesEloquent($data);
-        $workSite->resources()->syncWithoutDetaching($resourcesData);
+                $paymentData = CreateWorkSiteMapper::toPaymentEloquent($data);
 
-        $paymentData = CreateWorkSiteMapper::toPaymentEloquent($data, $workSite?->id);
+                foreach ($paymentData as $payment) {
+                    $workSite->payments()->create($payment);
+                }
 
-        Payment::query()->insert($paymentData);
+                $file = $request->file('image');
+                if ($file) {
+                    $fileNameParts = explode('.', $file->getClientOriginalName());
+                    $fileName = $fileNameParts[0];
+                    $path = lcfirst('WorkSite');
+                    $name = $fileName.'_'.now()->format('YmdH');
 
-        $file = $request->file('image');
-        if ($file) {
-            $fileNameParts = explode('.', $file->name);
-            $fileName = $fileNameParts[0];
-            $path = lcfirst('WorkSite');
-            $name = $fileName.'_'.now()->format('YmdH');
+                    if (! File::exists(public_path('storage/'.$path))) {
+                        File::makeDirectory(public_path('storage/'.$path));
+                    }
 
-            if (! File::exists(public_path('storage/'.$path))) {
-                File::makeDirectory(public_path('storage/'.$path));
-            }
+                    $fullPath = public_path('storage/'.$path).'/'.$name.'.webp';
 
-            $fullPath = public_path('storage/'.$path).'/'.$name.'.webp';
+                    // create new manager instance with desired driver
+                    $manager = new \Intervention\Image\ImageManager(new Driver());
 
-            // create new manager instance with desired driver
-            $manager = new \Intervention\Image\ImageManager(new Driver());
-
-            // read image from filesystem
-            $image = $manager->read($file)->save($fullPath);
-        }
-        //        $this->fileManager->upload($files);
+                    // read image from filesystem
+                    $image = $manager->read($file)->save($fullPath);
+                }
+                //        $this->fileManager->upload($files);
+            },
+            attempts: 3);
 
         return ApiResponseHelper::sendSuccessResponse(
             new Result());

@@ -11,7 +11,7 @@ class ResourceUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,9 @@ class ResourceUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'sometimes|string',
+            'description' => 'sometimes|string',
+            'resource_category_id' => 'sometimes|exists:resource_categories,id',
         ];
     }
 }

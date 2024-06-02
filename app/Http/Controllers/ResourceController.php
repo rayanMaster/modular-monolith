@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
-use App\Http\Requests\WorkSiteCreateRequest;
+use App\Http\Requests\ResourceCreateRequest;
+use App\Http\Requests\ResourceUpdateRequest;
+use App\Http\Resources\ResourceDetailsResource;
 use App\Http\Resources\ResourceListResource;
-use App\Models\WorkSiteResource;
-use Illuminate\Http\Request;
+use App\Models\Resource;
 
 class ResourceController extends Controller
 {
@@ -16,22 +17,24 @@ class ResourceController extends Controller
      */
     public function list()
     {
-        $resources = WorkSiteResource::query()->get();
+        $resources = Resource::query()->get();
+
         return ApiResponseHelper::sendResponse(new Result(ResourceListResource::collection($resources)));
     }
 
-    public function store(WorkSiteCreateRequest $request)
+    public function store(ResourceCreateRequest $request)
     {
-        WorkSiteResource::query()->create($request->validated());
+        Resource::query()->create($request->validated());
     }
-
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        //
+        $resource = Resource::query()->findOrFail($id);
+
+        return ApiResponseHelper::sendResponse(new Result(ResourceDetailsResource::make($resource)));
     }
 
     /**
@@ -45,9 +48,10 @@ class ResourceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ResourceUpdateRequest $request, string $id)
     {
-        //
+        $resource = Resource::query()->findOrFail($id);
+        $resource->update($request->validated());
     }
 
     /**
@@ -55,6 +59,7 @@ class ResourceController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $resource = Resource::query()->findOrFail($id);
+        $resource->delete();
     }
 }

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('resource_category_id')->constrained('resource_categories');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

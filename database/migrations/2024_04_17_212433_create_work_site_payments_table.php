@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PaymentTypesEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,10 +14,10 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('work_site_id')->constrained('work_sites');
+            $table->morphs('payable');
             $table->decimal('amount', 8, 2);
             $table->dateTime('payment_date');
-            $table->integer('payment_type')->default(1);
+            $table->integer('payment_type')->default(PaymentTypesEnum::CASH->value);
 
             $table->timestamps();
         });

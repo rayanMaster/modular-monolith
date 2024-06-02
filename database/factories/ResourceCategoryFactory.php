@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class ResourceCategoryFactory extends Factory
 {
     protected $model = ResourceCategory::class;
+
     /**
      * Define the model's default state.
      *

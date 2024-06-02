@@ -19,15 +19,26 @@ class PermissionGroupsSeeder extends Seeder
         */
         // WorkSite
         PermissionGroup::query()->updateOrCreate(['name' => 'work-site', 'display_name' => 'WorkSite'], ['name' => 'workSite']);
-
         /*
         |--------------------------------------------------------------------------
         | WorkSite Category
         |--------------------------------------------------------------------------
         */
-
         PermissionGroup::query()->updateOrCreate(['name' => 'ws-category', 'display_name' => 'WorkSite Category'], ['name' => 'ws-category']);
 
+        /*
+       |--------------------------------------------------------------------------
+       | Customer
+       |--------------------------------------------------------------------------
+       */
+        PermissionGroup::query()->updateOrCreate(['name' => 'customer', 'display_name' => 'Customer'], ['name' => 'customer']);
+
+        /*
+      |--------------------------------------------------------------------------
+      | Payment
+      |--------------------------------------------------------------------------
+      */
+        PermissionGroup::query()->updateOrCreate(['name' => 'payment', 'display_name' => 'Payment'], ['name' => 'payment']);
 
     }
 }

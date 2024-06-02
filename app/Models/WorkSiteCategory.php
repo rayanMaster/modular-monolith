@@ -14,7 +14,6 @@ class WorkSiteCategory extends Model
     /**
      * The attributes that are mass assignable.
      */
-
     protected $guarded = [];
 
     protected static function newFactory(): WorkSiteCategoryFactory

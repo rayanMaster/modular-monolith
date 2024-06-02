@@ -12,7 +12,11 @@ class PaymentCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'payable_id' => ['nullable', 'numeric'],
+            'payable_type' => ['nullable', 'string'],
+            'payment_date' => ['required', 'date'],
+            'payment_amount' => ['required', 'numeric', 'min:1'],
+            'payment_type' => ['sometimes', 'numeric'],
         ];
     }
 

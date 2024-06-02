@@ -18,10 +18,9 @@ class WorkSiteCategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'id'=>null,
+            'id' => null,
             'name' => fake()->name,
             'status' => rand(0, 1),
         ];
     }
 }
-

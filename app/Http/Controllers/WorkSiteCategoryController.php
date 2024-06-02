@@ -9,13 +9,13 @@ use App\Http\Requests\WorkSiteCategoryUpdateRequest;
 use App\Http\Resources\WorkSiteCategoryDetailsResource;
 use App\Http\Resources\WorkSiteCategoryListResource;
 use App\Models\WorkSiteCategory;
-use Illuminate\Http\Request;
 
 class WorkSiteCategoryController extends Controller
 {
     public function list()
     {
         $categories = WorkSiteCategory::query()->get();
+
         return ApiResponseHelper::sendResponse(new Result(WorkSiteCategoryListResource::collection($categories)));
     }
 
@@ -32,6 +32,7 @@ class WorkSiteCategoryController extends Controller
     public function show($id)
     {
         $category = WorkSiteCategory::query()->findOrFail($id);
+
         return ApiResponseHelper::sendResponse(new Result(WorkSiteCategoryDetailsResource::make($category)));
     }
 
@@ -44,7 +45,7 @@ class WorkSiteCategoryController extends Controller
     {
 
         $workSiteCategory = WorkSiteCategory::query()->findOrFail($id);
-        $workSiteCategory->update(['name'=>$request->name]);
+        $workSiteCategory->update(['name' => $request->name]);
 
     }
 

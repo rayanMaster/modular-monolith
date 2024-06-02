@@ -13,14 +13,29 @@ class UserFactory extends Factory
     {
         return [
             'name' => 'Rayan',
-            'email' => 'Rayan@Rayan.com',
-            'password' => 'Rayan',
+            'email' => 'rayan@rayan.com',
+            'password' => 'Rayan123@@',
         ];
+    }
+
+    public function mainAdmin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Main Admin',
+            'email' => 'main_admin@admin.com',
+            'password' => 'admin123',
+        ])->afterCreating(function (User $user) {
+            return $user->assignRole('admin');
+        });
     }
 
     public function admin(): static
     {
-        return $this->afterCreating(function (User $user) {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Admin',
+            'email' => 'admin@admin.com',
+            'password' => 'admin123',
+        ])->afterCreating(function (User $user) {
             return $user->assignRole('admin');
         });
     }
@@ -31,6 +46,7 @@ class UserFactory extends Factory
             return $user->assignRole('site_manager');
         });
     }
+
     public function employee(): static
     {
         return $this->afterCreating(function (User $user) {

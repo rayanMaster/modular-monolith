@@ -5,26 +5,33 @@ namespace App\Http\Controllers;
 use App\DTO\PaymentCreateDTO;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
+use App\Http\Requests\PaymentCreateRequest;
+use App\Http\Resources\PaymentListResource;
 use App\Models\Payment;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use App\Models\WorkSite;
+use Illuminate\Database\Eloquent\Builder;
 
 class PaymentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function list()
     {
-        return view('worksite::index');
+        $payments = Payment::query()->whereHasMorph(
+            'payable',
+            WorkSite::class,
+            function (Builder $query) {
+                $query->whereDate('receipt_date', '2024-08-04');
+            }
+        )->get();
+
+        return ApiResponseHelper::sendSuccessResponse(new Result(PaymentListResource::collection($payments)));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(Request $request, $work_site_id)
+    public function store(PaymentCreateRequest $request): \Illuminate\Http\JsonResponse
     {
-        Payment::query()->create(PaymentCreateDTO::fromRequest($request->all(), $work_site_id)->toArray());
+        Payment::query()->create(PaymentCreateDTO::fromRequest($request->validated())->toArray());
 
         return ApiResponseHelper::sendSuccessResponse(new Result());
     }
@@ -35,22 +42,6 @@ class PaymentController extends Controller
     public function show($id)
     {
         return view('worksite::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('worksite::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id): RedirectResponse
-    {
-        //
     }
 
     /**
