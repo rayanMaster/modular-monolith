@@ -23,6 +23,7 @@ abstract readonly class MainRepository implements MainRepositoryInterface
         return $this->query->get();
     }
 
+
     public function show(int $id): Model|Collection|Builder|array|null
     {
         $record = $this->query->findOrFail($id);
