@@ -14,20 +14,20 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
     Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::group(['prefix' => 'worksite'], function () {
-            Route::post('/create', [WorkSiteController::class, 'create'])
+            Route::post('/create', [WorkSiteController::class, 'store'])
                 ->middleware('can:work-site-add')
                 ->name('worksite.create');
             Route::get('/list', [WorkSiteController::class, 'list'])
-                ->middleware('can:work-site-add')
+                ->middleware('can:work-site-list')
                 ->name('worksite.list');
             Route::get('/show/{id}', [WorkSiteController::class, 'show'])
-                ->middleware('can:work-site-add')
+                ->middleware('can:work-site-show')
                 ->name('worksite.show');
-            Route::put('/update/{id}', [WorkSiteController::class, 'show'])
-                ->middleware('can:work-site-add')
+            Route::put('/update/{id}', [WorkSiteController::class, 'update'])
+                ->middleware('can:work-site-update')
                 ->name('worksite.update');
-            Route::delete('/delete/{id}', [WorkSiteController::class, 'show'])
-                ->middleware('can:work-site-add')
+            Route::delete('/delete/{id}', [WorkSiteController::class, 'delete'])
+                ->middleware('can:work-site-delete')
                 ->name('worksite.delete');
 
             Route::group(['prefix' => 'category'], function () {
@@ -132,7 +132,7 @@ Route::prefix('v1')->group(function () {
                 ->name('worker.update');
 
             Route::delete('/delete/{id}', [WorkerController::class, 'destroy'])
-                ->middleware('can:ws-worker-delete')
+                ->middleware('can:worker-delete')
                 ->name('worker.delete');
 
         });

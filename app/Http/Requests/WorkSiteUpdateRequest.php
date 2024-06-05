@@ -5,16 +5,26 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\File;
 
-class WorkSiteCreateRequest extends FormRequest
+class WorkSiteUpdateRequest extends FormRequest
 {
     /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'title' => 'required|string',
-            'description' => 'required|string',
+            'title' => 'sometimes|string',
+            'description' => 'sometimes|string',
             'customer_id' => 'sometimes|integer',
             'category_id' => 'sometimes|integer',
             'main_worksite' => 'nullable|boolean',
@@ -30,19 +40,8 @@ class WorkSiteCreateRequest extends FormRequest
             'resources.*.quantity' => 'sometimes|numeric',
             'resources.*.price' => 'sometimes|numeric',
             'resources.*.id' => 'sometimes|integer',
-            'payments' => 'sometimes|array',
-            'payments.*.payment_amount' => 'sometimes|numeric',
-            'payments.*.payment_date' => ['sometimes', 'date_format:Y-m-d H:i'],
             'image' => ['sometimes',File::types(['jpeg', 'png', 'gif', 'webp'])
                 ->max('2mb')],
         ];
-    }
-
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
     }
 }

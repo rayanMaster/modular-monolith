@@ -4,7 +4,7 @@ namespace App\DTO;
 
 use App\Enums\WorkSiteStatusesEnum;
 
-class WorkSiteCreateDTO extends \Spatie\LaravelData\Data
+class WorkSiteUpdateDTO extends \Spatie\LaravelData\Data
 {
     /**
      * @param  ResourceCreateDTO|null  $workSiteResourceDTO
@@ -50,18 +50,18 @@ class WorkSiteCreateDTO extends \Spatie\LaravelData\Data
      *  image?: array|null
      * } $request
      */
-    public static function fromRequest(array $request): WorkSiteCreateDTO
+    public static function fromRequest(array $request): WorkSiteUpdateDTO
     {
         return new self(
-            title: $request['title'],
-            description: $request['description'],
+            title: $request['title']?? null,
+            description: $request['description']?? null,
             customerId: $request['customer_id'] ?? null,
             categoryId: $request['category_id'] ?? null,
             mainWorksite: $request['main_worksite'] ?? null,
             startingBudget: $request['starting_budget'] ?? 0,
             cost: $request['cost'] ?? 0,
             address: $request['address'] ?? 0,
-            workersCount: $request['workers_count'] ?? 0,
+            workersCount: $request['workers_count']  ?? null,
             receiptDate: $request['receipt_date'] ?? null,
             startingDate: $request['starting_date'] ?? null,
             deliverDate: $request['deliver_date'] ?? null,

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\DTO\WorkSiteCreateDTO;
+use App\DTO\WorkSiteUpdateDTO;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
 use App\Http\Requests\WorkSiteCreateRequest;
+use App\Http\Requests\WorkSiteUpdateRequest;
 use App\Http\Resources\WorkSiteListResource;
 use App\Mapper\CreateWorkSiteMapper;
 use App\Models\WorkSite;
@@ -35,7 +37,7 @@ class WorkSiteController extends Controller
      *
      * @throws \Throwable
      */
-    public function create(WorkSiteCreateRequest $request)
+    public function store(WorkSiteCreateRequest $request)
     {
         DB::transaction(
             callback: function () use ($request) {
@@ -82,14 +84,6 @@ class WorkSiteController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        //
-    }
-
-    /**
      * Show the specified resource.
      */
     public function show($id)
@@ -98,19 +92,53 @@ class WorkSiteController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('worksite::edit');
-    }
-
-    /**
      * Update the specified resource in storage.
+     * @throws \Throwable
      */
-    public function update(Request $request, $id): RedirectResponse
+    public function update(WorkSiteUpdateRequest $request, $id)
     {
-        //
+        DB::transaction(
+            callback: function () use ($request,$id) {
+
+                $workSite = WorkSite::query()->findOrFail($id);
+
+                $data = WorkSiteUpdateDTO::fromRequest($request->validated());
+
+                $workSiteData = CreateWorkSiteMapper::toWorkSiteEloquent($data);
+
+                $workSite->update($workSiteData);
+
+                $resourcesData = CreateWorkSiteMapper::toWorkSiteResourcesEloquent($data);
+                $workSite->resources()->syncWithoutDetaching($resourcesData);
+
+                $paymentData = CreateWorkSiteMapper::toPaymentEloquent($data);
+
+
+                $file = $request->file('image');
+                if ($file) {
+                    $fileNameParts = explode('.', $file->getClientOriginalName());
+                    $fileName = $fileNameParts[0];
+                    $path = lcfirst('WorkSite');
+                    $name = $fileName.'_'.now()->format('YmdH');
+
+                    if (! File::exists(public_path('storage/'.$path))) {
+                        File::makeDirectory(public_path('storage/'.$path));
+                    }
+
+                    $fullPath = public_path('storage/'.$path).'/'.$name.'.webp';
+
+                    // create new manager instance with desired driver
+                    $manager = new \Intervention\Image\ImageManager(new Driver());
+
+                    // read image from filesystem
+                    $image = $manager->read($file)->save($fullPath);
+                }
+                //        $this->fileManager->upload($files);
+            },
+            attempts: 3);
+
+        return ApiResponseHelper::sendSuccessResponse(
+            new Result());
     }
 
     /**

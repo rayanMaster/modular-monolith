@@ -8,6 +8,7 @@ use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
 use App\Http\Requests\WorkerCreateRequest;
 use App\Http\Requests\WorkerUpdateRequest;
+use App\Http\Resources\WorkerDetailsResource;
 use App\Http\Resources\WorkerListResource;
 use App\Mapper\WorkerCreateMapper;
 use App\Mapper\WorkerUpdateMapper;
@@ -41,5 +42,16 @@ class WorkerController extends Controller
         $toUpdate = WorkerUpdateMapper::fromEloquent(WorkerUpdateDTO::fromRequest($request->validated()));
         $this->workerRepository->update($workerId, $toUpdate);
         return ApiResponseHelper::sendSuccessResponse(new Result());
+    }
+
+    public function show($id){
+        $worker = Worker::query()->findOrFail($id);
+        return ApiResponseHelper::sendResponse(new Result(WorkerDetailsResource::make($worker)));
+    }
+
+    public function destroy(int $workerId){
+        $worker = Worker::query()->findOrFail($workerId);
+        $worker->delete();
+        return ApiResponseHelper::sendResponse(new Result());
     }
 }

@@ -46,17 +46,12 @@ abstract readonly class MainRepository implements MainRepositoryInterface
      */
     public function update(int $id, array $attributes, bool $passNull = false) : Model|null
     {
-
         $record = $this->query->findOrFail($id);
-//        $filteredAttributes = array_filter($attributes, fn($attribute) => $attribute != null);
-        dd($attributes);
-        $record->update($attributes);
-
-//        return $this->databaseManager->transaction(
-//            callback: function () use ($attributes, $record, $passNull) {
-//                $filteredAttributes = array_filter($attributes, fn($attribute) => $attribute != null);
-//                $record->update($passNull ? $attributes : $filteredAttributes);
-//            }, attempts: 3);
+        return $this->databaseManager->transaction(
+            callback: function () use ($attributes, $record, $passNull) {
+                $filteredAttributes = array_filter($attributes, fn($attribute) => $attribute != null);
+                $record->update($passNull ? $attributes : $filteredAttributes);
+            }, attempts: 3);
     }
 
     /**

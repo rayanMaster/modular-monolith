@@ -14,6 +14,8 @@ class WorkerListResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'first_name'=>$this->first_name
+        ];
     }
 }

@@ -22,7 +22,7 @@ class WorkerUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'firstName' => ['nullable', 'string'],
+            'first_name' => ['nullable', 'string'],
         ];
     }
 }
