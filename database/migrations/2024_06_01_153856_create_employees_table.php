@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('resource_work_site', function (Blueprint $table) {
+        Schema::create('employees', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('work_site_id')->constrained('work_sites');
-            $table->foreignId('resource_id')->constrained('resources');
-            $table->integer('quantity');
-            $table->decimal('price', 8, 2);
+            $table->string('first_name');
+            $table->string('last_name')->nullable();
+            $table->tinyInteger('status')->default(\App\Enums\StatusEnum::Active->value);
+            $table->foreignIdFor(\App\Models\JobTitle::class)->nullable();
 
-            $table->timestamps();
             $table->softDeletes();
+            $table->timestamps();
         });
     }
 
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('resource_work_site');
+        Schema::dropIfExists('workers');
     }
 };

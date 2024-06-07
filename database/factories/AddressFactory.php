@@ -2,15 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Employee;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Employee>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Address>
  */
-class WorkerFactory extends Factory
+class AddressFactory extends Factory
 {
-    protected $model = Employee::class;
     /**
      * Define the model's default state.
      *
@@ -19,7 +17,7 @@ class WorkerFactory extends Factory
     public function definition(): array
     {
         return [
-            'first_name' => $this->faker->firstName(),
+            //
         ];
     }
 }

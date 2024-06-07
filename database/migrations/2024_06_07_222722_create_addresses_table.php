@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\City;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,15 +12,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('resource_work_site', function (Blueprint $table) {
+        Schema::create('addresses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('work_site_id')->constrained('work_sites');
-            $table->foreignId('resource_id')->constrained('resources');
-            $table->integer('quantity');
-            $table->decimal('price', 8, 2);
+            $table->string('street')->nullable();
+            $table->string('state')->nullable();
+            $table->string('zipCode')->nullable();
+            $table->foreignIdFor(City::class);
 
-            $table->timestamps();
             $table->softDeletes();
+            $table->timestamps();
         });
     }
 
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('resource_work_site');
+        Schema::dropIfExists('addresses');
     }
 };

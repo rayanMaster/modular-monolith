@@ -58,8 +58,8 @@ class PermissionsSeeder extends Seeder
         // Customer
         $this->addPermission('Payment', 'payment', ['list', 'show', 'add']);
 
-        //Worker
-        $this->addPermission('Worker', 'worker', ['list', 'show', 'add', 'update', 'delete']);
+        //Employee
+        $this->addPermission('Employee', 'employee', ['list', 'show', 'add', 'update', 'delete']);
 
     }
 }

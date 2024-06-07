@@ -4,7 +4,7 @@ namespace App\Mapper;
 
 use App\DTO\WorkerCreateDTO;
 
-class WorkerCreateMapper
+class EmployeeCreateMapper
 {
     public static function fromEloquent(WorkerCreateDTO $workerCreateDTO): array
     {

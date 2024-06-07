@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('resource_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->tinyInteger('status')->default(\App\Enums\StatusEnum::Active->value);
 
-            $table->softDeletes();
+
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

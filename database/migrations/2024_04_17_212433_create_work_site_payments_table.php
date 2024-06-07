@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('payment_type')->default(PaymentTypesEnum::CASH->value);
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

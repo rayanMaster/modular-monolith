@@ -1,11 +1,13 @@
 <?php
 
 use App\Enums\PaymentTypesEnum;
+use App\Enums\WorkSiteStatusesEnum;
 use App\Models\Customer;
 use App\Models\Resource;
 use App\Models\ResourceCategory;
 use App\Models\WorkSite;
 use App\Models\WorkSiteCategory;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
@@ -289,11 +291,9 @@ describe('List WorkSites', function () {
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
 
+        $this->admin = \App\Models\User::factory()->admin()->create();
         $this->notAdmin = \App\Models\User::factory()->siteManager()->create();
         expect($this->notAdmin->hasRole('site_manager'))->toBe(true);
-
-        //create multiple worksites in DB
-        WorkSite::factory()->count(3)->create();
 
     });
     test('As a non-authenticated, I cant show list of worksites', function () {
@@ -305,8 +305,49 @@ describe('List WorkSites', function () {
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     test('As an admin, I can show list of worksites', function () {
-        assertDatabaseCount(WorkSite::class, 3);
-    });
+        $wsCategory = WorkSiteCategory::factory()->create();
+        $customer = Customer::factory()->create();
+        $data =  [
+            'title' => 'worksite A',
+            'description' => 'this worksite is for freeTown',
+            'customer_id' => $customer?->id,
+            'category_id' => $wsCategory?->id, // construction
+            'main_worksite' => null, // this is main worksite == top level worksite
+            'starting_budget' => 15,
+            'cost' => 20,
+            'address' => 1,
+            'workers_count' => 20,
+            'receipt_date' => '2024-04-12',
+            'starting_date' => '2024-04-12',
+            'deliver_date' => '2024-04-12',
+            'status_on_receive' => WorkSiteStatusesEnum::SCRATCH->value,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        $workSite = WorkSite::factory()->create($data);
+        assertDatabaseCount(WorkSite::class, 1);
+        actingAs($this->admin)->getJson('/api/v1/worksite/list')
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJsonFragment([
+                'id' => $workSite->id,
+                'title' => $workSite->title,
+                'description' => $workSite->description,
+                'customer' => $workSite->customer->fullName,
+                'category' => $workSite->category->name,
+                'main_worksite' => $workSite->main_worksite?->title,
+                'starting_budget' => number_format($workSite->starting_budget,2),
+                'cost' => number_format($workSite->cost,2),
+                'address' => $workSite->address,
+                'workers_count' => $workSite->workers_count,
+                'receipt_date' => $workSite->receipt_date,
+                'starting_date' => $workSite->starting_date,
+                'deliver_date' => $workSite->deliver_date,
+                'status_on_receive' => $workSite->status_on_receive,
+                'created_at' => Carbon::parse($workSite->created_at)->toDateTimeString(),
+                'updated_at' => Carbon::parse($workSite->updated_at)->toDateTimeString(),
+                'payments' => $workSite->payments,
+            ]);
+    })->only();
 
 });
 describe('Show WorkSites Details', function () {

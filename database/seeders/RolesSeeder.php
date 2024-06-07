@@ -36,9 +36,9 @@ class RolesSeeder extends Seeder
 
         $employeeRole = Role::query()->updateOrCreate(['name' => 'worker'], [
             'name' => 'worker',
-            'display_name' => 'Worker',
+            'display_name' => 'Employee',
             'guard_name' => 'web',
-            'description' => 'Worker Role',
+            'description' => 'Employee Role',
         ]);
 
         $adminPermissions = Permission::all();

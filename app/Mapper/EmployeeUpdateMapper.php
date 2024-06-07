@@ -5,7 +5,7 @@ namespace App\Mapper;
 use App\DTO\WorkerCreateDTO;
 use App\DTO\WorkerUpdateDTO;
 
-class WorkerUpdateMapper
+class EmployeeUpdateMapper
 {
     public static function fromEloquent(WorkerUpdateDTO $workerUpdateDTO): array
     {

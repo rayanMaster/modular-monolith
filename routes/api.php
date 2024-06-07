@@ -5,7 +5,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ResourceCategoryController;
 use App\Http\Controllers\ResourceController;
-use App\Http\Controllers\WorkerController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\WorkSiteCategoryController;
 use App\Http\Controllers\WorkSiteController;
 use App\Http\Controllers\WorkSitePaymentController;
@@ -152,26 +152,26 @@ Route::prefix('v1')->group(function () {
                 ->name('customer.delete');
 
         });
-        Route::group(['prefix' => 'worker'], function () {
-            Route::get('/list', [WorkerController::class, 'list'])
-                ->middleware('can:worker-list')
-                ->name('worker.list');
+        Route::group(['prefix' => 'employee'], function () {
+            Route::get('/list', [EmployeeController::class, 'list'])
+                ->middleware('can:employee-list')
+                ->name('employee.list');
 
-            Route::get('/show/{id}', [WorkerController::class, 'show'])
-                ->middleware('can:worker-show')
-                ->name('worker.show');
+            Route::get('/show/{id}', [EmployeeController::class, 'show'])
+                ->middleware('can:employee-show')
+                ->name('employee.show');
 
-            Route::post('/create', [WorkerController::class, 'store'])
-                ->middleware('can:worker-add')
-                ->name('worker.create');
+            Route::post('/create', [EmployeeController::class, 'store'])
+                ->middleware('can:employee-add')
+                ->name('employee.create');
 
-            Route::put('/update/{id}', [WorkerController::class, 'update'])
-                ->middleware('can:worker-update')
-                ->name('worker.update');
+            Route::put('/update/{id}', [EmployeeController::class, 'update'])
+                ->middleware('can:employee-update')
+                ->name('employee.update');
 
-            Route::delete('/delete/{id}', [WorkerController::class, 'destroy'])
-                ->middleware('can:worker-delete')
-                ->name('worker.delete');
+            Route::delete('/delete/{id}', [EmployeeController::class, 'destroy'])
+                ->middleware('can:employee-delete')
+                ->name('employee.delete');
 
         });
         Route::group(['prefix' => 'payment'], function () {
