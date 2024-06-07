@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 use function Pest\Laravel\{postJson, actingAs, assertDatabaseHas, assertDatabaseCount};
 
@@ -40,9 +41,9 @@ describe('Create  Worker', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
     });
@@ -73,9 +74,9 @@ describe('Update  Worker', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -109,9 +110,9 @@ describe('Show  Workers list', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -128,7 +129,7 @@ describe('Show  Workers list', function () {
     it('should return right number of Workers in database', function () {
         $response = actingAs($this->admin)->getJson('/api/v1/worker/list');
         $response->assertStatus(Response::HTTP_OK);
-        assertDatabaseCount('workers', 10);
+        assertDatabaseCount(\App\Models\Worker::class, 10);
     });
     it('should return list of workers', function () {
         $response = actingAs($this->admin)->getJson('/api/v1/worker/list');
@@ -141,9 +142,9 @@ describe('Show  Worker details', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -173,9 +174,9 @@ describe('Delete Worker', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -197,7 +198,7 @@ describe('Delete Worker', function () {
     it('should delete a worker', function () {
         $response = actingAs($this->admin)->deleteJson('/api/v1/worker/delete/'.$this->worker->id);
         $response->assertStatus(Response::HTTP_OK);
-           assertDatabaseCount('workers', 0);
+           assertDatabaseCount(\App\Models\Worker::class, 0);
     });
 });
 

@@ -3,6 +3,7 @@
 use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 use function Pest\Laravel\{postJson,actingAs,putJson,getJson,assertDatabaseHas};
 
@@ -41,9 +42,9 @@ describe('Customer Create', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
     });
@@ -74,9 +75,9 @@ describe('Customer Update', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 

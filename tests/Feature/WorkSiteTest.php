@@ -8,8 +8,9 @@ use App\Models\WorkSite;
 use App\Models\WorkSiteCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
-use function Pest\Laravel\{postJson, putJson, actingAs, assertDatabaseHas, assertDatabaseCount};
+use function Pest\Laravel\{postJson, getJson, putJson, actingAs, assertDatabaseHas, assertDatabaseCount};
 
 describe('WorkSite routes check', function () {
     it('should have all routes for /worksite', function () {
@@ -62,9 +63,9 @@ describe('Create WorkSite', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
 
     });
 
@@ -174,7 +175,7 @@ describe('Create WorkSite', function () {
             ->assertJson([
                 'success' => false,
                 'error_code' => Response::HTTP_UNPROCESSABLE_ENTITY,
-                'message'=>'The title field is required.',
+                'message' => 'The title field is required.',
                 'data' => [
                     'title' => ['The title field is required.'],
                     'description' => ['The description field is required.'],
@@ -238,9 +239,9 @@ describe('Update WorkSite', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
 
         $this->admin = \App\Models\User::factory()->admin()->create();
         $this->workSite = WorkSite::factory()->create();
@@ -248,7 +249,6 @@ describe('Update WorkSite', function () {
     });
 
     test('As a non-authenticated, I cant update a main worksite', function () {
-
         $response = putJson('/api/v1/worksite/update/' . $this->workSite->id, []);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
 
@@ -264,20 +264,19 @@ describe('Update WorkSite', function () {
     });
     test('As an administrator, I want to update worksite main info', function () {
 
-        assertDatabaseCount('work_sites', 1);
+        assertDatabaseCount(WorkSite::class, 1);
         actingAs($this->admin)->putJson('/api/v1/worksite/update/' . $this->workSite->id, [
             'title' => 'worksite AB',
             'description' => 'this worksite is for freeTown new'
         ]);
 
-        assertDatabaseHas('work_sites', [
+        assertDatabaseHas(WorkSite::class, [
             'title' => 'worksite AB',
             'description' => 'this worksite is for freeTown new',
         ]);
 
 
     });
-
 
 });
 describe('List WorkSites', function () {
@@ -286,19 +285,27 @@ describe('List WorkSites', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
+
+        $this->notAdmin = \App\Models\User::factory()->siteManager()->create();
+        expect($this->notAdmin->hasRole('site_manager'))->toBe(true);
+
+        //create multiple worksites in DB
+        WorkSite::factory()->count(3)->create();
 
     });
     test('As a non-authenticated, I cant show list of worksites', function () {
-
+        $response = getJson('/api/v1/worksite/list');
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     test('As not admin, I cant show list of worksites', function () {
-
+        $response = actingAs($this->notAdmin)->getJson('/api/v1/worksite/list');
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     test('As an admin, I can show list of worksites', function () {
-
+        assertDatabaseCount(WorkSite::class, 3);
     });
 
 });
@@ -308,9 +315,9 @@ describe('Show WorkSites Details', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
 
     });
     test('As a non-authenticated, I cant show details of a worksite', function () {
@@ -333,9 +340,9 @@ describe('Close WorkSites', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
 
     });
     test('As a non-authenticated, I cant close a worksite', function () {

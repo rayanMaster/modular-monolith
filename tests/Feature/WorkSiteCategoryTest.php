@@ -3,6 +3,7 @@
 use App\Models\User;
 use App\Models\WorkSiteCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
@@ -49,9 +50,9 @@ describe('WorkSiteCategory Create', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -86,9 +87,9 @@ describe('WorkSiteCategory Update', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -128,9 +129,9 @@ describe('WorkSiteCategory List', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -156,9 +157,9 @@ describe('WorkSiteCategory Details', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -186,9 +187,9 @@ describe('WorkSiteCategory Delete', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -208,8 +209,8 @@ describe('WorkSiteCategory Delete', function () {
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should delete category from database', function () {
-        assertDatabaseCount('work_site_categories', 1);
+        assertDatabaseCount(WorkSiteCategory::class, 1);
         actingAs($this->admin)->deleteJson('/api/v1/worksite/category/delete/'.$this->category->id);
-        assertSoftDeleted('work_site_categories', ['id' => $this->category->id]);
+        assertSoftDeleted(WorkSiteCategory::class, ['id' => $this->category->id]);
     });
 });

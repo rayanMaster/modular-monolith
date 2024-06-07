@@ -4,6 +4,7 @@ use App\Models\Resource;
 use App\Models\ResourceCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
@@ -55,9 +56,9 @@ describe('WorkSiteResource Create', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
         $this->resourceCategory = ResourceCategory::factory()->create();
@@ -91,9 +92,9 @@ describe('WorkSite Resource Update', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -133,9 +134,9 @@ describe('WorkSite Resource List', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -161,9 +162,9 @@ describe('WorkSite Resource Details', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -191,9 +192,9 @@ describe('WorkSite Resource Delete', function () {
 
     beforeEach(function () {
         $this->artisan('storage:link');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 0);
+        $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
-        $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
+        $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -213,7 +214,7 @@ describe('WorkSite Resource Delete', function () {
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should delete resource from database', function () {
-        assertDatabaseCount('resources', 1);
+        assertDatabaseCount(Resource::class, 1);
         actingAs($this->admin)->deleteJson('/api/v1/resource/delete/'.$this->resource->id);
         assertSoftDeleted('resources', ['id' => $this->resource->id]);
     });
