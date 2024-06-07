@@ -24,7 +24,7 @@ class PermissionGroupsSeeder extends Seeder
         | WorkSite Category
         |--------------------------------------------------------------------------
         */
-        PermissionGroup::query()->updateOrCreate(['name' => 'ws-category', 'display_name' => 'WorkSite Category'], ['name' => 'ws-category']);
+        PermissionGroup::query()->updateOrCreate(['name' => 'worksite-category', 'display_name' => 'WorkSite Category'], ['name' => 'ws-category']);
 
         /*
        |--------------------------------------------------------------------------

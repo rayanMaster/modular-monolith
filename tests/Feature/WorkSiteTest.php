@@ -9,6 +9,7 @@ use App\Models\WorkSiteCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
+use function Pest\Laravel\{postJson, putJson, actingAs, assertDatabaseHas, assertDatabaseCount};
 
 describe('WorkSite routes check', function () {
     it('should have all routes for /worksite', function () {
@@ -20,7 +21,15 @@ describe('WorkSite routes check', function () {
             'worksite.list',
             'worksite.show',
             'worksite.delete',
+            'worksite.resource.list',
+            'worksite.resource.create',
+            'worksite.resource.show',
+            'worksite.resource.delete',
+            'worksite.resource.update',
+
             'worksite.payment.create',
+            'worksite.payment.list',
+            'worksite.payment.show',
 
             'worksite.category.create',
             'worksite.category.update',
@@ -97,7 +106,7 @@ describe('Create WorkSite', function () {
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
             'deliver_date' => '2024-04-12',
-            'status_on_receive' => 1,
+            'status_on_receive' => \App\Enums\WorkSiteStatusesEnum::SCRATCH->value,
             'resources' => [
                 ['id' => $workSiteResource1?->id, 'quantity' => 23, 'price' => 34],
                 ['id' => $workSiteResource2?->id, 'quantity' => 30, 'price' => 30],
@@ -113,9 +122,10 @@ describe('Create WorkSite', function () {
         $response->assertOk();
 
         // Assert the file was stored...
-        $path = lcfirst('WorkSite');
+        $path = 'workSite';
         $name = 'test' . '_' . now()->format('YmdH');
         $fullPath = public_path('storage/' . $path) . '/' . $name . '.webp';
+
         $this->assertFileExists($fullPath);
 
         $workSite = WorkSite::query()->latest('id')->first();
@@ -140,13 +150,36 @@ describe('Create WorkSite', function () {
             ->and($workSite->lastPayment->payment_type)->toBe(PaymentTypesEnum::CASH->value);
 
     });
-    test('As a guest, I cant create a main worksite', function () {
+    test('As a non-authenticated, I cant create a main worksite', function () {
 
         $response = $this->postJson('/api/v1/worksite/create', [
             'title' => 'worksite A',
             'description' => 'this worksite is for freeTown',
         ]);
-        $response->assertStatus(401);
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
+
+    });
+    test('As an administrator, should return validation error when no data', function () {
+
+        $mainWorkSite = WorkSite::factory()->create();
+
+        $admin = \App\Models\User::factory()->admin()->create();
+
+        expect($admin->hasRole('admin'))->toBe(true);
+
+        $response = $this->actingAs($admin)->postJson('/api/v1/worksite/create', [
+        ]);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJson([
+                'success' => false,
+                'error_code' => Response::HTTP_UNPROCESSABLE_ENTITY,
+                'message'=>'The title field is required.',
+                'data' => [
+                    'title' => ['The title field is required.'],
+                    'description' => ['The description field is required.'],
+                ],
+            ]);
 
     });
     test('As not admin, I cant create a main worksite', function () {
@@ -158,11 +191,10 @@ describe('Create WorkSite', function () {
             'title' => 'worksite A',
             'description' => 'this worksite is for freeTown',
         ]);
-        $response->assertStatus(403);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
 
     });
-
-    test('As an administrator, I want to create a sub worksites under main worksite without payment', function () {
+    test('As an administrator, I want to create a sub worksites', function () {
 
         $mainWorkSite = WorkSite::factory()->create();
 
@@ -170,7 +202,7 @@ describe('Create WorkSite', function () {
 
         expect($admin->hasRole('admin'))->toBe(true);
 
-        $response = $this->actingAs($admin)->postJson('/api/v1/worksite/create', [
+        $response = actingAs($admin)->postJson('/api/v1/worksite/create', [
             'title' => 'worksite AB',
             'description' => 'this worksite is for freeTown',
             'customer_id' => $mainWorkSite->customer?->id,
@@ -191,25 +223,13 @@ describe('Create WorkSite', function () {
         $workSite = WorkSite::query()->latest('id')->first();
 
         expect($workSite?->title)->toBe('worksite AB')
-            ->and($workSite?->description)->toBe('this worksite is for freeTown');
+            ->and($workSite?->description)->toBe('this worksite is for freeTown')
+            ->and($workSite->main_worksite)->toBe($mainWorkSite->id);
 
-    })->skip();
-    test('As an administrator, should return validation error when no data', function () {
+    });
 
-        $mainWorkSite = WorkSite::factory()->create();
-
-        $admin = \App\Models\User::factory()->admin()->create();
-
-        expect($admin->hasRole('admin'))->toBe(true);
-
-        $response = $this->actingAs($admin)->postJson('/api/v1/worksite/create', [
-        ]);
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-
-    })->skip();
 
 });
-
 
 
 describe('Update WorkSite', function () {
@@ -222,81 +242,42 @@ describe('Update WorkSite', function () {
         $this->artisan('db:seed');
         $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
 
-    });
-
-    test('As an administrator, I want to update a main worksite', function () {
-
-        $workSite = WorkSite::factory()->create();
-
+        $this->admin = \App\Models\User::factory()->admin()->create();
+        $this->workSite = WorkSite::factory()->create();
 
     });
-    test('As a guest, I cant create a main worksite', function () {
 
-        $response = $this->postJson('/api/v1/worksite/create', [
-            'title' => 'worksite A',
-            'description' => 'this worksite is for freeTown',
-        ]);
-        $response->assertStatus(401);
+    test('As a non-authenticated, I cant update a main worksite', function () {
+
+        $response = putJson('/api/v1/worksite/update/' . $this->workSite->id, []);
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
 
     });
-    test('As not admin, I cant create a main worksite', function () {
+    test('As not admin, I cant update a main worksite', function () {
 
         $siteManager = \App\Models\User::factory()->siteManager()->create();
         expect($siteManager->hasRole('site_manager'))->toBe(true);
 
-        $response = $this->actingAs($siteManager)->postJson('/api/v1/worksite/create', [
-            'title' => 'worksite A',
-            'description' => 'this worksite is for freeTown',
-        ]);
-        $response->assertStatus(403);
+        $response = actingAs($siteManager)->putJson('/api/v1/worksite/update/' . $this->workSite->id, []);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
 
     });
+    test('As an administrator, I want to update worksite main info', function () {
 
-    test('As an administrator, I want to create a sub worksites under main worksite without payment', function () {
-
-        $mainWorkSite = WorkSite::factory()->create();
-
-        $admin = \App\Models\User::factory()->admin()->create();
-
-        expect($admin->hasRole('admin'))->toBe(true);
-
-        $response = $this->actingAs($admin)->postJson('/api/v1/worksite/create', [
+        assertDatabaseCount('work_sites', 1);
+        actingAs($this->admin)->putJson('/api/v1/worksite/update/' . $this->workSite->id, [
             'title' => 'worksite AB',
-            'description' => 'this worksite is for freeTown',
-            'customer_id' => $mainWorkSite->customer?->id,
-            'category_id' => $mainWorkSite->category?->id, // construction
-            'main_worksite' => $mainWorkSite->id, // this is main worksite == top level worksite
-            'starting_budget' => 15,
-            'cost' => 20,
-            'address' => 1,
-            'workers_count' => 20,
-            'receipt_date' => '2024-04-12',
-            'starting_date' => '2024-04-12',
-            'deliver_date' => '2024-04-12',
-            'status_on_receive' => 1,
-
+            'description' => 'this worksite is for freeTown new'
         ]);
-        $response->assertOk();
 
-        $workSite = WorkSite::query()->latest('id')->first();
-
-        expect($workSite?->title)->toBe('worksite AB')
-            ->and($workSite?->description)->toBe('this worksite is for freeTown');
-
-    })->skip();
-    test('As an administrator, should return validation error when no data', function () {
-
-        $mainWorkSite = WorkSite::factory()->create();
-
-        $admin = \App\Models\User::factory()->admin()->create();
-
-        expect($admin->hasRole('admin'))->toBe(true);
-
-        $response = $this->actingAs($admin)->postJson('/api/v1/worksite/create', [
+        assertDatabaseHas('work_sites', [
+            'title' => 'worksite AB',
+            'description' => 'this worksite is for freeTown new',
         ]);
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+
 
     });
+
 
 });
 describe('List WorkSites', function () {
@@ -310,7 +291,15 @@ describe('List WorkSites', function () {
         $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
 
     });
+    test('As a non-authenticated, I cant show list of worksites', function () {
 
+    });
+    test('As not admin, I cant show list of worksites', function () {
+
+    });
+    test('As an admin, I can show list of worksites', function () {
+
+    });
 
 });
 describe('Show WorkSites Details', function () {
@@ -324,7 +313,18 @@ describe('Show WorkSites Details', function () {
         $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
 
     });
+    test('As a non-authenticated, I cant show details of a worksite', function () {
 
+    });
+    test('As not admin, I cant show details of a worksite', function () {
+
+    });
+    it('should return not found error if worksite not existed in database', function () {
+
+    });
+    test('As an admin, I can show details of a worksite', function () {
+
+    });
 
 });
 describe('Close WorkSites', function () {
@@ -338,14 +338,109 @@ describe('Close WorkSites', function () {
         $this->assertDatabaseCount(\Spatie\Permission\Models\Role::class, 4);
 
     });
+    test('As a non-authenticated, I cant close a worksite', function () {
 
+    });
+    test('As not admin, I cant close a worksite', function () {
+
+    });
+    it('should prevent me closing worksite with active worksites', function () {
+
+    });
+    it('should prevent me closing worksite with unpaid payments', function () {
+
+    });
+    test('As an admin, I can close a worksite', function () {
+
+    });
 
 });
-describe('Make payment to a worksite', function () {
+describe('Manage payment to a worksite', function () {
+    test('As a non-authenticated, I cant make a payment', function () {
+
+    });
+    test('As not admin, I cant make a payment', function () {
+
+    });
+
+    it('should prevent updating existed payment', function () {
+
+    });
+    it('should prevent removing existed payment', function () {
+
+    });
+    it('should make a payment to existed worksite', function () {
+
+    });
 });
-describe('manage resources of the worksite', function () {
+describe('Manage resources of the worksite', function () {
+    test('As a non-authenticated, I cant manage resource of a worksite', function () {
+
+    });
+    test('As not admin, I cant manage resource of a worksite', function () {
+
+    });
+
+    it('should add new resource to a worksite', function () {
+
+    });
+    it('should update existed resource of a worksite', function () {
+
+    });
+    it('should delete resources of a worksite', function () {
+
+    });
+    it('should show all resources a worksite', function () {
+
+    });
+    it('should show details of a resource in the worksite', function () {
+
+    });
 });
-describe('manage workers of the worksite', function () {
+describe('Manage workers of the worksite', function () {
+    test('As a non-authenticated, I cant manage workers of a worksite', function () {
+
+    });
+    test('As not admin, I cant manage workers of a worksite', function () {
+
+    });
+    it('should add new worker to a worksite', function () {
+
+    });
+    it('should update a worker of a worksite', function () {
+
+    });
+    it('should delete a worker of a worksite', function () {
+
+    });
+    it('should show all workers of the worksite', function () {
+
+    });
+    it('should show details of a worker in a worksite', function () {
+
+    });
 });
 describe('manage customer of the worksite', function () {
+    test('As a non-authenticated, I cant manage resource of a worksite', function () {
+
+    });
+    test('As not admin, I cant manage resource of a worksite', function () {
+
+    });
+
+    it('should add new customer to a worksite', function () {
+
+    });
+    it('should update a customer details of a worksite', function () {
+
+    });
+    it('should prevent delete a customer of an active worksite', function () {
+
+    });
+    it('should delete a customer of a closed worksite', function () {
+
+    });
+    it('should show details of a customer in a worksite', function () {
+
+    });
 });

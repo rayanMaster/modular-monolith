@@ -17,7 +17,7 @@ class WorkSiteCreateRequest extends FormRequest
             'description' => 'required|string',
             'customer_id' => 'sometimes|integer',
             'category_id' => 'sometimes|integer',
-            'main_worksite' => 'nullable|boolean',
+            'main_worksite' => 'nullable|integer|exists:work_sites,id',
             'starting_budget' => 'sometimes|integer|min:0',
             'cost' => 'sometimes|integer|min:0',
             'address' => 'sometimes|integer|min:0',

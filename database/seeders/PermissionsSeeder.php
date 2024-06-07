@@ -41,13 +41,16 @@ class PermissionsSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
         // WorkSite
-        $this->addPermission('Work Site', 'work-site', ['list', 'show', 'add', 'update', 'delete']);
+        $this->addPermission('Work Site', 'worksite', ['list', 'show', 'add', 'update', 'delete']);
 
         // WorkSite Category
-        $this->addPermission('Work Site Category', 'ws-category', ['list', 'show', 'add', 'update', 'delete']);
+        $this->addPermission('Work Site Category', 'worksite-category', ['list', 'show', 'add', 'update', 'delete']);
 
-        // WorkSite Resource
-        $this->addPermission('Work Site Resource', 'ws-resource', ['list', 'show', 'add', 'update', 'delete']);
+        // Resource
+        $this->addPermission('Resource', 'resource', ['list', 'show', 'add', 'update', 'delete']);
+
+        // Resource Category
+        $this->addPermission('Resource Category', 'resource-category', ['list', 'show', 'add', 'update', 'delete']);
 
         // Customer
         $this->addPermission('Customer', 'customer', ['list', 'show', 'add', 'update', 'delete']);

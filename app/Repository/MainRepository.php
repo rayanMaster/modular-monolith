@@ -11,7 +11,7 @@ abstract readonly class MainRepository implements MainRepositoryInterface
 {
 
     public function __construct(
-        private Builder                  $query,
+        private Builder|null    $query,
         private DatabaseManager $databaseManager
 
     )
@@ -33,7 +33,7 @@ abstract readonly class MainRepository implements MainRepositoryInterface
     /**
      * @throws \Throwable
      */
-    public function create(array $attributes) : Model|null
+    public function create(array $attributes): Model|null
     {
         return $this->databaseManager->transaction(
             callback: function () use ($attributes) {
@@ -44,7 +44,7 @@ abstract readonly class MainRepository implements MainRepositoryInterface
     /**
      * @throws \Throwable
      */
-    public function update(int $id, array $attributes, bool $passNull = false) : Model|null
+    public function update(int $id, array $attributes, bool $passNull = false): Model|null
     {
         $record = $this->query->findOrFail($id);
         return $this->databaseManager->transaction(

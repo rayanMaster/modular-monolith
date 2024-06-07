@@ -7,27 +7,28 @@ use App\Enums\WorkSiteStatusesEnum;
 class WorkSiteUpdateDTO extends \Spatie\LaravelData\Data
 {
     /**
-     * @param  ResourceCreateDTO|null  $workSiteResourceDTO
-     * @param  PaymentCreateDTO|null  $paymentDTO
+     * @param ResourceCreateDTO|null $workSiteResourceDTO
+     * @param PaymentCreateDTO|null $paymentDTO
      */
     public function __construct(
-        public string $title,
-        public string $description,
-        public ?int $customerId,
-        public ?int $categoryId,
-        public ?bool $mainWorksite,
-        public ?int $startingBudget,
-        public ?int $cost,
-        public ?int $address,
-        public ?int $workersCount,
-        public ?string $receiptDate,
-        public ?string $startingDate,
-        public ?string $deliverDate,
-        public ?int $statusOnReceive,
-        public ?array $workSiteResources,
-        public ?array $payments,
+        public ?string   $title,
+        public ?string   $description,
+        public ?int     $customerId,
+        public ?int     $categoryId,
+        public ?bool    $mainWorksite,
+        public ?int     $startingBudget,
+        public ?int     $cost,
+        public ?int     $address,
+        public ?int     $workersCount,
+        public ?string  $receiptDate,
+        public ?string  $startingDate,
+        public ?string  $deliverDate,
+        public ?int     $statusOnReceive,
+        public ?array   $workSiteResources,
+        public ?array   $payments,
         public ?FileDTO $image // Adjust namespace according to your application
-    ) {
+    )
+    {
     }
 
     /**
@@ -53,15 +54,15 @@ class WorkSiteUpdateDTO extends \Spatie\LaravelData\Data
     public static function fromRequest(array $request): WorkSiteUpdateDTO
     {
         return new self(
-            title: $request['title']?? null,
-            description: $request['description']?? null,
+            title: $request['title'] ?? null,
+            description: $request['description'] ?? null,
             customerId: $request['customer_id'] ?? null,
             categoryId: $request['category_id'] ?? null,
             mainWorksite: $request['main_worksite'] ?? null,
             startingBudget: $request['starting_budget'] ?? 0,
             cost: $request['cost'] ?? 0,
             address: $request['address'] ?? 0,
-            workersCount: $request['workers_count']  ?? null,
+            workersCount: $request['workers_count'] ?? null,
             receiptDate: $request['receipt_date'] ?? null,
             startingDate: $request['starting_date'] ?? null,
             deliverDate: $request['deliver_date'] ?? null,

@@ -6,7 +6,7 @@ use App\DTO\WorkSiteCreateDTO;
 use App\Enums\PaymentTypesEnum;
 use Carbon\Carbon;
 
-class CreateWorkSiteMapper extends \Spatie\LaravelData\Data
+class WorkSiteCreateMapper extends \Spatie\LaravelData\Data
 {
     public static function toWorkSiteEloquent(WorkSiteCreateDTO $workSiteDTO): array
     {

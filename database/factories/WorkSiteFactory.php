@@ -2,7 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Enums\WorkSiteStatusesEnum;
 use App\Models\Customer;
+use App\Models\Resource;
+use App\Models\ResourceCategory;
 use App\Models\WorkSite;
 use App\Models\WorkSiteCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -35,7 +38,7 @@ class WorkSiteFactory extends Factory
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
             'deliver_date' => '2024-04-12',
-            'status_on_receive' => 1,
+            'status_on_receive' => WorkSiteStatusesEnum::SCRATCH->value,
             'created_at' => now(),
             'updated_at' => now(),
         ];
