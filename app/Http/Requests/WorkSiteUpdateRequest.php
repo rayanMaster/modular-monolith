@@ -27,7 +27,7 @@ class WorkSiteUpdateRequest extends FormRequest
             'description' => 'sometimes|string',
             'customer_id' => 'sometimes|integer',
             'category_id' => 'sometimes|integer',
-            'main_worksite' => 'nullable|boolean',
+            'parent_worksite_id' => 'nullable|int',
             'starting_budget' => 'sometimes|integer|min:0',
             'cost' => 'sometimes|integer|min:0',
             'address' => 'sometimes|integer|min:0',

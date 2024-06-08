@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('description');
             $table->foreignIdFor(\App\Models\Customer::class)->nullable();
-            $table->foreignIdFor(\App\Models\WorkSiteCategory::class)->nullable();
-            $table->foreignIdFor(WorkSite::class)->nullable();
+            $table->foreignIdFor(\App\Models\WorkSiteCategory::class,'category_id')->nullable();
+            $table->foreignIdFor(WorkSite::class,'parent_worksite_id')->nullable();
             $table->decimal('starting_budget', 8, 2);
             $table->decimal('cost', 8, 2);
             $table->foreignIdFor(\App\Models\Address::class)->nullable();

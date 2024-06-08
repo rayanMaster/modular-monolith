@@ -182,7 +182,7 @@ describe('WorkSite Resource Details', function () {
     it('should return data', function () {
         $response = actingAs($this->admin)->getJson('/api/v1/resource/show/'.$this->resource->id);
         $response->assertStatus(Response::HTTP_OK)
-            ->assertJsonCount(7, 'data')
+            ->assertJsonCount(8, 'data')
             ->assertJsonFragment(['name' => 'resource 10']);
     });
 });

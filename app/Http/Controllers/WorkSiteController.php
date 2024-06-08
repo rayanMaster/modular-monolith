@@ -30,7 +30,7 @@ class WorkSiteController extends Controller
 
     public function list()
     {
-        $workSites = WorkSite::query()->with('payments')->get();
+        $workSites = WorkSite::query()->with(['payments','address'])->get();
 
         return ApiResponseHelper::sendResponse(new Result(WorkSiteListResource::collection($workSites)));
     }
@@ -40,7 +40,7 @@ class WorkSiteController extends Controller
      *
      * @throws \Throwable
      */
-    public function store(WorkSiteCreateRequest $request)
+    public function store(WorkSiteCreateRequest $request): \Illuminate\Http\JsonResponse
     {
         DB::transaction(
             callback: function () use ($request) {

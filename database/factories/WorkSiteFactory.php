@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\WorkSiteStatusesEnum;
+use App\Models\Address;
 use App\Models\Customer;
 use App\Models\Resource;
 use App\Models\ResourceCategory;
@@ -30,10 +31,11 @@ class WorkSiteFactory extends Factory
             'description' => 'this worksite is for freeTown',
             'customer_id' => $customer?->id,
             'category_id' => $wsCategory?->id, // construction
-            'main_worksite' => null, // this is main worksite == top level worksite
+            'parent_worksite_id' => null, // this is main worksite == top level worksite
             'starting_budget' => 15,
             'cost' => 20,
-            'address' => 1,
+            'address_id' => fn() => Address::query()->first() != null ?
+                Address::query()->first()->id : Address::factory()->create()->id,
             'workers_count' => 20,
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',

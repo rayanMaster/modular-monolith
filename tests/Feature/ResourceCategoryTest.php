@@ -188,7 +188,7 @@ describe('Resource Category Details', function () {
         $response = actingAs($this->admin)
             ->getJson("/api/v1/resource/".$this->resource->id."/category/show/".$this->resourceCategory->id);
         $response->assertStatus(Response::HTTP_OK)
-            ->assertJsonCount(5, 'data')
+            ->assertJsonCount(6, 'data')
             ->assertJsonFragment(['name' => 'resource 10']);
     });
 });

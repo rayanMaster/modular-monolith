@@ -29,4 +29,12 @@ return Application::configure(basePath: dirname(__DIR__))
             }
             return back(Response::HTTP_UNPROCESSABLE_ENTITY);
         });
+
+        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $exception, Request $request) {
+            if ($request->expectsJson()) {
+                return ApiResponseHelper::sendResponse(new Result(null,
+                    null, 'UnAuthenticated', false, Response::HTTP_UNAUTHORIZED));
+            }
+            return back(Response::HTTP_UNPROCESSABLE_ENTITY);
+        });
     })->create();

@@ -76,6 +76,7 @@ describe('Create WorkSite', function () {
         $wsCategory = WorkSiteCategory::factory()->create();
 
         $customer = Customer::factory()->create();
+        $address = \App\Models\Address::factory()->create();
 
         $workSiteResourceCategory = ResourceCategory::factory()->create();
 
@@ -101,10 +102,10 @@ describe('Create WorkSite', function () {
             'description' => 'this worksite is for freeTown',
             'customer_id' => $customer?->id,
             'category_id' => $wsCategory?->id, // construction
-            'main_worksite' => null, // this is main worksite == top level worksite
+            'parent_worksite_id' => null, // this is main worksite == top level worksite
             'starting_budget' => 15,
             'cost' => 20,
-            'address' => 1,
+            'address_id' => $address?->id,
             'workers_count' => 20,
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
@@ -133,7 +134,7 @@ describe('Create WorkSite', function () {
 
         $workSite = WorkSite::query()->latest('id')->first();
 
-        expect($workSite->main_worksite)->toBeNull('that indicates that worksite is main')
+        expect($workSite->parentWorksite)->toBeNull('that indicates that worksite is main')
             ->and($workSite?->title)->toBe('worksite A')
             ->and($workSite?->description)->toBe('this worksite is for freeTown')
             ->and($workSite?->resources[0]->pivot->getAttributes())->toBe(
@@ -200,6 +201,7 @@ describe('Create WorkSite', function () {
     test('As an administrator, I want to create a sub worksites', function () {
 
         $mainWorkSite = WorkSite::factory()->create();
+        $address = \App\Models\Address::factory()->create();
 
         $admin = \App\Models\User::factory()->admin()->create();
 
@@ -210,10 +212,10 @@ describe('Create WorkSite', function () {
             'description' => 'this worksite is for freeTown',
             'customer_id' => $mainWorkSite->customer?->id,
             'category_id' => $mainWorkSite->category?->id, // construction
-            'main_worksite' => $mainWorkSite->id, // this is main worksite == top level worksite
+            'parent_worksite_id' => $mainWorkSite->id, // this is main worksite == top level worksite
             'starting_budget' => 15,
             'cost' => 20,
-            'address' => 1,
+            'address_id' => $address->id,
             'workers_count' => 20,
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
@@ -227,13 +229,12 @@ describe('Create WorkSite', function () {
 
         expect($workSite?->title)->toBe('worksite AB')
             ->and($workSite?->description)->toBe('this worksite is for freeTown')
-            ->and($workSite->main_worksite)->toBe($mainWorkSite->id);
+            ->and($workSite->parentWorksite)->toBe($mainWorkSite->id);
 
     });
 
 
 });
-
 
 describe('Update WorkSite', function () {
 
@@ -304,18 +305,63 @@ describe('List WorkSites', function () {
         $response = actingAs($this->notAdmin)->getJson('/api/v1/worksite/list');
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
+    test('As an admin, I can show list of worksites without customer and category while creating', function () {
+        $address = \App\Models\Address::factory()->create();
+        $data = [
+            'title' => 'worksite A',
+            'description' => 'this worksite is for freeTown',
+            'customer_id' => null,
+            'category_id' => null, // construction
+            'parent_worksite_id' => null, // this is main worksite == top level worksite
+            'starting_budget' => 15,
+            'cost' => 20,
+            'address_id' => $address->id,
+            'workers_count' => 20,
+            'receipt_date' => '2024-04-12',
+            'starting_date' => '2024-04-12',
+            'deliver_date' => '2024-04-12',
+            'status_on_receive' => WorkSiteStatusesEnum::SCRATCH->value,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        $workSite = WorkSite::factory()->create($data);
+        assertDatabaseCount(WorkSite::class, 1);
+        actingAs($this->admin)->getJson('/api/v1/worksite/list')
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJsonFragment([
+                'id' => $workSite->id,
+                'title' => $workSite->title,
+                'description' => $workSite->description,
+                'customer' => $workSite->customer?->fullName,
+                'category' => $workSite->category?->name,
+                'parent_worksite_id' => $workSite->parentWorksite?->title,
+                'starting_budget' => number_format($workSite->starting_budget, 2),
+                'cost' => number_format($workSite->cost, 2),
+                'address' => $workSite->address,
+                'workers_count' => $workSite->workers_count,
+                'receipt_date' => $workSite->receipt_date,
+                'starting_date' => $workSite->starting_date,
+                'deliver_date' => $workSite->deliver_date,
+                'status_on_receive' => $workSite->status_on_receive,
+                'created_at' => Carbon::parse($workSite->created_at)->toDateTimeString(),
+                'updated_at' => Carbon::parse($workSite->updated_at)->toDateTimeString(),
+                'payments' => $workSite->payments,
+            ]);
+
+    });
     test('As an admin, I can show list of worksites', function () {
         $wsCategory = WorkSiteCategory::factory()->create();
         $customer = Customer::factory()->create();
-        $data =  [
+        $address = \App\Models\Address::factory()->create();
+        $data = [
             'title' => 'worksite A',
             'description' => 'this worksite is for freeTown',
             'customer_id' => $customer?->id,
             'category_id' => $wsCategory?->id, // construction
-            'main_worksite' => null, // this is main worksite == top level worksite
+            'parent_worksite_id' => null, // this is main worksite == top level worksite
             'starting_budget' => 15,
             'cost' => 20,
-            'address' => 1,
+            'address_id' => $address->id,
             'workers_count' => 20,
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
@@ -334,10 +380,16 @@ describe('List WorkSites', function () {
                 'description' => $workSite->description,
                 'customer' => $workSite->customer->fullName,
                 'category' => $workSite->category->name,
-                'main_worksite' => $workSite->main_worksite?->title,
-                'starting_budget' => number_format($workSite->starting_budget,2),
-                'cost' => number_format($workSite->cost,2),
-                'address' => $workSite->address,
+                'parent_worksite' => $workSite->parentWorksite,
+                'starting_budget' => number_format($workSite->starting_budget, 2),
+                'cost' => number_format($workSite->cost, 2),
+                'address' => [
+                    'id' => $address->id,
+                    'city' => $address->city?->name,
+                    'street' => $address->street,
+                    'state' => $address->sstate,
+                    'zipCode' => $address->zipcode
+                ],
                 'workers_count' => $workSite->workers_count,
                 'receipt_date' => $workSite->receipt_date,
                 'starting_date' => $workSite->starting_date,
@@ -347,7 +399,8 @@ describe('List WorkSites', function () {
                 'updated_at' => Carbon::parse($workSite->updated_at)->toDateTimeString(),
                 'payments' => $workSite->payments,
             ]);
-    })->only();
+
+    });
 
 });
 describe('Show WorkSites Details', function () {

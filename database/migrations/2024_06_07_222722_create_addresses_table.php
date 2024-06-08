@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('street')->nullable();
             $table->string('state')->nullable();
-            $table->string('zipCode')->nullable();
+            $table->string('zipcode')->nullable();
             $table->foreignIdFor(City::class);
 
             $table->softDeletes();

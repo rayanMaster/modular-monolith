@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\LoginDTO;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
 use App\Http\Requests\LoginRequest;
@@ -9,6 +10,7 @@ use App\Http\Resources\LoginResource;
 use App\Models\User;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -18,10 +20,13 @@ class LoginController extends Controller
     public function __invoke(LoginRequest $request): \Illuminate\Http\JsonResponse
     {
 
-        if (! Auth::attempt($request->validated())) {
+        $data  = LoginDTO::fromRequest($request->validated());
+        $user = User::query()->where('phone', $data->phone)->first();
+
+        if (! $user || ! Hash::check($data->password, $user->password)) {
             throw new AuthenticationException();
         }
-        $user = User::query()->find(Auth::id());
+
         $result['user'] = $user;
         $result['token'] = $user->createToken('token')->plainTextToken;
 

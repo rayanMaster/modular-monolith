@@ -14,6 +14,7 @@ class UserFactory extends Factory
         return [
             'name' => 'Rayan',
             'email' => 'rayan@rayan.com',
+            'phone'=>'0945795748',
             'password' => 'Rayan123@@',
         ];
     }
@@ -22,6 +23,7 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'name' => 'Main Admin',
+            'phone' => '0945795749',
             'email' => 'main_admin@admin.com',
             'password' => 'admin123',
         ])->afterCreating(function (User $user) {
@@ -33,6 +35,7 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'name' => 'Admin',
+            'phone' => '0945795747',
             'email' => 'admin@admin.com',
             'password' => 'admin123',
         ])->afterCreating(function (User $user) {

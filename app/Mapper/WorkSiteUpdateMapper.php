@@ -16,7 +16,7 @@ class WorkSiteUpdateMapper extends \Spatie\LaravelData\Data
             'description' => $workSiteDTO->description,
             'customer_id' => $workSiteDTO->customerId,
             'category_id' => $workSiteDTO->categoryId,
-            'main_worksite' => $workSiteDTO->mainWorksite,
+            'parent_worksite_id' => $workSiteDTO->mainWorksite,
             'starting_budget' => $workSiteDTO->startingBudget,
             'cost' => $workSiteDTO->cost,
             'address' => $workSiteDTO->address,
