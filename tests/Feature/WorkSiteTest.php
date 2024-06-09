@@ -229,7 +229,7 @@ describe('Create WorkSite', function () {
 
         expect($workSite?->title)->toBe('worksite AB')
             ->and($workSite?->description)->toBe('this worksite is for freeTown')
-            ->and($workSite->parentWorksite)->toBe($mainWorkSite->id);
+            ->and($workSite->parentWorksite->id)->toBe($mainWorkSite->id);
 
     });
 
@@ -268,16 +268,15 @@ describe('Update WorkSite', function () {
     test('As an administrator, I want to update worksite main info', function () {
 
         assertDatabaseCount(WorkSite::class, 1);
-        actingAs($this->admin)->putJson('/api/v1/worksite/update/' . $this->workSite->id, [
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/update/' . $this->workSite->id, [
             'title' => 'worksite AB',
             'description' => 'this worksite is for freeTown new'
         ]);
-
+        $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(WorkSite::class, [
             'title' => 'worksite AB',
             'description' => 'this worksite is for freeTown new',
         ]);
-
 
     });
 
@@ -334,10 +333,16 @@ describe('List WorkSites', function () {
                 'description' => $workSite->description,
                 'customer' => $workSite->customer?->fullName,
                 'category' => $workSite->category?->name,
-                'parent_worksite_id' => $workSite->parentWorksite?->title,
+                'parent_worksite' => null,
                 'starting_budget' => number_format($workSite->starting_budget, 2),
                 'cost' => number_format($workSite->cost, 2),
-                'address' => $workSite->address,
+                'address' => [
+                    'id' => $address->id,
+                    'city' => $address->city?->name,
+                    'street' => $address->street,
+                    'state' => $address->sstate,
+                    'zipCode' => $address->zipcode
+                ],
                 'workers_count' => $workSite->workers_count,
                 'receipt_date' => $workSite->receipt_date,
                 'starting_date' => $workSite->starting_date,
