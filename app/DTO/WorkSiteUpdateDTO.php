@@ -2,7 +2,7 @@
 
 namespace App\DTO;
 
-use App\Enums\WorkSiteStatusesEnum;
+use App\Enums\WorkSiteReceptionStatusEnum;
 
 class WorkSiteUpdateDTO extends \Spatie\LaravelData\Data
 {
@@ -23,7 +23,7 @@ class WorkSiteUpdateDTO extends \Spatie\LaravelData\Data
         public ?string  $receiptDate,
         public ?string  $startingDate,
         public ?string  $deliverDate,
-        public ?int     $statusOnReceive,
+        public ?int     $receptionStatus,
         public ?array   $workSiteResources,
         public ?array   $payments,
         public ?FileDTO $image // Adjust namespace according to your application
@@ -45,7 +45,7 @@ class WorkSiteUpdateDTO extends \Spatie\LaravelData\Data
      *  receipt_date?: string|null,
      *  starting_date?: string|null,
      *  deliver_date?: string|null,
-     *  status_on_receive?: int|null,
+     *  reception_status?: int|null,
      *  resources?: array|null,
      *  payments: array|null,
      *  image?: array|null
@@ -66,7 +66,7 @@ class WorkSiteUpdateDTO extends \Spatie\LaravelData\Data
             receiptDate: $request['receipt_date'] ?? null,
             startingDate: $request['starting_date'] ?? null,
             deliverDate: $request['deliver_date'] ?? null,
-            statusOnReceive: $request['status_on_receive'] ?? WorkSiteStatusesEnum::SCRATCH->value,
+            receptionStatus: $request['reception_status'] ?? WorkSiteReceptionStatusEnum::SCRATCH->value,
             workSiteResources: $request['resources'] ?? null,
             payments: $request['payments'] ?? null,
             image: FileDTO::fromRequest($request) ?? null

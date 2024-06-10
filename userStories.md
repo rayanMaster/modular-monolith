@@ -58,4 +58,26 @@ As an administrator, I should manage all payments.
 As an administrator, I should manage all workers.
 </li>
 </ul>
+<h3>Backlog:</h3>
+<ul>
+<h4>Epic -> Unit Testing:</h4>
+<li>
+Should assertFragmentPath
+</li>
+<li>
+Move route check to each test case.
+</li>
+<li>
+Architecture test.
+</li>
+<li>
+Test all migrations against required/nullable fields.
+</li>
+<h4>Epic-> Performance:</h4>
+<li>
+Fix Model::preventLazyLoading(!app()->isProduction());
+</li>
+<li></li>
+</ul>
+
 

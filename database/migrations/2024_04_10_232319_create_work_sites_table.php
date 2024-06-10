@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\WorkSiteStatusesEnum;
+use App\Enums\WorkSiteReceptionStatusEnum;
 use App\Models\WorkSite;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -20,14 +20,15 @@ return new class extends Migration
             $table->foreignIdFor(\App\Models\Customer::class)->nullable();
             $table->foreignIdFor(\App\Models\WorkSiteCategory::class,'category_id')->nullable();
             $table->foreignIdFor(WorkSite::class,'parent_worksite_id')->nullable();
-            $table->decimal('starting_budget', 8, 2);
-            $table->decimal('cost', 8, 2);
+            $table->decimal('starting_budget', 8, 2)->nullable()->default(0);
+            $table->decimal('cost', 8, 2)->nullable()->default(0);
             $table->foreignIdFor(\App\Models\Address::class)->nullable();
-            $table->integer('workers_count')->default(0);
+            $table->integer('workers_count')->nullable()->default(0);
             $table->date('receipt_date')->nullable();
             $table->date('starting_date')->nullable();
             $table->date('deliver_date')->nullable();
-            $table->tinyInteger('status_on_receive')->default(WorkSiteStatusesEnum::SCRATCH->value);
+            $table->tinyInteger('reception_status')->nullable()->default(WorkSiteReceptionStatusEnum::SCRATCH->value);
+            $table->tinyInteger('completion_status')->nullable()->default(\App\Enums\WorkSiteCompletionStatusEnum::STARTED->value);
 
             $table->timestamps();
             $table->softDeletes();

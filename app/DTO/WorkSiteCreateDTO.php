@@ -2,7 +2,8 @@
 
 namespace App\DTO;
 
-use App\Enums\WorkSiteStatusesEnum;
+use App\Enums\WorkSiteCompletionStatusEnum;
+use App\Enums\WorkSiteReceptionStatusEnum;
 
 class WorkSiteCreateDTO extends \Spatie\LaravelData\Data
 {
@@ -19,7 +20,8 @@ class WorkSiteCreateDTO extends \Spatie\LaravelData\Data
      * @param string|null $receiptDate
      * @param string|null $startingDate
      * @param string|null $deliverDate
-     * @param int|null $statusOnReceive
+     * @param int|null $receptionStatus
+     * @param int|null $completionStatus
      * @param array|null $workSiteResources
      * @param array|null $payments
      * @param FileDTO|null $image
@@ -37,7 +39,8 @@ class WorkSiteCreateDTO extends \Spatie\LaravelData\Data
         public ?string $receiptDate,
         public ?string $startingDate,
         public ?string $deliverDate,
-        public ?int $statusOnReceive,
+        public ?int $receptionStatus,
+        public ?int $completionStatus,
         public ?array $workSiteResources,
         public ?array $payments,
         public ?FileDTO $image // Adjust namespace according to your application
@@ -58,7 +61,8 @@ class WorkSiteCreateDTO extends \Spatie\LaravelData\Data
      *  receipt_date?: string|null,
      *  starting_date?: string|null,
      *  deliver_date?: string|null,
-     *  status_on_receive?: int|null,
+     *  reception_status?: int|null,
+     *  completion_status?: int|null,
      *  resources?: array|null,
      *  payments: array|null,
      *  image?: array|null
@@ -79,7 +83,8 @@ class WorkSiteCreateDTO extends \Spatie\LaravelData\Data
             receiptDate: $request['receipt_date'] ?? null,
             startingDate: $request['starting_date'] ?? null,
             deliverDate: $request['deliver_date'] ?? null,
-            statusOnReceive: $request['status_on_receive'] ?? WorkSiteStatusesEnum::SCRATCH->value,
+            receptionStatus: $request['reception_status'] ?? WorkSiteReceptionStatusEnum::SCRATCH->value,
+            completionStatus: $request['completion_status'] ?? WorkSiteCompletionStatusEnum::PENDING->value,
             workSiteResources: $request['resources'] ?? null,
             payments: $request['payments'] ?? null,
             image: FileDTO::fromRequest($request)

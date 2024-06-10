@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\DTO\WorkSiteCreateDTO;
 use App\DTO\WorkSiteUpdateDTO;
+use App\Enums\WorkSiteCompletionStatusEnum;
+use App\Exceptions\UnAbleToCloseWorkSiteException;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
 use App\Http\Requests\WorkSiteCreateRequest;
@@ -12,8 +14,10 @@ use App\Http\Resources\WorkSiteDetailsResource;
 use App\Http\Resources\WorkSiteListResource;
 use App\Mapper\WorkSiteCreateMapper;
 use App\Mapper\WorkSiteUpdateMapper;
+use App\Models\Payment;
 use App\Models\WorkSite;
 use App\Repository\WorkSiteRepository;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -114,6 +118,36 @@ class WorkSiteController extends Controller
 
             },
             attempts: 3);
+
+        return ApiResponseHelper::sendSuccessResponse(
+            new Result());
+    }
+
+    /**
+     * @throws UnAbleToCloseWorkSiteException
+     */
+    public function close(int $id)
+    {
+        $workSite = WorkSite::query()->with(['subWorksites'])->findOrFail($id);
+        $relatedSubActiveWorkSitesCount = $workSite->whereHas('subWorksites',function (Builder $query){
+            return $query->where(
+                column: 'completion_status',
+                operator: '<>',
+                value:WorkSiteCompletionStatusEnum::CLOSED
+            );
+        })->count();
+
+        $workSitePayments = $workSite->payments->sum('amount');
+
+        if($relatedSubActiveWorkSitesCount > 0)
+            throw new UnAbleToCloseWorkSiteException("You can't close a worksite with active sub-worksites");
+
+        if($workSitePayments < $workSite->cost)
+            throw new UnAbleToCloseWorkSiteException("You can't close a worksite with unpaid payment");
+
+        $workSite->update([
+            'completion_status'=> WorkSiteCompletionStatusEnum::CLOSED
+        ]);
 
         return ApiResponseHelper::sendSuccessResponse(
             new Result());

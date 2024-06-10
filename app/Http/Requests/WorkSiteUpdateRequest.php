@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\WorkSiteCompletionStatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
 
 class WorkSiteUpdateRequest extends FormRequest
@@ -35,7 +37,8 @@ class WorkSiteUpdateRequest extends FormRequest
             'receipt_date' => 'sometimes|date',
             'starting_date' => 'sometimes|date',
             'deliver_date' => 'sometimes|date',
-            'status_on_receive' => 'sometimes|integer',
+            'completion_status' => ['sometimes','integer',Rule::in(WorkSiteCompletionStatusEnum::cases())],
+            'reception_status' => 'sometimes|integer',
             'resources' => 'sometimes|array',
             'resources.*.quantity' => 'sometimes|numeric',
             'resources.*.price' => 'sometimes|numeric',

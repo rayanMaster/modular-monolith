@@ -30,6 +30,10 @@ Route::prefix('v1')->group(function () {
                 ->middleware('can:worksite-update')
                 ->name('worksite.update');
 
+            Route::post('/close/{id}', [WorkSiteController::class, 'close'])
+                ->middleware('can:worksite-close')
+                ->name('worksite.close');
+
             Route::delete('/delete/{id}', [WorkSiteController::class, 'delete'])
                 ->middleware('can:worksite-delete')
                 ->name('worksite.delete');

@@ -1,7 +1,8 @@
 <?php
 
 use App\Enums\PaymentTypesEnum;
-use App\Enums\WorkSiteStatusesEnum;
+use App\Enums\WorkSiteCompletionStatusEnum;
+use App\Enums\WorkSiteReceptionStatusEnum;
 use App\Http\Resources\WorkSiteDetailsResource;
 use App\Models\Customer;
 use App\Models\Resource;
@@ -15,6 +16,56 @@ use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 use function Pest\Laravel\{postJson, getJson, putJson, actingAs, assertDatabaseHas, assertDatabaseCount};
 
+describe('Worksite entity fields check', function () {
+    beforeEach(function () {
+        $this->requiredFields = [
+            'id',
+            'title',
+            'description',
+        ];
+        $this->nullableFields = [
+            'customer_id',
+            'category_id',
+            'parent_worksite_id',
+            'starting_budget',
+            'cost',
+            'address_id',
+            'workers_count',
+            'receipt_date',
+            'starting_date',
+            'deliver_date',
+            'reception_status',
+            'completion_status',
+            'created_at',
+            'updated_at',
+            'deleted_at',
+        ];
+    });
+    it('should have not nullable fields', function () {
+        // Get table columns
+        $tableColumns = collect(Schema::getColumns('work_sites'));
+
+        $requiredColumns = $tableColumns->filter(function ($item) {
+            return !$item['nullable'];
+        })->map(function ($subItem) {
+            return $subItem['name'];
+        })->toArray();
+
+        $nullableColumns = $tableColumns->filter(function ($item) {
+            return $item['nullable'];
+        })->map(function ($subItem) {
+            return $subItem['name'];
+        })->toArray();
+
+
+        $this->assertEqualsCanonicalizing($requiredColumns, $this->requiredFields);
+        $this->assertEqualsCanonicalizing($nullableColumns, $this->nullableFields);
+
+
+    });
+
+});
+
 describe('WorkSite routes check', function () {
     it('should have all routes for /worksite', function () {
         $this->artisan('optimize:clear');
@@ -25,6 +76,8 @@ describe('WorkSite routes check', function () {
             'worksite.list',
             'worksite.show',
             'worksite.delete',
+            'worksite.close',
+
             'worksite.resource.list',
             'worksite.resource.create',
             'worksite.resource.show',
@@ -111,7 +164,8 @@ describe('Create WorkSite', function () {
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
             'deliver_date' => '2024-04-12',
-            'status_on_receive' => \App\Enums\WorkSiteStatusesEnum::SCRATCH->value,
+            'reception_status' => WorkSiteReceptionStatusEnum::SCRATCH->value,
+            'completion_status' => WorkSiteCompletionStatusEnum::PENDING->value,
             'resources' => [
                 ['id' => $workSiteResource1?->id, 'quantity' => 23, 'price' => 34],
                 ['id' => $workSiteResource2?->id, 'quantity' => 30, 'price' => 30],
@@ -135,6 +189,10 @@ describe('Create WorkSite', function () {
 
         $workSite = WorkSite::query()->latest('id')->first();
 
+        assertDatabaseHas(WorkSite::class, [
+            'reception_status' => WorkSiteReceptionStatusEnum::SCRATCH->value,
+            'completion_status' => WorkSiteCompletionStatusEnum::PENDING->value,
+        ]);
         expect($workSite->parentWorksite)->toBeNull('that indicates that worksite is main')
             ->and($workSite?->title)->toBe('worksite A')
             ->and($workSite?->description)->toBe('this worksite is for freeTown')
@@ -221,7 +279,7 @@ describe('Create WorkSite', function () {
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
             'deliver_date' => '2024-04-12',
-            'status_on_receive' => 1,
+            'reception_status' => 1,
 
         ]);
         $response->assertOk();
@@ -271,7 +329,7 @@ describe('Update WorkSite', function () {
         assertDatabaseCount(WorkSite::class, 1);
         $response = actingAs($this->admin)->putJson('/api/v1/worksite/update/' . $this->workSite->id, [
             'title' => 'worksite AB',
-            'description' => 'this worksite is for freeTown new'
+            'description' => 'this worksite is for freeTown new',
         ]);
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(WorkSite::class, [
@@ -320,7 +378,7 @@ describe('List WorkSites', function () {
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
             'deliver_date' => '2024-04-12',
-            'status_on_receive' => WorkSiteStatusesEnum::SCRATCH->value,
+            'reception_status' => WorkSiteReceptionStatusEnum::SCRATCH->value,
             'created_at' => now(),
             'updated_at' => now(),
         ];
@@ -348,7 +406,7 @@ describe('List WorkSites', function () {
                 'receipt_date' => $workSite->receipt_date,
                 'starting_date' => $workSite->starting_date,
                 'deliver_date' => $workSite->deliver_date,
-                'status_on_receive' => $workSite->status_on_receive,
+                'reception_status' => $workSite->reception_status,
                 'created_at' => Carbon::parse($workSite->created_at)->toDateTimeString(),
                 'updated_at' => Carbon::parse($workSite->updated_at)->toDateTimeString(),
                 'payments' => $workSite->payments,
@@ -372,7 +430,7 @@ describe('List WorkSites', function () {
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
             'deliver_date' => '2024-04-12',
-            'status_on_receive' => WorkSiteStatusesEnum::SCRATCH->value,
+            'reception_status' => WorkSiteReceptionStatusEnum::SCRATCH->value,
             'created_at' => now(),
             'updated_at' => now(),
         ];
@@ -400,7 +458,7 @@ describe('List WorkSites', function () {
                 'receipt_date' => $workSite->receipt_date,
                 'starting_date' => $workSite->starting_date,
                 'deliver_date' => $workSite->deliver_date,
-                'status_on_receive' => $workSite->status_on_receive,
+                'reception_status' => $workSite->reception_status,
                 'created_at' => Carbon::parse($workSite->created_at)->toDateTimeString(),
                 'updated_at' => Carbon::parse($workSite->updated_at)->toDateTimeString(),
                 'payments' => $workSite->payments,
@@ -440,7 +498,7 @@ describe('Show WorkSites Details', function () {
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
             'deliver_date' => '2024-04-12',
-            'status_on_receive' => WorkSiteStatusesEnum::SCRATCH->value,
+            'reception_status' => WorkSiteReceptionStatusEnum::SCRATCH->value,
             'created_at' => now(),
             'updated_at' => now(),
         ];
@@ -481,7 +539,7 @@ describe('Show WorkSites Details', function () {
                 'receipt_date' => $this->workSite->receipt_date,
                 'starting_date' => $this->workSite->starting_date,
                 'deliver_date' => $this->workSite->deliver_date,
-                'status_on_receive' => $this->workSite->status_on_receive,
+                'reception_status' => $this->workSite->reception_status,
                 'created_at' => Carbon::parse($this->workSite->created_at)->toDateTimeString(),
                 'updated_at' => Carbon::parse($this->workSite->updated_at)->toDateTimeString(),
             ])
@@ -506,7 +564,7 @@ describe('Show WorkSites Details', function () {
                     "receipt_date" => $this->subWorkSite->receipt_date,
                     "starting_date" => $this->subWorkSite->starting_date,
                     "deliver_date" => $this->subWorkSite->deliver_date,
-                    "status_on_receive" => $this->subWorkSite->status_on_receive,
+                    "reception_status" => $this->subWorkSite->reception_status,
                     "created_at" => Carbon::parse($this->subWorkSite->created_at)->toDateTimeString(),
                     "updated_at" => Carbon::parse($this->subWorkSite->updated_at)->toDateTimeString(),
                     "payments" => [],
@@ -537,7 +595,7 @@ describe('Show WorkSites Details', function () {
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
             'deliver_date' => '2024-04-12',
-            'status_on_receive' => WorkSiteStatusesEnum::SCRATCH->value,
+            'reception_status' => WorkSiteReceptionStatusEnum::SCRATCH->value,
             'created_at' => now(),
             'updated_at' => now(),
         ];
@@ -548,7 +606,7 @@ describe('Show WorkSites Details', function () {
             'payable_type' => 'worksite',
             'amount' => 20,
             'payment_date' => Carbon::now(),
-            'payment_type' => 1,
+            'payment_type' => PaymentTypesEnum::CASH->value,
         ]);
 
         $workSite->resources()->syncWithoutDetaching([
@@ -579,7 +637,7 @@ describe('Show WorkSites Details', function () {
                 'receipt_date' => $workSite->receipt_date,
                 'starting_date' => $workSite->starting_date,
                 'deliver_date' => $workSite->deliver_date,
-                'status_on_receive' => $workSite->status_on_receive,
+                'reception_status' => $workSite->reception_status,
                 'created_at' => Carbon::parse($workSite->created_at)->toDateTimeString(),
                 'updated_at' => Carbon::parse($workSite->updated_at)->toDateTimeString(),
                 'payments' => [
@@ -589,16 +647,16 @@ describe('Show WorkSites Details', function () {
                         'payable_type' => 'worksite',
                         'amount' => number_format(20, 2),
                         'date' => Carbon::parse(Carbon::now())->toDateTimeString(),
-                        'payment_type' => 1,
+                        'payment_type' => PaymentTypesEnum::CASH->value,
                     ]
                 ],
                 'resources' => [
                     [
-                        'name'=>$workSiteResource1->name,
-                        'description'=>$workSiteResource1->description,
-                        'resource_category'=>[
-                            'id'=>$workSiteResourceCategory->id,
-                            'name'=>$workSiteResourceCategory->name
+                        'name' => $workSiteResource1->name,
+                        'description' => $workSiteResource1->description,
+                        'resource_category' => [
+                            'id' => $workSiteResourceCategory->id,
+                            'name' => $workSiteResourceCategory->name
                         ],
                         'work_site_id' => $workSite->id,
                         'resource_id' => $workSiteResource1->id,
@@ -620,21 +678,80 @@ describe('Close WorkSites', function () {
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
 
+        $this->admin = \App\Models\User::factory()->admin()->create();
+        $this->notAdmin = \App\Models\User::factory()->siteManager()->create();
+        expect($this->notAdmin->hasRole('site_manager'))->toBe(true);
+
+        $this->workSite = WorkSite::factory()->create([
+            'cost' => 2000
+        ]);
+
     });
     test('As a non-authenticated, I cant close a worksite', function () {
-
+        $response = postJson('/api/v1/worksite/close/' . $this->workSite->id);
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     test('As not admin, I cant close a worksite', function () {
-
+        $response = actingAs($this->notAdmin)->postJson('/api/v1/worksite/close/' . $this->workSite->id);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    });
+    it('should return not found error if worksite not existed in database', function () {
+        $unExistedWorkSiteId = rand(200, 333);
+        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/' . $unExistedWorkSiteId);
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should prevent me closing worksite with active worksites', function () {
+        WorkSite::factory()->create([
+            'completion_status' => WorkSiteCompletionStatusEnum::STARTED,
+            'parent_worksite_id' => $this->workSite->id
+        ]);
+        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/' . $this->workSite->id);
+        $response->assertStatus(Response::HTTP_CONFLICT)
+            ->assertJson([
+                'message' => "You can't close a worksite with active sub-worksites"
+            ]);
 
     });
     it('should prevent me closing worksite with unpaid payments', function () {
+        \App\Models\Payment::factory()->create([
+            'payable_id' => $this->workSite->id,
+            'payable_type' => 'worksite',
+            'amount' => 1000,
+            'payment_date' => Carbon::now(),
+            'payment_type' => PaymentTypesEnum::CASH->value,
+        ]);
+        \App\Models\Payment::factory()->create([
+            'payable_id' => $this->workSite->id,
+            'payable_type' => 'worksite',
+            'amount' => 100,
+            'payment_date' => Carbon::now(),
+            'payment_type' => PaymentTypesEnum::CASH->value,
+        ]);
+        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/' . $this->workSite->id);
 
+        $response->assertStatus(Response::HTTP_CONFLICT)
+            ->assertJson([
+                'message' => "You can't close a worksite with unpaid payment"
+            ]);
     });
-    test('As an admin, I can close a worksite', function () {
+    test('As an admin, I can close a worksite with full payments and closed sub worksites', function () {
+        \App\Models\Payment::factory()->create([
+            'payable_id' => $this->workSite->id,
+            'payable_type' => 'worksite',
+            'amount' => $this->workSite->cost,
+            'payment_date' => Carbon::now(),
+            'payment_type' => PaymentTypesEnum::CASH->value,
+        ]);
+        WorkSite::factory()->create([
+            'completion_status' => WorkSiteCompletionStatusEnum::CLOSED,
+            'parent_worksite_id' => $this->workSite->id
+        ]);
+        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/' . $this->workSite->id);
+        $response->assertStatus(Response::HTTP_OK);
 
+        assertDatabaseHas(WorkSite::class, [
+            'completion_status' => WorkSiteCompletionStatusEnum::CLOSED
+        ]);
     });
 
 });

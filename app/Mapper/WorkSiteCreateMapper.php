@@ -23,7 +23,8 @@ class WorkSiteCreateMapper extends \Spatie\LaravelData\Data
             'receipt_date' => $workSiteDTO->receiptDate,
             'starting_date' => $workSiteDTO->startingDate,
             'deliver_date' => $workSiteDTO->deliverDate,
-            'status_on_receive' => $workSiteDTO->statusOnReceive,
+            'reception_status' => $workSiteDTO->receptionStatus,
+            'completion_status' => $workSiteDTO->completionStatus,
         ];
     }
 

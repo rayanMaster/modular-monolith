@@ -29,7 +29,7 @@ class WorkSiteDetailsResource extends JsonResource
             'receipt_date' => $this->receipt_date,
             'starting_date' => $this->starting_date,
             'deliver_date' => $this->deliver_date,
-            'status_on_receive' => $this->status_on_receive,
+            'reception_status' => $this->reception_status,
             'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
             'updated_at' => Carbon::parse($this->updated_at)->toDateTimeString(),
             'payments' => PaymentListResource::collection($this->payments),
