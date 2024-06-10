@@ -2,6 +2,7 @@
 
 use App\Enums\PaymentTypesEnum;
 use App\Enums\WorkSiteStatusesEnum;
+use App\Http\Resources\WorkSiteDetailsResource;
 use App\Models\Customer;
 use App\Models\Resource;
 use App\Models\ResourceCategory;
@@ -333,14 +334,14 @@ describe('List WorkSites', function () {
                 'description' => $workSite->description,
                 'customer' => $workSite->customer?->fullName,
                 'category' => $workSite->category?->name,
-                'parent_worksite' => null,
+                'sub_worksites' => [],
                 'starting_budget' => number_format($workSite->starting_budget, 2),
                 'cost' => number_format($workSite->cost, 2),
                 'address' => [
                     'id' => $address->id,
                     'city' => $address->city?->name,
                     'street' => $address->street,
-                    'state' => $address->sstate,
+                    'state' => $address->state,
                     'zipCode' => $address->zipcode
                 ],
                 'workers_count' => $workSite->workers_count,
@@ -385,14 +386,14 @@ describe('List WorkSites', function () {
                 'description' => $workSite->description,
                 'customer' => $workSite->customer->fullName,
                 'category' => $workSite->category->name,
-                'parent_worksite' => $workSite->parentWorksite,
+                'sub_worksites' => $workSite->subWorkSites,
                 'starting_budget' => number_format($workSite->starting_budget, 2),
                 'cost' => number_format($workSite->cost, 2),
                 'address' => [
                     'id' => $address->id,
                     'city' => $address->city?->name,
                     'street' => $address->street,
-                    'state' => $address->sstate,
+                    'state' => $address->state,
                     'zipCode' => $address->zipcode
                 ],
                 'workers_count' => $workSite->workers_count,
@@ -418,18 +419,194 @@ describe('Show WorkSites Details', function () {
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
 
+        $this->admin = \App\Models\User::factory()->admin()->create();
+        $this->notAdmin = \App\Models\User::factory()->siteManager()->create();
+        expect($this->notAdmin->hasRole('site_manager'))->toBe(true);
+
+        $this->workSite = WorkSite::factory()->create();
+        $this->wsCategory = WorkSiteCategory::factory()->create();
+        $this->customer = Customer::factory()->create();
+        $this->address = \App\Models\Address::factory()->create();
+        $data = [
+            'title' => 'worksite sub',
+            'description' => 'this worksite is for freeTown sub',
+            'customer_id' => $this->customer?->id,
+            'category_id' => $this->wsCategory?->id, // construction
+            'parent_worksite_id' => $this->workSite->id, // this is main worksite == top level worksite
+            'starting_budget' => 15,
+            'cost' => 20,
+            'address_id' => $this->address->id,
+            'workers_count' => 20,
+            'receipt_date' => '2024-04-12',
+            'starting_date' => '2024-04-12',
+            'deliver_date' => '2024-04-12',
+            'status_on_receive' => WorkSiteStatusesEnum::SCRATCH->value,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        $this->subWorkSite = WorkSite::factory()->create($data);
     });
     test('As a non-authenticated, I cant show details of a worksite', function () {
-
+        $response = getJson('/api/v1/worksite/show/' . $this->workSite->id);
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     test('As not admin, I cant show details of a worksite', function () {
-
+        $response = actingAs($this->notAdmin)->getJson('/api/v1/worksite/show/' . $this->workSite->id);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found error if worksite not existed in database', function () {
-
+        $unExistedWorkSiteId = rand(200, 333);
+        $response = actingAs($this->admin)->getJson('/api/v1/worksite/show/' . $unExistedWorkSiteId);
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     test('As an admin, I can show details of a worksite', function () {
+        $response = actingAs($this->admin)->getJson('/api/v1/worksite/show/' . $this->workSite->id);
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJsonFragment([
+                'id' => $this->workSite->id,
+                'title' => $this->workSite->title,
+                'description' => $this->workSite->description,
+                'customer' => $this->workSite->customer?->fullName,
+                'category' => $this->workSite->category?->name, // construction
+                'starting_budget' => number_format($this->workSite->starting_budget, 2),
+                'cost' => number_format($this->workSite->cost, 2),
+                'address' => [
+                    'id' => $this->workSite->address->id,
+                    'city' => $this->workSite->address->city?->name,
+                    'street' => $this->workSite->address->street,
+                    'state' => $this->workSite->address->state,
+                    'zipCode' => $this->workSite->address->zipcode
+                ],
+                'workers_count' => $this->workSite->workers_count,
+                'receipt_date' => $this->workSite->receipt_date,
+                'starting_date' => $this->workSite->starting_date,
+                'deliver_date' => $this->workSite->deliver_date,
+                'status_on_receive' => $this->workSite->status_on_receive,
+                'created_at' => Carbon::parse($this->workSite->created_at)->toDateTimeString(),
+                'updated_at' => Carbon::parse($this->workSite->updated_at)->toDateTimeString(),
+            ])
+            ->assertJsonPath('data.sub_worksites', [
+                [
+                    "id" => $this->subWorkSite->id,
+                    "title" => $this->subWorkSite->title,
+                    "description" => $this->subWorkSite->description,
+                    "customer" => $this->subWorkSite->customer?->fullName,
+                    "category" => $this->subWorkSite->category?->name,
+                    "sub_worksites" => [],
+                    'starting_budget' => number_format($this->subWorkSite->starting_budget, 2),
+                    'cost' => number_format($this->subWorkSite->cost, 2),
+                    "address" => [
+                        "id" => $this->address->id,
+                        "city" => $this->address->city?->name,
+                        "street" => $this->address->street,
+                        "state" => $this->address->state,
+                        "zipCode" => $this->address->zipcode
+                    ],
+                    "workers_count" => $this->subWorkSite->workers_count,
+                    "receipt_date" => $this->subWorkSite->receipt_date,
+                    "starting_date" => $this->subWorkSite->starting_date,
+                    "deliver_date" => $this->subWorkSite->deliver_date,
+                    "status_on_receive" => $this->subWorkSite->status_on_receive,
+                    "created_at" => Carbon::parse($this->subWorkSite->created_at)->toDateTimeString(),
+                    "updated_at" => Carbon::parse($this->subWorkSite->updated_at)->toDateTimeString(),
+                    "payments" => [],
+                    "resources" => []
+                ]
+            ]);
+    });
+    test('As an admin, I can show details of a worksite with payments and resources', function () {
 
+        $workSiteResourceCategory = ResourceCategory::factory()->create();
+
+        $workSiteResource1 = Resource::factory()->create([
+            'resource_category_id' => $workSiteResourceCategory->id,
+        ]);
+        $workSiteResource2 = Resource::factory()->create([
+            'resource_category_id' => $workSiteResourceCategory->id,
+        ]);
+        $data = [
+            'title' => 'worksite sub',
+            'description' => 'this worksite is for freeTown sub',
+            'customer_id' => $this->customer?->id,
+            'category_id' => $this->wsCategory?->id, // construction
+            'parent_worksite_id' => $this->workSite->id, // this is main worksite == top level worksite
+            'starting_budget' => 15,
+            'cost' => 20,
+            'address_id' => $this->address->id,
+            'workers_count' => 20,
+            'receipt_date' => '2024-04-12',
+            'starting_date' => '2024-04-12',
+            'deliver_date' => '2024-04-12',
+            'status_on_receive' => WorkSiteStatusesEnum::SCRATCH->value,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        $workSite = WorkSite::factory()->create($data);
+
+        $payment = \App\Models\Payment::factory()->create([
+            'payable_id' => $workSite->id,
+            'payable_type' => 'worksite',
+            'amount' => 20,
+            'payment_date' => Carbon::now(),
+            'payment_type' => 1,
+        ]);
+
+        $workSite->resources()->syncWithoutDetaching([
+            $workSiteResource1->id => [
+                'quantity' => 23,
+                'price' => '34.00'
+            ]
+        ]);
+
+        $response = actingAs($this->admin)->getJson('/api/v1/worksite/show/' . $workSite->id);
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJsonFragment([
+                'id' => $workSite->id,
+                'title' => $workSite->title,
+                'description' => $workSite->description,
+                'customer' => $workSite->customer?->fullName,
+                'category' => $workSite->category?->name, // construction
+                'starting_budget' => number_format($workSite->starting_budget, 2),
+                'cost' => number_format($workSite->cost, 2),
+                'address' => [
+                    'id' => $workSite->address->id,
+                    'city' => $workSite->address->city?->name,
+                    'street' => $workSite->address->street,
+                    'state' => $workSite->address->state,
+                    'zipCode' => $workSite->address->zipcode
+                ],
+                'workers_count' => $workSite->workers_count,
+                'receipt_date' => $workSite->receipt_date,
+                'starting_date' => $workSite->starting_date,
+                'deliver_date' => $workSite->deliver_date,
+                'status_on_receive' => $workSite->status_on_receive,
+                'created_at' => Carbon::parse($workSite->created_at)->toDateTimeString(),
+                'updated_at' => Carbon::parse($workSite->updated_at)->toDateTimeString(),
+                'payments' => [
+                    [
+                        'id' => $payment->id,
+                        'payable_id' => $workSite->id,
+                        'payable_type' => 'worksite',
+                        'amount' => number_format(20, 2),
+                        'date' => Carbon::parse(Carbon::now())->toDateTimeString(),
+                        'payment_type' => 1,
+                    ]
+                ],
+                'resources' => [
+                    [
+                        'name'=>$workSiteResource1->name,
+                        'description'=>$workSiteResource1->description,
+                        'resource_category'=>[
+                            'id'=>$workSiteResourceCategory->id,
+                            'name'=>$workSiteResourceCategory->name
+                        ],
+                        'work_site_id' => $workSite->id,
+                        'resource_id' => $workSiteResource1->id,
+                        'quantity' => 23,
+                        'price' => '34.00'
+                    ]
+                ]
+            ]);
     });
 
 });

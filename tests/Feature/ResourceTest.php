@@ -153,7 +153,9 @@ describe('WorkSite Resource List', function () {
         $response = actingAs($this->admin)->getJson('/api/v1/resource/list/');
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonCount(3, 'data')
-            ->assertJsonFragment(['name' => 'resource 1']);
+            ->assertJsonFragment([
+                'name' => 'resource 1'
+            ]);
     });
 });
 

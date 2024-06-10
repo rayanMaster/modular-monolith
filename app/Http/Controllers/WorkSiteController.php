@@ -8,6 +8,7 @@ use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
 use App\Http\Requests\WorkSiteCreateRequest;
 use App\Http\Requests\WorkSiteUpdateRequest;
+use App\Http\Resources\WorkSiteDetailsResource;
 use App\Http\Resources\WorkSiteListResource;
 use App\Mapper\WorkSiteCreateMapper;
 use App\Mapper\WorkSiteUpdateMapper;
@@ -28,7 +29,7 @@ class WorkSiteController extends Controller
     {
     }
 
-    public function list()
+    public function list(): \Illuminate\Http\JsonResponse
     {
         $workSites = WorkSite::query()->with(['payments','address'])->get();
 
@@ -89,9 +90,10 @@ class WorkSiteController extends Controller
     /**
      * Show the specified resource.
      */
-    public function show($id)
+    public function show($id): \Illuminate\Http\JsonResponse
     {
-        return view('worksite::show');
+        $worksite = WorkSite::query()->with(['customer','payments','resources'])->findOrFail($id);
+        return ApiResponseHelper::sendResponse(new Result(WorkSiteDetailsResource::make($worksite)));
     }
 
     /**

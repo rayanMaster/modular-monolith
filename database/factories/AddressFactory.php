@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class AddressFactory extends Factory
 {
     protected $model = Address::class;
+
     /**
      * Define the model's default state.
      *
@@ -22,7 +23,7 @@ class AddressFactory extends Factory
         return [
             'zipcode' => fake()->postcode(),
             'street' => fake()->streetName(),
-            'state'=>fake()->city,
+            'state' => fake()->city,
             'city_id' => fn() => City::query()->first() != null ?
                 City::query()->first()->id : City::factory()->create()->id,
         ];

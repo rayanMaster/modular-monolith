@@ -20,4 +20,9 @@ class Resource extends Model
     {
         return ResourceFactory::new();
     }
+
+    public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(ResourceCategory::class,'resource_category_id');
+    }
 }

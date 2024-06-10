@@ -59,20 +59,20 @@ describe('Resource Category Create', function () {
 
     });
     it('should prevent non auth creating new Resource Category', function () {
-        $response = postJson("/api/v1/resource/".$this->resource->id."/category/create");
+        $response = postJson("/api/v1/resource/" . $this->resource->id . "/category/create");
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin creating new Resource', function () {
 
-        $response = actingAs($this->notAdmin)->postJson("/api/v1/resource/".$this->resource->id."/category/create");
+        $response = actingAs($this->notAdmin)->postJson("/api/v1/resource/" . $this->resource->id . "/category/create");
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return validation error when data is missed', function () {
-        $response = actingAs($this->admin)->postJson("/api/v1/resource/".$this->resource->id."/category/create", []);
+        $response = actingAs($this->admin)->postJson("/api/v1/resource/" . $this->resource->id . "/category/create", []);
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     });
     it('should create new Resource with valid data', function () {
-        $response = actingAs($this->admin)->postJson("/api/v1/resource/".$this->resource->id."/category/create", [
+        $response = actingAs($this->admin)->postJson("/api/v1/resource/" . $this->resource->id . "/category/create", [
             'name' => 'new',
             'description' => 'new',
         ]);
@@ -97,7 +97,7 @@ describe('Resource Category Update', function () {
     });
 
     it('should prevent non auth updating existed ResourceCategory', function () {
-        $response = putJson("/api/v1/resource/".$this->resource->id."/category/update/".$this->resourceCategory->id, [
+        $response = putJson("/api/v1/resource/" . $this->resource->id . "/category/update/" . $this->resourceCategory->id, [
             'name' => 'new1',
         ]);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
@@ -105,24 +105,24 @@ describe('Resource Category Update', function () {
     it('should prevent non admin updating existed ResourceCategory', function () {
 
         $response = actingAs($this->notAdmin)
-            ->putJson("/api/v1/resource/".$this->resource->id."/category/update/".$this->resourceCategory->id, [
-            'name' => 'new1',
-        ]);
+            ->putJson("/api/v1/resource/" . $this->resource->id . "/category/update/" . $this->resourceCategory->id, [
+                'name' => 'new1',
+            ]);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should not return validation error when data is missed', function () {
 
         $response = actingAs($this->admin)
-            ->putJson("/api/v1/resource/".$this->resource->id."/category/update/".$this->resourceCategory->id, []);
+            ->putJson("/api/v1/resource/" . $this->resource->id . "/category/update/" . $this->resourceCategory->id, []);
 
         $response->assertStatus(Response::HTTP_OK);
     });
     it('should update existed Resource with valid data', function () {
 
         $response = actingAs($this->admin)
-            ->putJson("/api/v1/resource/".$this->resource->id."/category/update/".$this->resourceCategory->id, [
-            'name' => 'new1',
-        ]);
+            ->putJson("/api/v1/resource/" . $this->resource->id . "/category/update/" . $this->resourceCategory->id, [
+                'name' => 'new1',
+            ]);
         assertDatabaseHas('resource_categories', ['name' => 'new1']);
         $response->assertOk();
     });
@@ -148,11 +148,11 @@ describe('Resource Category List', function () {
 
     });
     it('should prevent non auth updating existed resource', function () {
-        $response = getJson("/api/v1/resource/".$this->resource->id."/category/list");
+        $response = getJson("/api/v1/resource/" . $this->resource->id . "/category/list");
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should return data', function () {
-        $response = actingAs($this->admin)->getJson("/api/v1/resource/".$this->resource->id."/category/list");
+        $response = actingAs($this->admin)->getJson("/api/v1/resource/" . $this->resource->id . "/category/list");
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonCount(4, 'data')
             ->assertJsonFragment(['name' => 'resource 1']);
@@ -175,21 +175,25 @@ describe('Resource Category Details', function () {
 
     });
     it('should prevent non auth show resource', function () {
-        $response = getJson("/api/v1/resource/".$this->resource->id."/category/show/".$this->resourceCategory->id);
+        $response = getJson("/api/v1/resource/" . $this->resource->id . "/category/show/" . $this->resourceCategory->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should return not found for un-existed resource', function () {
-        $nonExisted = rand(222,333);
+        $nonExisted = rand(222, 333);
         $response = actingAs($this->admin)
-            ->getJson("/api/v1/resource/".$this->resource->id."/category/show/".$nonExisted);
+            ->getJson("/api/v1/resource/" . $this->resource->id . "/category/show/" . $nonExisted);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should return data', function () {
         $response = actingAs($this->admin)
-            ->getJson("/api/v1/resource/".$this->resource->id."/category/show/".$this->resourceCategory->id);
+            ->getJson("/api/v1/resource/" . $this->resource->id . "/category/show/" . $this->resourceCategory->id);
         $response->assertStatus(Response::HTTP_OK)
-            ->assertJsonCount(6, 'data')
-            ->assertJsonFragment(['name' => 'resource 10']);
+            ->assertJsonPath('data',
+                [
+                    'id' => $this->resourceCategory->id,
+                    'name' => $this->resourceCategory->name
+                ]
+            );
     });
 });
 
@@ -209,24 +213,24 @@ describe('Resource Category Delete', function () {
 
     });
     it('should prevent non auth delete resourceCategory', function () {
-        $response = deleteJson("/api/v1/resource/".$this->resource->id."/category/delete/".$this->resourceCategory->id);
+        $response = deleteJson("/api/v1/resource/" . $this->resource->id . "/category/delete/" . $this->resourceCategory->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin delete existed resourceCategory', function () {
         $response = actingAs($this->notAdmin)
-            ->deleteJson("/api/v1/resource/".$this->resource->id."/category/delete/".$this->resourceCategory->id);
+            ->deleteJson("/api/v1/resource/" . $this->resource->id . "/category/delete/" . $this->resourceCategory->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found for un-existed resourceCategory', function () {
-        $nonExisted = rand(222,333);
+        $nonExisted = rand(222, 333);
         $response = actingAs($this->admin)
-            ->deleteJson("/api/v1/resource/".$this->resource->id."/category/delete/".$nonExisted);
+            ->deleteJson("/api/v1/resource/" . $this->resource->id . "/category/delete/" . $nonExisted);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should delete resourceCategory from database', function () {
         assertDatabaseCount(ResourceCategory::class, 2);
         actingAs($this->admin)
-            ->deleteJson("/api/v1/resource/".$this->resource->id."/category/delete/".$this->resourceCategory->id);
+            ->deleteJson("/api/v1/resource/" . $this->resource->id . "/category/delete/" . $this->resourceCategory->id);
         assertSoftDeleted('resource_categories', ['id' => $this->resourceCategory->id]);
         $count = \App\Models\ResourceCategory::query()->get()->count();
         // Assert the count

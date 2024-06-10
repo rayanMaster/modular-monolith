@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class WorkSiteListResource extends JsonResource
+class WorkSiteDetailsResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -21,7 +21,7 @@ class WorkSiteListResource extends JsonResource
             'description' => $this->description,
             'customer' => $this->customer?->fullName,
             'category' => $this->category?->name,
-            'sub_worksites' => $this->subWorksites,
+            'sub_worksites' => WorkSiteDetailsResource::collection($this->subWorksites),
             'starting_budget' => $this->starting_budget,
             'cost' => $this->cost,
             'address' => AddressDetailsResource::make($this->address),
@@ -32,7 +32,8 @@ class WorkSiteListResource extends JsonResource
             'status_on_receive' => $this->status_on_receive,
             'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
             'updated_at' => Carbon::parse($this->updated_at)->toDateTimeString(),
-            'payments' => $this->payments,
+            'payments' => PaymentListResource::collection($this->payments),
+            'resources' => ResourceListResource::collection($this->resources),
         ];
     }
 }
