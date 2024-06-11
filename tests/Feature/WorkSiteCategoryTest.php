@@ -53,7 +53,7 @@ describe('WorkSiteCategory Create', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
     });
@@ -90,7 +90,7 @@ describe('WorkSiteCategory Update', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
         $this->category = WorkSiteCategory::factory()->create(['name' => 'new']);
@@ -132,7 +132,7 @@ describe('WorkSiteCategory List', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
         $this->category1 = WorkSiteCategory::factory()->create(['name' => 'category 1']);
@@ -160,7 +160,7 @@ describe('WorkSiteCategory Details', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
         $this->category = WorkSiteCategory::factory()->create(['id' => 10, 'name' => 'category 10']);
@@ -190,7 +190,7 @@ describe('WorkSiteCategory Delete', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
         $this->category = WorkSiteCategory::factory()->create(['id' => 10, 'name' => 'category 10']);

@@ -45,7 +45,7 @@ describe('Customer Create', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
     });
 
@@ -78,7 +78,7 @@ describe('Customer Update', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
         $this->customer = Customer::factory()->create(['first_name' => 'Rayan']);

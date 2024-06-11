@@ -27,6 +27,7 @@ describe('Worksite entity fields check', function () {
             'customer_id',
             'category_id',
             'parent_worksite_id',
+            'contractor_id',
             'starting_budget',
             'cost',
             'address_id',
@@ -65,7 +66,6 @@ describe('Worksite entity fields check', function () {
     });
 
 });
-
 describe('WorkSite routes check', function () {
     it('should have all routes for /worksite', function () {
         $this->artisan('optimize:clear');
@@ -93,6 +93,8 @@ describe('WorkSite routes check', function () {
             'worksite.category.list',
             'worksite.category.show',
             'worksite.category.delete',
+
+            'worksite.employee.assign'
         ];
 
         // Collect routes and filter based on the prefix
@@ -112,7 +114,6 @@ describe('WorkSite routes check', function () {
     });
 
 });
-
 describe('Create WorkSite', function () {
 
     uses(RefreshDatabase::class);
@@ -294,7 +295,6 @@ describe('Create WorkSite', function () {
 
 
 });
-
 describe('Update WorkSite', function () {
 
     uses(RefreshDatabase::class);

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContractorController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PaymentController;
@@ -15,7 +16,7 @@ Route::prefix('v1')->group(function () {
     Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::group(['prefix' => 'worksite'], function () {
             Route::post('/create', [WorkSiteController::class, 'store'])
-                ->middleware('can:worksite-add')
+                ->middleware('can:worksite-create')
                 ->name('worksite.create');
 
             Route::get('/list', [WorkSiteController::class, 'list'])
@@ -49,7 +50,7 @@ Route::prefix('v1')->group(function () {
                     ->name('worksite.category.show');
 
                 Route::post('/create', [WorkSiteCategoryController::class, 'create'])
-                    ->middleware('can:worksite-category-add')
+                    ->middleware('can:worksite-category-create')
                     ->name('worksite.category.create');
 
                 Route::put('/update/{id}', [WorkSiteCategoryController::class, 'update'])
@@ -64,7 +65,7 @@ Route::prefix('v1')->group(function () {
             Route::group(['prefix' => '{worksiteId}/payment'], function () {
 
                 Route::post('create', WorkSitePaymentController::class)
-                    ->middleware('can:payment-add')
+                    ->middleware('can:payment-create')
                     ->name('worksite.payment.create');
 
                 Route::post('list', WorkSitePaymentController::class)
@@ -78,7 +79,7 @@ Route::prefix('v1')->group(function () {
 
             Route::group(['prefix' => '{worksiteId}/resource'], function () {
                 Route::post('create', WorkSitePaymentController::class)
-                    ->middleware('can:worksite-resource-add')
+                    ->middleware('can:worksite-resource-create')
                     ->name('worksite.resource.create');
 
                 Route::post('list', WorkSitePaymentController::class)
@@ -97,6 +98,28 @@ Route::prefix('v1')->group(function () {
                     ->middleware('can:worksite-resource-delete')
                     ->name('worksite.resource.delete');
             });
+
+            Route::group(['prefix' => '{worksiteId}/employee'], function () {
+                Route::post('assign', [WorkSiteController::class,'assignEmployee'])
+                    ->middleware('can:worksite-employee-assign')
+                    ->name('worksite.employee.assign');
+
+//                Route::post('list', WorkSitePaymentController::class)
+//                    ->middleware('can:worksite-resource-list')
+//                    ->name('worksite.resource.list');
+//
+//                Route::post('update/{id}', WorkSitePaymentController::class)
+//                    ->middleware('can:worksite-resource-update')
+//                    ->name('worksite.resource.update');
+//
+//                Route::post('show/{id}', WorkSitePaymentController::class)
+//                    ->middleware('can:worksite-resource-show')
+//                    ->name('worksite.resource.show');
+//
+//                Route::post('delete/{id}', WorkSitePaymentController::class)
+//                    ->middleware('can:worksite-resource-delete')
+//                    ->name('worksite.resource.delete');
+            });
         });
 
         Route::group(['prefix' => 'resource'], function () {
@@ -107,7 +130,7 @@ Route::prefix('v1')->group(function () {
                 ->middleware('can:resource-show')
                 ->name('resource.show');
             Route::post('/create', [ResourceController::class, 'store'])
-                ->middleware('can:resource-add')
+                ->middleware('can:resource-create')
                 ->name('resource.create');
             Route::put('/update/{id}', [ResourceController::class, 'update'])
                 ->middleware('can:resource-update')
@@ -124,7 +147,7 @@ Route::prefix('v1')->group(function () {
                     ->middleware('can:resource-category-show')
                     ->name('resource.category.show');
                 Route::post('/create', [ResourceCategoryController::class, 'store'])
-                    ->middleware('can:resource-category-add')
+                    ->middleware('can:resource-category-create')
                     ->name('resource.category.create');
                 Route::put('/update/{id}', [ResourceCategoryController::class, 'update'])
                     ->middleware('can:resource-category-update')
@@ -144,7 +167,7 @@ Route::prefix('v1')->group(function () {
                 ->name('customer.show');
 
             Route::post('/create', [CustomerController::class, 'store'])
-                ->middleware('can:customer-add')
+                ->middleware('can:customer-create')
                 ->name('customer.create');
 
             Route::put('/update/{id}', [CustomerController::class, 'update'])
@@ -154,6 +177,28 @@ Route::prefix('v1')->group(function () {
             Route::delete('/delete/{id}', [CustomerController::class, 'destroy'])
                 ->middleware('can:customer-delete')
                 ->name('customer.delete');
+
+        });
+        Route::group(['prefix' => 'contractor'], function () {
+            Route::get('/list', [ContractorController::class, 'list'])
+                ->middleware('can:contractor-list')
+                ->name('contractor.list');
+
+            Route::get('/show/{id}', [ContractorController::class, 'show'])
+                ->middleware('can:contractor-show')
+                ->name('contractor.show');
+
+            Route::post('/create', [ContractorController::class, 'store'])
+                ->middleware('can:contractor-create')
+                ->name('contractor.create');
+
+            Route::put('/update/{id}', [ContractorController::class, 'update'])
+                ->middleware('can:contractor-update')
+                ->name('contractor.update');
+
+            Route::delete('/delete/{id}', [ContractorController::class, 'destroy'])
+                ->middleware('can:contractor-delete')
+                ->name('contractor.delete');
 
         });
         Route::group(['prefix' => 'employee'], function () {
@@ -166,7 +211,7 @@ Route::prefix('v1')->group(function () {
                 ->name('employee.show');
 
             Route::post('/create', [EmployeeController::class, 'store'])
-                ->middleware('can:employee-add')
+                ->middleware('can:employee-create')
                 ->name('employee.create');
 
             Route::put('/update/{id}', [EmployeeController::class, 'update'])

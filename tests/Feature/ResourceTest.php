@@ -59,8 +59,8 @@ describe('WorkSiteResource Create', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
-        $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
+        $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
         $this->resourceCategory = ResourceCategory::factory()->create();
 
     });
@@ -95,8 +95,8 @@ describe('WorkSite Resource Update', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
-        $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
+        $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
         $this->resource = \App\Models\Resource::factory()->create(['name' => 'new']);
 
@@ -137,8 +137,8 @@ describe('WorkSite Resource List', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
-        $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
+        $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
         $this->resource1 = Resource::factory()->create(['name' => 'resource 1']);
         $this->resource2 = Resource::factory()->create(['name' => 'resource 2']);
@@ -167,8 +167,8 @@ describe('WorkSite Resource Details', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
-        $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
+        $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
         $this->resource = Resource::factory()->create(['id' => 10, 'name' => 'resource 10']);
 
@@ -197,8 +197,8 @@ describe('WorkSite Resource Delete', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
-        $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
+        $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
         $this->resource = Resource::factory()->create(['id' => 10, 'name' => 'resource 10']);
 

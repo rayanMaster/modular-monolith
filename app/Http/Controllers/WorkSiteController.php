@@ -129,7 +129,7 @@ class WorkSiteController extends Controller
     public function close(int $id)
     {
         $workSite = WorkSite::query()->with(['subWorksites'])->findOrFail($id);
-        $relatedSubActiveWorkSitesCount = $workSite->whereHas('subWorksites',function (Builder $query){
+        $relatedActiveSubWorkSitesCount = $workSite->whereHas('subWorksites',function (Builder $query){
             return $query->where(
                 column: 'completion_status',
                 operator: '<>',
@@ -139,7 +139,7 @@ class WorkSiteController extends Controller
 
         $workSitePayments = $workSite->payments->sum('amount');
 
-        if($relatedSubActiveWorkSitesCount > 0)
+        if($relatedActiveSubWorkSitesCount > 0)
             throw new UnAbleToCloseWorkSiteException("You can't close a worksite with active sub-worksites");
 
         if($workSitePayments < $workSite->cost)
@@ -151,6 +151,11 @@ class WorkSiteController extends Controller
 
         return ApiResponseHelper::sendSuccessResponse(
             new Result());
+    }
+
+    public function assignEmployee()
+    {
+
     }
 
     /**

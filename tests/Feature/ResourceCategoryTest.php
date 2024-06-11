@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Resource;
 use App\Models\ResourceCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -53,9 +54,9 @@ describe('Resource Category Create', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
-        $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
-        $this->resource = \App\Models\Resource::factory()->create();
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
+        $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
+        $this->resource = Resource::factory()->create();
 
     });
     it('should prevent non auth creating new Resource Category', function () {
@@ -88,10 +89,10 @@ describe('Resource Category Update', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
-        $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
+        $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
-        $this->resource = \App\Models\Resource::factory()->create();
+        $this->resource = Resource::factory()->create();
         $this->resourceCategory = \App\Models\ResourceCategory::factory()->create(['name' => 'new']);
 
     });
@@ -136,10 +137,10 @@ describe('Resource Category List', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
-        $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
+        $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
-        $this->resource = \App\Models\Resource::factory()->create();
+        $this->resource = Resource::factory()->create();
 
         $this->resourceCategory1 = ResourceCategory::factory()->create(['name' => 'resource 1']);
         $this->resourceCategory2 = ResourceCategory::factory()->create(['name' => 'resource 2']);
@@ -167,11 +168,11 @@ describe('Resource Category Details', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
-        $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
+        $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
         $this->resourceCategory = ResourceCategory::factory()->create(['id' => 10, 'name' => 'resource 10']);
-        $this->resource = \App\Models\Resource::factory()->create();
+        $this->resource = Resource::factory()->create();
 
     });
     it('should prevent non auth show resource', function () {
@@ -205,10 +206,10 @@ describe('Resource Category Delete', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
-        $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
+        $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
-        $this->resource = \App\Models\Resource::factory()->create();
+        $this->resource = Resource::factory()->create();
         $this->resourceCategory = ResourceCategory::factory()->create(['id' => 10, 'name' => 'resource 10']);
 
     });

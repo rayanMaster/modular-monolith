@@ -44,7 +44,7 @@ describe('Create  Employee', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
     });
 
@@ -77,7 +77,7 @@ describe('Update  Employee', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
         $this->employee = \App\Models\Employee::factory()->create(['first_name' => 'Rayan']);
@@ -113,7 +113,7 @@ describe('Show  Employees list', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
         $this->employee = \App\Models\Employee::factory(10)->create(['first_name' => 'Rayan']);
@@ -145,7 +145,7 @@ describe('Show  Employee details', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
         $this->employee = \App\Models\Employee::factory()->create(['first_name' => 'Rayan']);
@@ -177,7 +177,7 @@ describe('Delete Employee', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->employee()->create(['email' => 'not_admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = \App\Models\User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
         $this->employee = \App\Models\Employee::factory()->create();

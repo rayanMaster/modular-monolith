@@ -41,25 +41,36 @@ class PermissionsSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
         // WorkSite
-        $this->addPermission('Work Site', 'worksite', ['list', 'show', 'add', 'update', 'delete','close']);
+        $this->addPermission('Work Site', 'worksite', [
+            'list',
+            'show',
+            'create',
+            'update',
+            'delete',
+            'close',
+            'employee-assign'
+        ]);
 
         // WorkSite Category
-        $this->addPermission('Work Site Category', 'worksite-category', ['list', 'show', 'add', 'update', 'delete']);
+        $this->addPermission('Work Site Category', 'worksite-category', ['list', 'show', 'create', 'update', 'delete']);
 
         // Resource
-        $this->addPermission('Resource', 'resource', ['list', 'show', 'add', 'update', 'delete']);
+        $this->addPermission('Resource', 'resource', ['list', 'show', 'create', 'update', 'delete']);
 
         // Resource Category
-        $this->addPermission('Resource Category', 'resource-category', ['list', 'show', 'add', 'update', 'delete']);
+        $this->addPermission('Resource Category', 'resource-category', ['list', 'show', 'create', 'update', 'delete']);
 
         // Customer
-        $this->addPermission('Customer', 'customer', ['list', 'show', 'add', 'update', 'delete']);
+        $this->addPermission('Customer', 'customer', ['list', 'show', 'create', 'update', 'delete']);
 
         // Customer
-        $this->addPermission('Payment', 'payment', ['list', 'show', 'add']);
+        $this->addPermission('Payment', 'payment', ['list', 'show', 'create']);
 
         //Employee
-        $this->addPermission('Employee', 'employee', ['list', 'show', 'add', 'update', 'delete']);
+        $this->addPermission('Employee', 'employee', ['list', 'show', 'create', 'update', 'delete']);
+
+        //Contractor
+        $this->addPermission('Contractor', 'contractor', ['list', 'show', 'create', 'update', 'delete']);
 
     }
 }

@@ -13,15 +13,15 @@ class UserFactory extends Factory
     {
         return [
             'name' => 'Rayan',
-            'email' => 'rayan@rayan.com',
-            'phone'=>'0945795748',
+            'email' => fake()->email(),
+            'phone' => fake()->phoneNumber(),
             'password' => 'Rayan123@@',
         ];
     }
 
     public function mainAdmin(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'name' => 'Main Admin',
             'phone' => '0945795749',
             'email' => 'main_admin@admin.com',
@@ -33,10 +33,10 @@ class UserFactory extends Factory
 
     public function admin(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'name' => 'Admin',
-            'phone' => '0945795747',
-            'email' => 'admin@admin.com',
+            'phone' => fake()->phoneNumber(),
+            'email' => fake()->email(),
             'password' => 'admin123',
         ])->afterCreating(function (User $user) {
             return $user->assignRole('admin');
@@ -50,7 +50,7 @@ class UserFactory extends Factory
         });
     }
 
-    public function employee(): static
+    public function worker(): static
     {
         return $this->afterCreating(function (User $user) {
             return $user->assignRole('worker');
