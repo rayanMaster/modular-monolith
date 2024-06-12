@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 interface MainRepositoryInterface
 {
-    public function all(): Collection|array;
+    public function list(): Collection|array;
 
     public function show(int $id): Model|Collection|Builder|array|null;
 

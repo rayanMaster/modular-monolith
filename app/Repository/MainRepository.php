@@ -18,7 +18,7 @@ abstract readonly class MainRepository implements MainRepositoryInterface
     {
     }
 
-    public function all(): Collection|array
+    public function list(): Collection|array
     {
         return $this->query->get();
     }

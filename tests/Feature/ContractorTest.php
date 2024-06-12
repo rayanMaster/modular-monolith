@@ -5,7 +5,7 @@ use App\Models\Contractor;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
-use function Pest\Laravel\{postJson, actingAs, putJson, getJson, assertDatabaseHas};
+use function Pest\Laravel\{postJson, actingAs, putJson, getJson, assertDatabaseHas, assertDatabaseCount};
 use Symfony\Component\HttpFoundation\Response;
 
 describe('Contractor routes check', function () {
@@ -103,7 +103,7 @@ describe('Update Contractor of worksite Test', function () {
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found if updating non-existed contractor', function () {
-        $unExisted = rand(33,44);
+        $unExisted = rand(33, 44);
         $response = actingAs($this->notAdmin)->putJson('/api/v1/contractor/update/' . $unExisted);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
@@ -111,16 +111,105 @@ describe('Update Contractor of worksite Test', function () {
         $addressNew = Address::factory()->create();
         $response = actingAs($this->admin)->putJson('/api/v1/contractor/update/' . $this->contractor->id, [
             'first_name' => 'Rayan',
-            'phone'=>'0945795749',
+            'phone' => '0945795749',
             'address_id' => $addressNew->id,
         ]);
         assertDatabaseHas(Contractor::class, [
             'first_name' => 'Rayan',
             'last_name' => 'Doe',
-            'phone'=>'0945795749',
+            'phone' => '0945795749',
             'address_id' => $addressNew->id,
         ]);
         $response->assertOk();
+    });
+
+});
+describe('List of Contractors Test', function () {
+    uses(RefreshDatabase::class);
+    beforeEach(function () {
+        $this->artisan('storage:link');
+        $this->assertDatabaseCount(Role::class, 0);
+        $this->artisan('db:seed');
+        $this->assertDatabaseCount(Role::class, 4);
+        $this->notAdmin = User::factory()->worker()->create();
+        $this->admin = User::factory()->admin()->create();
+
+        $this->address = Address::factory()->create();
+        $this->contractor = Contractor::factory(10)->create();
+        assertDatabaseCount(Contractor::class, 10);
+    });
+    it('should prevent non auth show list of Contractors', function () {
+        $response = $this->getJson('/api/v1/contractor/list');
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
+    });
+    it('should prevent non admin show list of Contractors', function () {
+        $response = actingAs($this->notAdmin)->getJson('/api/v1/contractor/list');
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    });
+
+    it('should return list of contractors', function () {
+        $response = actingAs($this->admin)->getJson('/api/v1/contractor/list');
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    [
+                        'id',
+                        'first_name',
+                        'last_name',
+                        'phone',
+                        'address'
+                    ]
+                ]
+            ]);
+    });
+
+});
+describe('Details of Contractors Test', function () {
+    uses(RefreshDatabase::class);
+    beforeEach(function () {
+        $this->artisan('storage:link');
+        $this->assertDatabaseCount(Role::class, 0);
+        $this->artisan('db:seed');
+        $this->assertDatabaseCount(Role::class, 4);
+        $this->notAdmin = User::factory()->worker()->create();
+        $this->admin = User::factory()->admin()->create();
+
+        $this->address = Address::factory()->create();
+        $this->contractor = Contractor::factory()->create([
+            'first_name' => 'Rayan',
+            'last_name' => 'Azzam',
+            'phone' => '0945795748',
+            'address_id' => $this->address->id,
+        ]);
+    });
+    it('should prevent non auth show details of a Contractor', function () {
+        $response = $this->getJson('/api/v1/contractor/show/' . $this->contractor->id);
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
+    });
+    it('should prevent non admin show details of a Contractor', function () {
+        $response = actingAs($this->notAdmin)->getJson('/api/v1/contractor/show/' . $this->contractor->id);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    });
+    it('should return not found if show non-existed contractor', function () {
+        $unExisted = rand(33, 44);
+        $response = actingAs($this->notAdmin)->getJson('/api/v1/contractor/show/' . $unExisted);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    });
+    it('should show details of a contractor', function () {
+        $response = actingAs($this->admin)->getJson('/api/v1/contractor/show/' . $this->contractor->id);
+        $response->assertOk()
+            ->assertJsonFragment([
+                'first_name' => $this->contractor->first_name,
+                'last_name' => $this->contractor->last_name,
+                'phone' => $this->contractor->phone,
+                'address' => [
+                    'id' => $this->address->id,
+                    'city' => $this->address->city?->name,
+                    'street' => $this->address->street,
+                    'state' => $this->address->state,
+                    'zipCode' => $this->address->zipcode
+                ],
+            ]);
     });
 
 });

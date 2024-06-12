@@ -11,7 +11,7 @@ readonly class ContractorRepository extends MainRepository
 {
     public function __construct(Builder $query, DatabaseManager $databaseManager)
     {
-        $query = Contractor::query();
+        $query = Contractor::query()->with(['address']);
         parent::__construct($query, $databaseManager);
     }
 }
