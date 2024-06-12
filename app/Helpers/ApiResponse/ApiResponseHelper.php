@@ -3,6 +3,7 @@
 namespace App\Helpers\ApiResponse;
 
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class ApiResponseHelper
 {
@@ -44,22 +45,22 @@ class ApiResponseHelper
         return response()->json($response, (int) $result->code);
     }
 
-    public static function sendSuccessResponse(Result $result): JsonResponse
+    public static function sendSuccessResponse(?Result $result = null): JsonResponse
     {
 
         $response = [
-            'success' => $result->isOk,
+            'success' => $result->isOk ?? true,
             'error_code' => null,
-            'message' => $result->message,
+            'message' => $result->message ?? 'success',
             'data' => $result->result ?? null,
             'pagination' => $result->paginate ?? null,
         ];
         if (env('APP_ENV') != 'production') {
-            if ($result->exception != null) {
+            if ($result?->exception != null) {
                 $response['exception'] = $result->exception;
             }
         }
 
-        return response()->json($response, (int) $result->code);
+        return response()->json($response, $result?->code ?? Response::HTTP_OK);
     }
 }

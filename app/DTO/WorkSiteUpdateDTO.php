@@ -7,28 +7,27 @@ use App\Enums\WorkSiteReceptionStatusEnum;
 class WorkSiteUpdateDTO extends \Spatie\LaravelData\Data
 {
     /**
-     * @param ResourceCreateDTO|null $workSiteResourceDTO
-     * @param PaymentCreateDTO|null $paymentDTO
+     * @param  ResourceCreateDTO|null  $workSiteResourceDTO
+     * @param  PaymentCreateDTO|null  $paymentDTO
      */
     public function __construct(
-        public ?string   $title,
-        public ?string   $description,
-        public ?int     $customerId,
-        public ?int     $categoryId,
-        public ?int    $parentWorkSiteId,
-        public ?int     $startingBudget,
-        public ?int     $cost,
-        public ?int     $address,
-        public ?int     $workersCount,
-        public ?string  $receiptDate,
-        public ?string  $startingDate,
-        public ?string  $deliverDate,
-        public ?int     $receptionStatus,
-        public ?array   $workSiteResources,
-        public ?array   $payments,
+        public ?string $title,
+        public ?string $description,
+        public ?int $customerId,
+        public ?int $categoryId,
+        public ?int $parentWorkSiteId,
+        public ?int $startingBudget,
+        public ?int $cost,
+        public ?int $address,
+        public ?int $workersCount,
+        public ?string $receiptDate,
+        public ?string $startingDate,
+        public ?string $deliverDate,
+        public ?int $receptionStatus,
+        public ?array $workSiteResources,
+        public ?array $payments,
         public ?FileDTO $image // Adjust namespace according to your application
-    )
-    {
+    ) {
     }
 
     /**

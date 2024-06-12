@@ -15,6 +15,7 @@ class WorkSiteCreateMapper extends \Spatie\LaravelData\Data
             'description' => $workSiteDTO->description,
             'customer_id' => $workSiteDTO->customerId,
             'category_id' => $workSiteDTO->categoryId,
+            'contractor_id' => $workSiteDTO->contractorId,
             'parent_worksite_id' => $workSiteDTO->parentWorksiteId,
             'starting_budget' => $workSiteDTO->startingBudget,
             'cost' => $workSiteDTO->cost,

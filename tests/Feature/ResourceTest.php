@@ -154,7 +154,7 @@ describe('WorkSite Resource List', function () {
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonCount(3, 'data')
             ->assertJsonFragment([
-                'name' => 'resource 1'
+                'name' => 'resource 1',
             ]);
     });
 });

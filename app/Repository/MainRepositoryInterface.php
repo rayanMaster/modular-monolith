@@ -12,10 +12,9 @@ interface MainRepositoryInterface
 
     public function show(int $id): Model|Collection|Builder|array|null;
 
-    public function create(array $attributes) : Model|null;
+    public function create(array $attributes): ?Model;
 
-    public function update(int $id, array $attributes, bool $passNull = false) : Model|null;
+    public function update(int $id, array $attributes, bool $passNull = false): ?Model;
 
     public function delete($id): void;
-
 }

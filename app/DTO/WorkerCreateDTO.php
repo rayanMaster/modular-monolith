@@ -8,7 +8,8 @@ class WorkerCreateDTO extends Data
 {
     public function __construct(
         public string $firstName,
-    ){}
+    ) {
+    }
 
     public static function fromRequest(array $request): self
     {
@@ -17,5 +18,4 @@ class WorkerCreateDTO extends Data
         );
 
     }
-
 }

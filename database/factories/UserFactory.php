@@ -21,7 +21,7 @@ class UserFactory extends Factory
 
     public function mainAdmin(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'name' => 'Main Admin',
             'phone' => '0945795749',
             'email' => 'main_admin@admin.com',
@@ -33,7 +33,7 @@ class UserFactory extends Factory
 
     public function admin(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'name' => 'Admin',
             'phone' => fake()->phoneNumber(),
             'email' => fake()->email(),

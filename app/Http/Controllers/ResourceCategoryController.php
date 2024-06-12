@@ -24,7 +24,7 @@ class ResourceCategoryController extends Controller
         ResourceCategory::query()->create($request->validated());
     }
 
-    public function show($resourceId,$resourceCategoryId)
+    public function show($resourceId, $resourceCategoryId)
     {
         $resourceCategory = ResourceCategory::query()->findOrFail($resourceCategoryId);
 
@@ -32,7 +32,7 @@ class ResourceCategoryController extends Controller
 
     }
 
-    public function update(ResourceCategoryUpdateRequest $request, $resourceId,$resourceCategoryId)
+    public function update(ResourceCategoryUpdateRequest $request, $resourceId, $resourceCategoryId)
     {
 
         $resourceCategory = ResourceCategory::query()->findOrFail($resourceCategoryId);
@@ -40,7 +40,7 @@ class ResourceCategoryController extends Controller
 
     }
 
-    public function destroy($resourceId,$resourceCategoryId)
+    public function destroy($resourceId, $resourceCategoryId)
     {
         $resourceCategory = ResourceCategory::query()->findOrFail($resourceCategoryId);
         $resourceCategory->delete();

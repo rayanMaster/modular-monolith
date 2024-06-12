@@ -7,7 +7,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ContractorDetailsResource extends JsonResource
 {
-
     /**
      * Transform the resource into an array.
      *
@@ -16,11 +15,11 @@ class ContractorDetailsResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'=>$this->id,
-            'first_name'=>$this->first_name,
-            'last_name'=>$this->last_name,
-            'phone'=>$this->phone,
-            'address'=>AddressDetailsResource::make($this->address)
+            'id' => $this->id,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'phone' => $this->phone,
+            'address' => AddressDetailsResource::make($this->address),
         ];
     }
 }

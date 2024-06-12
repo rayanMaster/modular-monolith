@@ -5,8 +5,12 @@ use App\Models\Contractor;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
-use function Pest\Laravel\{postJson, actingAs, putJson, getJson, assertDatabaseHas, assertDatabaseCount};
 use Symfony\Component\HttpFoundation\Response;
+
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\postJson;
 
 describe('Contractor routes check', function () {
     it('should have all routes for /contractor', function () {
@@ -91,25 +95,25 @@ describe('Update Contractor of worksite Test', function () {
             'first_name' => 'John',
             'last_name' => 'Doe',
             'address_id' => $this->address->id,
-            'phone' => '0945795748'
+            'phone' => '0945795748',
         ]);
     });
     it('should prevent non auth updating new Contractor', function () {
-        $response = $this->putJson('/api/v1/contractor/update/' . $this->contractor->id);
+        $response = $this->putJson('/api/v1/contractor/update/'.$this->contractor->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin updating new Contractor', function () {
-        $response = actingAs($this->notAdmin)->putJson('/api/v1/contractor/update/' . $this->contractor->id);
+        $response = actingAs($this->notAdmin)->putJson('/api/v1/contractor/update/'.$this->contractor->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found if updating non-existed contractor', function () {
         $unExisted = rand(33, 44);
-        $response = actingAs($this->notAdmin)->putJson('/api/v1/contractor/update/' . $unExisted);
+        $response = actingAs($this->notAdmin)->putJson('/api/v1/contractor/update/'.$unExisted);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should update existed Contractor with valid data', function () {
         $addressNew = Address::factory()->create();
-        $response = actingAs($this->admin)->putJson('/api/v1/contractor/update/' . $this->contractor->id, [
+        $response = actingAs($this->admin)->putJson('/api/v1/contractor/update/'.$this->contractor->id, [
             'first_name' => 'Rayan',
             'phone' => '0945795749',
             'address_id' => $addressNew->id,
@@ -157,9 +161,9 @@ describe('List of Contractors Test', function () {
                         'first_name',
                         'last_name',
                         'phone',
-                        'address'
-                    ]
-                ]
+                        'address',
+                    ],
+                ],
             ]);
     });
 
@@ -183,20 +187,20 @@ describe('Details of Contractors Test', function () {
         ]);
     });
     it('should prevent non auth show details of a Contractor', function () {
-        $response = $this->getJson('/api/v1/contractor/show/' . $this->contractor->id);
+        $response = $this->getJson('/api/v1/contractor/show/'.$this->contractor->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin show details of a Contractor', function () {
-        $response = actingAs($this->notAdmin)->getJson('/api/v1/contractor/show/' . $this->contractor->id);
+        $response = actingAs($this->notAdmin)->getJson('/api/v1/contractor/show/'.$this->contractor->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found if show non-existed contractor', function () {
         $unExisted = rand(33, 44);
-        $response = actingAs($this->notAdmin)->getJson('/api/v1/contractor/show/' . $unExisted);
+        $response = actingAs($this->notAdmin)->getJson('/api/v1/contractor/show/'.$unExisted);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should show details of a contractor', function () {
-        $response = actingAs($this->admin)->getJson('/api/v1/contractor/show/' . $this->contractor->id);
+        $response = actingAs($this->admin)->getJson('/api/v1/contractor/show/'.$this->contractor->id);
         $response->assertOk()
             ->assertJsonFragment([
                 'first_name' => $this->contractor->first_name,
@@ -207,7 +211,7 @@ describe('Details of Contractors Test', function () {
                     'city' => $this->address->city?->name,
                     'street' => $this->address->street,
                     'state' => $this->address->state,
-                    'zipCode' => $this->address->zipcode
+                    'zipCode' => $this->address->zipcode,
                 ],
             ]);
     });

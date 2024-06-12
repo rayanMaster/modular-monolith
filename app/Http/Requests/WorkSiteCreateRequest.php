@@ -21,6 +21,7 @@ class WorkSiteCreateRequest extends FormRequest
             'customer_id' => 'sometimes|integer',
             'category_id' => 'sometimes|integer',
             'parent_worksite_id' => 'nullable|integer|exists:work_sites,id',
+            'contractor_id' => ['nullable', 'integer', 'exists:contractors,id'],
             'starting_budget' => 'sometimes|integer|min:0',
             'cost' => 'sometimes|integer|min:0',
             'address_id' => 'sometimes|integer|exists:addresses,id',
@@ -28,8 +29,8 @@ class WorkSiteCreateRequest extends FormRequest
             'receipt_date' => 'sometimes|date',
             'starting_date' => 'sometimes|date',
             'deliver_date' => 'sometimes|date',
-            'reception_status' => ['sometimes','integer',Rule::in(WorkSiteReceptionStatusEnum::cases())],
-            'completion_status' => ['sometimes','integer',Rule::in(WorkSiteCompletionStatusEnum::cases())],
+            'reception_status' => ['sometimes', 'integer', Rule::in(WorkSiteReceptionStatusEnum::cases())],
+            'completion_status' => ['sometimes', 'integer', Rule::in(WorkSiteCompletionStatusEnum::cases())],
             'resources' => 'sometimes|array',
             'resources.*.quantity' => 'sometimes|numeric',
             'resources.*.price' => 'sometimes|numeric',
@@ -37,7 +38,7 @@ class WorkSiteCreateRequest extends FormRequest
             'payments' => 'sometimes|array',
             'payments.*.payment_amount' => 'sometimes|numeric',
             'payments.*.payment_date' => ['sometimes', 'date_format:Y-m-d H:i'],
-            'image' => ['sometimes',File::types(['jpeg', 'png', 'gif', 'webp'])
+            'image' => ['sometimes', File::types(['jpeg', 'png', 'gif', 'webp'])
                 ->max('2mb')],
         ];
     }

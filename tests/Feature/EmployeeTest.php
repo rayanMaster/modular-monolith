@@ -4,7 +4,11 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
-use function Pest\Laravel\{postJson, actingAs, assertDatabaseHas, assertDatabaseCount};
+
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\postJson;
 
 describe('Employee routes check', function () {
     it('should have all routes for /employee', function () {
@@ -84,21 +88,21 @@ describe('Update  Employee', function () {
     });
 
     it('should prevent non auth updating a Employee', function () {
-        $response = $this->putJson('/api/v1/employee/update/' . $this->employee->id);
+        $response = $this->putJson('/api/v1/employee/update/'.$this->employee->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin updating a Employee', function () {
 
-        $response = actingAs($this->notAdmin)->putJson('/api/v1/employee/update/' . $this->employee->id);
+        $response = actingAs($this->notAdmin)->putJson('/api/v1/employee/update/'.$this->employee->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return validation error when data is missed', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/employee/update/' . $this->employee->id, []);
+        $response = actingAs($this->admin)->putJson('/api/v1/employee/update/'.$this->employee->id, []);
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas('employees', ['first_name' => 'Rayan']);
     });
     it('should update a Employee with valid data', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/employee/update/' . $this->employee->id, [
+        $response = actingAs($this->admin)->putJson('/api/v1/employee/update/'.$this->employee->id, [
             'first_name' => 'Komay',
         ]);
         $response->assertOk();
@@ -159,7 +163,7 @@ describe('Show  Employee details', function () {
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return error if employee not existed', function () {
-        $nonExistedWorker = rand(100,200);
+        $nonExistedWorker = rand(100, 200);
         $response = actingAs($this->admin)->getJson('/api/v1/employee/show/'.$nonExistedWorker);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
@@ -191,17 +195,13 @@ describe('Delete Employee', function () {
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return error if employee not existed', function () {
-        $nonExistedWorker = rand(100,200);
+        $nonExistedWorker = rand(100, 200);
         $response = actingAs($this->admin)->deleteJson('/api/v1/employee/delete/'.$nonExistedWorker);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should delete a employee', function () {
         $response = actingAs($this->admin)->deleteJson('/api/v1/employee/delete/'.$this->employee->id);
         $response->assertStatus(Response::HTTP_OK);
-           assertDatabaseCount(\App\Models\Employee::class, 0);
+        assertDatabaseCount(\App\Models\Employee::class, 0);
     });
 });
-
-
-
-

@@ -2,7 +2,6 @@
 
 namespace App\Mapper;
 
-use App\DTO\WorkerCreateDTO;
 use App\DTO\WorkerUpdateDTO;
 
 class EmployeeUpdateMapper

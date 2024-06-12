@@ -23,6 +23,6 @@ class Resource extends Model
 
     public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(ResourceCategory::class,'resource_category_id');
+        return $this->belongsTo(ResourceCategory::class, 'resource_category_id');
     }
 }

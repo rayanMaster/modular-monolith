@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description')->nullable();
-            $table->foreignIdFor(\App\Models\ResourceCategory::class,'resource_category_id');
+            $table->foreignIdFor(\App\Models\ResourceCategory::class, 'resource_category_id');
             $table->tinyInteger('status')->default(\App\Enums\StatusEnum::Active->value);
 
             $table->timestamps();

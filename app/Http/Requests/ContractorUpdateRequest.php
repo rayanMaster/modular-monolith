@@ -22,10 +22,10 @@ class ContractorUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name'=>['sometimes','string'],
-            'last_name'=>['sometimes','string'],
-            'phone'=>['sometimes','string'],
-            'address_id'=>['sometimes','int'],
+            'first_name' => ['sometimes', 'string'],
+            'last_name' => ['sometimes', 'string'],
+            'phone' => ['sometimes', 'string'],
+            'address_id' => ['sometimes', 'int'],
         ];
     }
 }

@@ -1,6 +1,5 @@
 <?php
 
-use _PHPStan_c55d0e35f\Composer\XdebugHandler\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class WorkerFactory extends Factory
 {
     protected $model = Employee::class;
+
     /**
      * Define the model's default state.
      *

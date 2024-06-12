@@ -4,22 +4,13 @@ namespace App\DTO;
 
 use Spatie\LaravelData\Data;
 
-/**
- *
- */
 class AddressCreateDTO extends Data
 {
-    /**
-     * @param int $city_id
-     * @param string $street
-     * @param string $state
-     */
     public function __construct(
-        public int    $city_id,
+        public int $city_id,
         public string $street,
         public string $state,
-    )
-    {
+    ) {
     }
 
     /**
@@ -28,7 +19,6 @@ class AddressCreateDTO extends Data
      *    street:string,
      *    state:string
      * } $request
-     * @return self
      */
     public static function fromRequest(array $request): AddressCreateDTO
     {
@@ -38,5 +28,4 @@ class AddressCreateDTO extends Data
             state: $request['state']
         );
     }
-
 }

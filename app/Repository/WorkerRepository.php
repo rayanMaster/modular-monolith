@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Models\Employee;
-use App\Repository\MainRepository;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Builder;
 

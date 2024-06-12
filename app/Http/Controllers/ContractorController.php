@@ -15,18 +15,18 @@ use App\Mapper\ContractorUpdateMapper;
 use App\Models\Contractor;
 use App\Repository\ContractorRepository;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ContractorController extends Controller
 {
     public function __construct(
         private readonly ContractorRepository $contractorRepository
-    )
-    {}
+    ) {
+    }
 
     public function list(): JsonResponse
     {
         $result = $this->contractorRepository->list();
+
         return ApiResponseHelper::sendResponse(new Result(ContractorListResource::collection($result)));
     }
 
@@ -58,7 +58,7 @@ class ContractorController extends Controller
     public function show(int $id): JsonResponse
     {
         $contractor = Contractor::query()->findOrFail($id);
+
         return ApiResponseHelper::sendSuccessResponse(new Result(ContractorDetailsResource::make($contractor)));
     }
-
 }

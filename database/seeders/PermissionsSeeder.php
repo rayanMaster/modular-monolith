@@ -48,7 +48,8 @@ class PermissionsSeeder extends Seeder
             'update',
             'delete',
             'close',
-            'employee-assign'
+            'employee-assign',
+            'contractor-assign',
         ]);
 
         // WorkSite Category

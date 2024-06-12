@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
@@ -26,14 +25,16 @@ class WorkSite extends Model
         return WorkSiteFactory::new();
     }
 
-    public function subWorkSites():HasMany
+    public function subWorkSites(): HasMany
     {
-        return $this->hasMany(WorkSite::class,'parent_worksite_id');
+        return $this->hasMany(WorkSite::class, 'parent_worksite_id');
     }
-    public function parentWorksite():BelongsTo
+
+    public function parentWorksite(): BelongsTo
     {
-        return $this->belongsTo(WorkSite::class,'parent_worksite_id');
+        return $this->belongsTo(WorkSite::class, 'parent_worksite_id');
     }
+
     public function resources(): BelongsToMany
     {
         return $this->belongsToMany(Resource::class)->withPivot(['quantity', 'price']);

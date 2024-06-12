@@ -1,8 +1,11 @@
 <?php
 
+use App\Enums\WorkSiteCompletionStatusEnum;
 use App\Enums\WorkSiteReceptionStatusEnum;
 use App\Models\Contractor;
+use App\Models\Customer;
 use App\Models\WorkSite;
+use App\Models\WorkSiteCategory;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,9 +21,9 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('description');
-            $table->foreignIdFor(\App\Models\Customer::class)->nullable();
-            $table->foreignIdFor(\App\Models\WorkSiteCategory::class,'category_id')->nullable();
-            $table->foreignIdFor(WorkSite::class,'parent_worksite_id')->nullable();
+            $table->foreignIdFor(Customer::class)->nullable();
+            $table->foreignIdFor(WorkSiteCategory::class, 'category_id')->nullable();
+            $table->foreignIdFor(WorkSite::class, 'parent_worksite_id')->nullable();
             $table->foreignIdFor(Contractor::class)->nullable();
             $table->decimal('starting_budget', 8, 2)->nullable()->default(0);
             $table->decimal('cost', 8, 2)->nullable()->default(0);
@@ -30,7 +33,7 @@ return new class extends Migration
             $table->date('starting_date')->nullable();
             $table->date('deliver_date')->nullable();
             $table->tinyInteger('reception_status')->nullable()->default(WorkSiteReceptionStatusEnum::SCRATCH->value);
-            $table->tinyInteger('completion_status')->nullable()->default(\App\Enums\WorkSiteCompletionStatusEnum::STARTED->value);
+            $table->tinyInteger('completion_status')->nullable()->default(WorkSiteCompletionStatusEnum::STARTED->value);
 
             $table->timestamps();
             $table->softDeletes();

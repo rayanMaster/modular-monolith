@@ -6,5 +6,4 @@ enum WorkSiteReceptionStatusEnum: int
 {
     case SCRATCH = 1;
 
-
 }

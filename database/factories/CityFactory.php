@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class CityFactory extends Factory
 {
     protected $model = City::class;
+
     /**
      * Define the model's default state.
      *
@@ -21,7 +22,7 @@ class CityFactory extends Factory
     {
         return [
             'name' => $this->faker->city(),
-            'status'=> $this->faker->randomElement([StatusEnum::Active, StatusEnum::Inactive]),
+            'status' => $this->faker->randomElement([StatusEnum::Active, StatusEnum::Inactive]),
         ];
     }
 }

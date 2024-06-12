@@ -18,14 +18,15 @@ class FileDTO
     {
         $image = $request['image'] ?? null;
 
-        if($image) {
+        if ($image) {
             if (App::isProduction()) {
                 // Validate if it's an UploadedFile
-                if (!($request['image'] instanceof UploadedFile)) {
+                if (! ($request['image'] instanceof UploadedFile)) {
                     throw new \InvalidArgumentException('Invalid file format');
                 }
             }
         }
+
         // Validation for file can be added here if needed
         return new self(
             $image

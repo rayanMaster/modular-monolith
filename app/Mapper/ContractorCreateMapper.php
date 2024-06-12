@@ -12,8 +12,7 @@ class ContractorCreateMapper
             'first_name' => $createDTO->firstName,
             'last_name' => $createDTO->lastName ?? null,
             'phone' => $createDTO->phone ?? null,
-            'address_id' => $createDTO->addressId ?? null
+            'address_id' => $createDTO->addressId ?? null,
         ];
     }
-
 }

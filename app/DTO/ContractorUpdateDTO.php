@@ -7,12 +7,11 @@ use Spatie\LaravelData\Data;
 class ContractorUpdateDTO extends Data
 {
     public function __construct(
-        public ?string  $firstName,
+        public ?string $firstName,
         public ?string $lastName,
         public ?string $phone,
-        public ?int    $addressId
-    )
-    {
+        public ?int $addressId
+    ) {
     }
 
     /**
@@ -22,7 +21,6 @@ class ContractorUpdateDTO extends Data
      *     phone : string|null,
      *     address_id:int|null
      * } $request
-     * @return self
      */
     public static function fromRequest(array $request): self
     {

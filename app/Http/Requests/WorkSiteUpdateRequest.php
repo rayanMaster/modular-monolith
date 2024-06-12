@@ -37,13 +37,13 @@ class WorkSiteUpdateRequest extends FormRequest
             'receipt_date' => 'sometimes|date',
             'starting_date' => 'sometimes|date',
             'deliver_date' => 'sometimes|date',
-            'completion_status' => ['sometimes','integer',Rule::in(WorkSiteCompletionStatusEnum::cases())],
+            'completion_status' => ['sometimes', 'integer', Rule::in(WorkSiteCompletionStatusEnum::cases())],
             'reception_status' => 'sometimes|integer',
             'resources' => 'sometimes|array',
             'resources.*.quantity' => 'sometimes|numeric',
             'resources.*.price' => 'sometimes|numeric',
             'resources.*.id' => 'sometimes|integer',
-            'image' => ['sometimes',File::types(['jpeg', 'png', 'gif', 'webp'])
+            'image' => ['sometimes', File::types(['jpeg', 'png', 'gif', 'webp'])
                 ->max('2mb')],
         ];
     }

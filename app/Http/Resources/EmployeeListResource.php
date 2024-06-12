@@ -15,7 +15,7 @@ class EmployeeListResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'first_name'=>$this->first_name
+            'first_name' => $this->first_name,
         ];
     }
 }

@@ -1,12 +1,15 @@
 <?php
 
+use App\Enums\ConfirmEnum;
 use App\Enums\PaymentTypesEnum;
 use App\Enums\WorkSiteCompletionStatusEnum;
 use App\Enums\WorkSiteReceptionStatusEnum;
-use App\Http\Resources\WorkSiteDetailsResource;
+use App\Models\Address;
+use App\Models\Contractor;
 use App\Models\Customer;
 use App\Models\Resource;
 use App\Models\ResourceCategory;
+use App\Models\User;
 use App\Models\WorkSite;
 use App\Models\WorkSiteCategory;
 use Carbon\Carbon;
@@ -14,7 +17,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
-use function Pest\Laravel\{postJson, getJson, putJson, actingAs, assertDatabaseHas, assertDatabaseCount};
+
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
 
 describe('Worksite entity fields check', function () {
     beforeEach(function () {
@@ -47,7 +56,7 @@ describe('Worksite entity fields check', function () {
         $tableColumns = collect(Schema::getColumns('work_sites'));
 
         $requiredColumns = $tableColumns->filter(function ($item) {
-            return !$item['nullable'];
+            return ! $item['nullable'];
         })->map(function ($subItem) {
             return $subItem['name'];
         })->toArray();
@@ -58,10 +67,8 @@ describe('Worksite entity fields check', function () {
             return $subItem['name'];
         })->toArray();
 
-
         $this->assertEqualsCanonicalizing($requiredColumns, $this->requiredFields);
         $this->assertEqualsCanonicalizing($nullableColumns, $this->nullableFields);
-
 
     });
 
@@ -94,7 +101,8 @@ describe('WorkSite routes check', function () {
             'worksite.category.show',
             'worksite.category.delete',
 
-            'worksite.employee.assign'
+            'worksite.employee.assign',
+            'worksite.contractor.assign',
         ];
 
         // Collect routes and filter based on the prefix
@@ -131,7 +139,8 @@ describe('Create WorkSite', function () {
         $wsCategory = WorkSiteCategory::factory()->create();
 
         $customer = Customer::factory()->create();
-        $address = \App\Models\Address::factory()->create();
+        $address = Address::factory()->create();
+        $contractor = Contractor::factory()->create();
 
         $workSiteResourceCategory = ResourceCategory::factory()->create();
 
@@ -142,7 +151,7 @@ describe('Create WorkSite', function () {
             'resource_category_id' => $workSiteResourceCategory->id,
         ]);
 
-        $admin = \App\Models\User::factory()->admin()->create([
+        $admin = User::factory()->admin()->create([
             'name' => 'Admin1',
             'email' => 'admin1@admin.com',
             'password' => 'admin123',
@@ -152,11 +161,13 @@ describe('Create WorkSite', function () {
         Storage::fake();
 
         $file = \Illuminate\Http\UploadedFile::fake()->image('test.jpg');
+
         $response = $this->actingAs($admin)->postJson('/api/v1/worksite/create', [
             'title' => 'worksite A',
             'description' => 'this worksite is for freeTown',
-            'customer_id' => $customer?->id,
-            'category_id' => $wsCategory?->id, // construction
+            'customer_id' => $customer->id,
+            'category_id' => $wsCategory->id, // construction
+            'contractor_id' => $contractor->id,
             'parent_worksite_id' => null, // this is main worksite == top level worksite
             'starting_budget' => 15,
             'cost' => 20,
@@ -183,8 +194,8 @@ describe('Create WorkSite', function () {
 
         // Assert the file was stored...
         $path = 'workSite';
-        $name = 'test' . '_' . now()->format('YmdH');
-        $fullPath = public_path('storage/' . $path) . '/' . $name . '.webp';
+        $name = 'test'.'_'.now()->format('YmdH');
+        $fullPath = public_path('storage/'.$path).'/'.$name.'.webp';
 
         $this->assertFileExists($fullPath);
 
@@ -193,6 +204,7 @@ describe('Create WorkSite', function () {
         assertDatabaseHas(WorkSite::class, [
             'reception_status' => WorkSiteReceptionStatusEnum::SCRATCH->value,
             'completion_status' => WorkSiteCompletionStatusEnum::PENDING->value,
+            'contractor_id' => $contractor->id,
         ]);
         expect($workSite->parentWorksite)->toBeNull('that indicates that worksite is main')
             ->and($workSite?->title)->toBe('worksite A')
@@ -227,7 +239,7 @@ describe('Create WorkSite', function () {
 
         $mainWorkSite = WorkSite::factory()->create();
 
-        $admin = \App\Models\User::factory()->admin()->create();
+        $admin = User::factory()->admin()->create();
 
         expect($admin->hasRole('admin'))->toBe(true);
 
@@ -248,7 +260,7 @@ describe('Create WorkSite', function () {
     });
     test('As not admin, I cant create a main worksite', function () {
 
-        $siteManager = \App\Models\User::factory()->siteManager()->create();
+        $siteManager = User::factory()->siteManager()->create();
         expect($siteManager->hasRole('site_manager'))->toBe(true);
 
         $response = $this->actingAs($siteManager)->postJson('/api/v1/worksite/create', [
@@ -261,9 +273,9 @@ describe('Create WorkSite', function () {
     test('As an administrator, I want to create a sub worksites', function () {
 
         $mainWorkSite = WorkSite::factory()->create();
-        $address = \App\Models\Address::factory()->create();
+        $address = Address::factory()->create();
 
-        $admin = \App\Models\User::factory()->admin()->create();
+        $admin = User::factory()->admin()->create();
 
         expect($admin->hasRole('admin'))->toBe(true);
 
@@ -293,7 +305,6 @@ describe('Create WorkSite', function () {
 
     });
 
-
 });
 describe('Update WorkSite', function () {
 
@@ -305,29 +316,29 @@ describe('Update WorkSite', function () {
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
 
-        $this->admin = \App\Models\User::factory()->admin()->create();
+        $this->admin = User::factory()->admin()->create();
         $this->workSite = WorkSite::factory()->create();
 
     });
 
     test('As a non-authenticated, I cant update a main worksite', function () {
-        $response = putJson('/api/v1/worksite/update/' . $this->workSite->id, []);
+        $response = putJson('/api/v1/worksite/update/'.$this->workSite->id, []);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
 
     });
     test('As not admin, I cant update a main worksite', function () {
 
-        $siteManager = \App\Models\User::factory()->siteManager()->create();
+        $siteManager = User::factory()->siteManager()->create();
         expect($siteManager->hasRole('site_manager'))->toBe(true);
 
-        $response = actingAs($siteManager)->putJson('/api/v1/worksite/update/' . $this->workSite->id, []);
+        $response = actingAs($siteManager)->putJson('/api/v1/worksite/update/'.$this->workSite->id, []);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
 
     });
     test('As an administrator, I want to update worksite main info', function () {
 
         assertDatabaseCount(WorkSite::class, 1);
-        $response = actingAs($this->admin)->putJson('/api/v1/worksite/update/' . $this->workSite->id, [
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/update/'.$this->workSite->id, [
             'title' => 'worksite AB',
             'description' => 'this worksite is for freeTown new',
         ]);
@@ -338,7 +349,9 @@ describe('Update WorkSite', function () {
         ]);
 
     });
+    test('As an administrator, I want to update worksite contractor before worksite finished', function () {
 
+    });
 });
 describe('List WorkSites', function () {
 
@@ -350,8 +363,8 @@ describe('List WorkSites', function () {
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
 
-        $this->admin = \App\Models\User::factory()->admin()->create();
-        $this->notAdmin = \App\Models\User::factory()->siteManager()->create();
+        $this->admin = User::factory()->admin()->create();
+        $this->notAdmin = User::factory()->siteManager()->create();
         expect($this->notAdmin->hasRole('site_manager'))->toBe(true);
 
     });
@@ -364,7 +377,7 @@ describe('List WorkSites', function () {
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     test('As an admin, I can show list of worksites without customer and category while creating', function () {
-        $address = \App\Models\Address::factory()->create();
+        $address = Address::factory()->create();
         $data = [
             'title' => 'worksite A',
             'description' => 'this worksite is for freeTown',
@@ -400,7 +413,7 @@ describe('List WorkSites', function () {
                     'city' => $address->city?->name,
                     'street' => $address->street,
                     'state' => $address->state,
-                    'zipCode' => $address->zipcode
+                    'zipCode' => $address->zipcode,
                 ],
                 'workers_count' => $workSite->workers_count,
                 'receipt_date' => $workSite->receipt_date,
@@ -416,7 +429,7 @@ describe('List WorkSites', function () {
     test('As an admin, I can show list of worksites', function () {
         $wsCategory = WorkSiteCategory::factory()->create();
         $customer = Customer::factory()->create();
-        $address = \App\Models\Address::factory()->create();
+        $address = Address::factory()->create();
         $data = [
             'title' => 'worksite A',
             'description' => 'this worksite is for freeTown',
@@ -452,7 +465,7 @@ describe('List WorkSites', function () {
                     'city' => $address->city?->name,
                     'street' => $address->street,
                     'state' => $address->state,
-                    'zipCode' => $address->zipcode
+                    'zipCode' => $address->zipcode,
                 ],
                 'workers_count' => $workSite->workers_count,
                 'receipt_date' => $workSite->receipt_date,
@@ -477,14 +490,14 @@ describe('Show WorkSites Details', function () {
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
 
-        $this->admin = \App\Models\User::factory()->admin()->create();
-        $this->notAdmin = \App\Models\User::factory()->siteManager()->create();
+        $this->admin = User::factory()->admin()->create();
+        $this->notAdmin = User::factory()->siteManager()->create();
         expect($this->notAdmin->hasRole('site_manager'))->toBe(true);
 
         $this->workSite = WorkSite::factory()->create();
         $this->wsCategory = WorkSiteCategory::factory()->create();
         $this->customer = Customer::factory()->create();
-        $this->address = \App\Models\Address::factory()->create();
+        $this->address = Address::factory()->create();
         $data = [
             'title' => 'worksite sub',
             'description' => 'this worksite is for freeTown sub',
@@ -505,20 +518,20 @@ describe('Show WorkSites Details', function () {
         $this->subWorkSite = WorkSite::factory()->create($data);
     });
     test('As a non-authenticated, I cant show details of a worksite', function () {
-        $response = getJson('/api/v1/worksite/show/' . $this->workSite->id);
+        $response = getJson('/api/v1/worksite/show/'.$this->workSite->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     test('As not admin, I cant show details of a worksite', function () {
-        $response = actingAs($this->notAdmin)->getJson('/api/v1/worksite/show/' . $this->workSite->id);
+        $response = actingAs($this->notAdmin)->getJson('/api/v1/worksite/show/'.$this->workSite->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found error if worksite not existed in database', function () {
         $unExistedWorkSiteId = rand(200, 333);
-        $response = actingAs($this->admin)->getJson('/api/v1/worksite/show/' . $unExistedWorkSiteId);
+        $response = actingAs($this->admin)->getJson('/api/v1/worksite/show/'.$unExistedWorkSiteId);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     test('As an admin, I can show details of a worksite', function () {
-        $response = actingAs($this->admin)->getJson('/api/v1/worksite/show/' . $this->workSite->id);
+        $response = actingAs($this->admin)->getJson('/api/v1/worksite/show/'.$this->workSite->id);
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment([
                 'id' => $this->workSite->id,
@@ -533,7 +546,7 @@ describe('Show WorkSites Details', function () {
                     'city' => $this->workSite->address->city?->name,
                     'street' => $this->workSite->address->street,
                     'state' => $this->workSite->address->state,
-                    'zipCode' => $this->workSite->address->zipcode
+                    'zipCode' => $this->workSite->address->zipcode,
                 ],
                 'workers_count' => $this->workSite->workers_count,
                 'receipt_date' => $this->workSite->receipt_date,
@@ -545,31 +558,31 @@ describe('Show WorkSites Details', function () {
             ])
             ->assertJsonPath('data.sub_worksites', [
                 [
-                    "id" => $this->subWorkSite->id,
-                    "title" => $this->subWorkSite->title,
-                    "description" => $this->subWorkSite->description,
-                    "customer" => $this->subWorkSite->customer?->fullName,
-                    "category" => $this->subWorkSite->category?->name,
-                    "sub_worksites" => [],
+                    'id' => $this->subWorkSite->id,
+                    'title' => $this->subWorkSite->title,
+                    'description' => $this->subWorkSite->description,
+                    'customer' => $this->subWorkSite->customer?->fullName,
+                    'category' => $this->subWorkSite->category?->name,
+                    'sub_worksites' => [],
                     'starting_budget' => number_format($this->subWorkSite->starting_budget, 2),
                     'cost' => number_format($this->subWorkSite->cost, 2),
-                    "address" => [
-                        "id" => $this->address->id,
-                        "city" => $this->address->city?->name,
-                        "street" => $this->address->street,
-                        "state" => $this->address->state,
-                        "zipCode" => $this->address->zipcode
+                    'address' => [
+                        'id' => $this->address->id,
+                        'city' => $this->address->city?->name,
+                        'street' => $this->address->street,
+                        'state' => $this->address->state,
+                        'zipCode' => $this->address->zipcode,
                     ],
-                    "workers_count" => $this->subWorkSite->workers_count,
-                    "receipt_date" => $this->subWorkSite->receipt_date,
-                    "starting_date" => $this->subWorkSite->starting_date,
-                    "deliver_date" => $this->subWorkSite->deliver_date,
-                    "reception_status" => $this->subWorkSite->reception_status,
-                    "created_at" => Carbon::parse($this->subWorkSite->created_at)->toDateTimeString(),
-                    "updated_at" => Carbon::parse($this->subWorkSite->updated_at)->toDateTimeString(),
-                    "payments" => [],
-                    "resources" => []
-                ]
+                    'workers_count' => $this->subWorkSite->workers_count,
+                    'receipt_date' => $this->subWorkSite->receipt_date,
+                    'starting_date' => $this->subWorkSite->starting_date,
+                    'deliver_date' => $this->subWorkSite->deliver_date,
+                    'reception_status' => $this->subWorkSite->reception_status,
+                    'created_at' => Carbon::parse($this->subWorkSite->created_at)->toDateTimeString(),
+                    'updated_at' => Carbon::parse($this->subWorkSite->updated_at)->toDateTimeString(),
+                    'payments' => [],
+                    'resources' => [],
+                ],
             ]);
     });
     test('As an admin, I can show details of a worksite with payments and resources', function () {
@@ -612,11 +625,11 @@ describe('Show WorkSites Details', function () {
         $workSite->resources()->syncWithoutDetaching([
             $workSiteResource1->id => [
                 'quantity' => 23,
-                'price' => '34.00'
-            ]
+                'price' => '34.00',
+            ],
         ]);
 
-        $response = actingAs($this->admin)->getJson('/api/v1/worksite/show/' . $workSite->id);
+        $response = actingAs($this->admin)->getJson('/api/v1/worksite/show/'.$workSite->id);
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment([
                 'id' => $workSite->id,
@@ -631,7 +644,7 @@ describe('Show WorkSites Details', function () {
                     'city' => $workSite->address->city?->name,
                     'street' => $workSite->address->street,
                     'state' => $workSite->address->state,
-                    'zipCode' => $workSite->address->zipcode
+                    'zipCode' => $workSite->address->zipcode,
                 ],
                 'workers_count' => $workSite->workers_count,
                 'receipt_date' => $workSite->receipt_date,
@@ -648,7 +661,7 @@ describe('Show WorkSites Details', function () {
                         'amount' => number_format(20, 2),
                         'date' => Carbon::parse(Carbon::now())->toDateTimeString(),
                         'payment_type' => PaymentTypesEnum::CASH->value,
-                    ]
+                    ],
                 ],
                 'resources' => [
                     [
@@ -656,14 +669,14 @@ describe('Show WorkSites Details', function () {
                         'description' => $workSiteResource1->description,
                         'resource_category' => [
                             'id' => $workSiteResourceCategory->id,
-                            'name' => $workSiteResourceCategory->name
+                            'name' => $workSiteResourceCategory->name,
                         ],
                         'work_site_id' => $workSite->id,
                         'resource_id' => $workSiteResource1->id,
                         'quantity' => 23,
-                        'price' => '34.00'
-                    ]
-                ]
+                        'price' => '34.00',
+                    ],
+                ],
             ]);
     });
 
@@ -678,37 +691,37 @@ describe('Close WorkSites', function () {
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
 
-        $this->admin = \App\Models\User::factory()->admin()->create();
-        $this->notAdmin = \App\Models\User::factory()->siteManager()->create();
+        $this->admin = User::factory()->admin()->create();
+        $this->notAdmin = User::factory()->siteManager()->create();
         expect($this->notAdmin->hasRole('site_manager'))->toBe(true);
 
         $this->workSite = WorkSite::factory()->create([
-            'cost' => 2000
+            'cost' => 2000,
         ]);
 
     });
     test('As a non-authenticated, I cant close a worksite', function () {
-        $response = postJson('/api/v1/worksite/close/' . $this->workSite->id);
+        $response = postJson('/api/v1/worksite/close/'.$this->workSite->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     test('As not admin, I cant close a worksite', function () {
-        $response = actingAs($this->notAdmin)->postJson('/api/v1/worksite/close/' . $this->workSite->id);
+        $response = actingAs($this->notAdmin)->postJson('/api/v1/worksite/close/'.$this->workSite->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found error if worksite not existed in database', function () {
         $unExistedWorkSiteId = rand(200, 333);
-        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/' . $unExistedWorkSiteId);
+        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/'.$unExistedWorkSiteId);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should prevent me closing worksite with active worksites', function () {
         WorkSite::factory()->create([
             'completion_status' => WorkSiteCompletionStatusEnum::STARTED,
-            'parent_worksite_id' => $this->workSite->id
+            'parent_worksite_id' => $this->workSite->id,
         ]);
-        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/' . $this->workSite->id);
+        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/'.$this->workSite->id);
         $response->assertStatus(Response::HTTP_CONFLICT)
             ->assertJson([
-                'message' => "You can't close a worksite with active sub-worksites"
+                'message' => "You can't close a worksite with active sub-worksites",
             ]);
 
     });
@@ -727,11 +740,11 @@ describe('Close WorkSites', function () {
             'payment_date' => Carbon::now(),
             'payment_type' => PaymentTypesEnum::CASH->value,
         ]);
-        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/' . $this->workSite->id);
+        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/'.$this->workSite->id);
 
         $response->assertStatus(Response::HTTP_CONFLICT)
             ->assertJson([
-                'message' => "You can't close a worksite with unpaid payment"
+                'message' => "You can't close a worksite with unpaid payment",
             ]);
     });
     test('As an admin, I can close a worksite with full payments and closed sub worksites', function () {
@@ -744,17 +757,107 @@ describe('Close WorkSites', function () {
         ]);
         WorkSite::factory()->create([
             'completion_status' => WorkSiteCompletionStatusEnum::CLOSED,
-            'parent_worksite_id' => $this->workSite->id
+            'parent_worksite_id' => $this->workSite->id,
         ]);
-        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/' . $this->workSite->id);
+        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/'.$this->workSite->id);
         $response->assertStatus(Response::HTTP_OK);
 
         assertDatabaseHas(WorkSite::class, [
-            'completion_status' => WorkSiteCompletionStatusEnum::CLOSED
+            'completion_status' => WorkSiteCompletionStatusEnum::CLOSED,
         ]);
     });
 
 });
+describe('Assign Contractor to WorkSites', function () {
+
+    uses(RefreshDatabase::class);
+
+    beforeEach(function () {
+        $this->artisan('storage:link');
+        $this->assertDatabaseCount(Role::class, 0);
+        $this->artisan('db:seed');
+        $this->assertDatabaseCount(Role::class, 4);
+
+        $this->admin = User::factory()->admin()->create();
+        $this->notAdmin = User::factory()->siteManager()->create();
+        expect($this->notAdmin->hasRole('site_manager'))->toBe(true);
+
+        $this->workSite = WorkSite::factory()->create();
+        $this->contractor = Contractor::factory()->create();
+
+    });
+    test('As a non-authenticated, I cant assign contractor to a worksite', function () {
+        $response = putJson('/api/v1/worksite/'.$this->workSite->id.'/contractor/assign', []);
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
+    });
+    test('As not admin, I cant assign contractor to a worksite', function () {
+        $response = actingAs($this->notAdmin)->putJson('/api/v1/worksite/'.$this->workSite->id.'/contractor/assign', []);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    });
+    it('should return not found error if worksite not existed in database and if contractor not existed', function () {
+        $unExistedWorkSiteId = rand(200, 333);
+        $unExistedContractorId = rand(200, 333);
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/'.$unExistedWorkSiteId.'/contractor/assign', [
+            'contractor_id' => $this->contractor->id,
+        ]);
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
+
+        $otherResponse = actingAs($this->admin)->putJson('/api/v1/worksite/'.$this->workSite->id.'/contractor/assign', [
+            'contractor_id' => $unExistedContractorId,
+        ]);
+        $otherResponse->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    });
+    it('should add contractor of a worksite', function () {
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/'.$this->workSite->id.'/contractor/assign', [
+            'contractor_id' => $this->contractor->id,
+        ]);
+        $response->assertStatus(Response::HTTP_OK);
+        assertDatabaseHas(WorkSite::class, [
+            'contractor_id' => $this->contractor->id,
+        ]);
+
+    });
+    it('should update contractor of a worksite', function () {
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/'.$this->workSite->id.'/contractor/assign', [
+            'contractor_id' => $this->contractor->id,
+        ]);
+        $response->assertStatus(Response::HTTP_OK);
+        assertDatabaseHas(WorkSite::class, [
+            'contractor_id' => $this->contractor->id,
+        ]);
+
+        $otherContractor = Contractor::factory()->create();
+
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/'.$this->workSite->id.'/contractor/assign', [
+            'contractor_id' => $otherContractor->id,
+        ]);
+        $response->assertStatus(Response::HTTP_OK);
+        assertDatabaseHas(WorkSite::class, [
+            'contractor_id' => $otherContractor->id,
+        ]);
+
+    });
+    test('As an admin i can remove contractor of a worksite ', function () {
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/'.$this->workSite->id.'/contractor/assign', [
+            'contractor_id' => $this->contractor->id,
+        ]);
+        $response->assertStatus(Response::HTTP_OK);
+        assertDatabaseHas(WorkSite::class, [
+            'contractor_id' => $this->contractor->id,
+        ]);
+
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/'.$this->workSite->id.'/contractor/assign', [
+            'contractor_id' => $this->contractor->id,
+            'should_remove' => ConfirmEnum::YES->value,
+        ]);
+        $response->assertStatus(Response::HTTP_OK);
+        assertDatabaseHas(WorkSite::class, [
+            'contractor_id' => null,
+        ]);
+
+    });
+});
+
 describe('Manage payment to a worksite', function () {
     test('As a non-authenticated, I cant make a payment', function () {
 

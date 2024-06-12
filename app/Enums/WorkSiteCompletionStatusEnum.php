@@ -10,5 +10,4 @@ enum WorkSiteCompletionStatusEnum: int
     case COMPLETED = 4;
     case CLOSED = 5;
 
-
 }

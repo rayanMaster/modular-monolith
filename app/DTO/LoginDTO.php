@@ -4,20 +4,15 @@ namespace App\DTO;
 
 use Spatie\LaravelData\Data;
 
-/**
- *
- */
 class LoginDTO extends Data
 {
     /**
-     * @param string $email
-     * @param string $password
+     * @param  string  $email
      */
     public function __construct(
         public string $phone,
         public string $password
-    )
-    {
+    ) {
     }
 
     /**
@@ -25,7 +20,6 @@ class LoginDTO extends Data
      *  user_name:string,
      *  password:string
      * } $request
-     * @return LoginDTO
      */
     public static function fromRequest(array $request): LoginDTO
     {
@@ -34,5 +28,4 @@ class LoginDTO extends Data
             password: $request['password']
         );
     }
-
 }

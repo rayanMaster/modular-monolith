@@ -9,13 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 
 abstract readonly class MainRepository implements MainRepositoryInterface
 {
-
     public function __construct(
-        private Builder|null    $query,
+        private ?Builder $query,
         private DatabaseManager $databaseManager
 
-    )
-    {
+    ) {
     }
 
     public function list(): Collection|array
@@ -23,17 +21,17 @@ abstract readonly class MainRepository implements MainRepositoryInterface
         return $this->query->get();
     }
 
-
     public function show(int $id): Model|Collection|Builder|array|null
     {
         $record = $this->query->findOrFail($id);
+
         return $record;
     }
 
     /**
      * @throws \Throwable
      */
-    public function create(array $attributes): Model|null
+    public function create(array $attributes): ?Model
     {
         return $this->databaseManager->transaction(
             callback: function () use ($attributes) {
@@ -44,12 +42,13 @@ abstract readonly class MainRepository implements MainRepositoryInterface
     /**
      * @throws \Throwable
      */
-    public function update(int $id, array $attributes, bool $passNull = false): Model|null
+    public function update(int $id, array $attributes, bool $passNull = false): ?Model
     {
         $record = $this->query->findOrFail($id);
+
         return $this->databaseManager->transaction(
             callback: function () use ($attributes, $record, $passNull) {
-                $filteredAttributes = array_filter($attributes, fn($attribute) => $attribute != null);
+                $filteredAttributes = array_filter($attributes, fn ($attribute) => $attribute != null);
                 $record->update($passNull ? $attributes : $filteredAttributes);
             }, attempts: 3);
     }

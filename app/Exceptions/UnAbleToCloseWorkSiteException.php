@@ -4,7 +4,6 @@ namespace App\Exceptions;
 
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\ErrorResult;
-use App\Helpers\ApiResponse\Result;
 use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;

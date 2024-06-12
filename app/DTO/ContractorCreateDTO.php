@@ -4,23 +4,14 @@ namespace App\DTO;
 
 use Spatie\LaravelData\Data;
 
-/**
- *
- */
 class ContractorCreateDTO extends Data
 {
-    /**
-     * @param string $firstName
-     * @param string|null $lastName
-     * @param int|null $addressId
-     */
     public function __construct(
-        public string  $firstName,
+        public string $firstName,
         public ?string $lastName,
         public ?string $phone,
-        public ?int    $addressId
-    )
-    {
+        public ?int $addressId
+    ) {
     }
 
     /**
@@ -30,7 +21,6 @@ class ContractorCreateDTO extends Data
      *     phone: string | null,
      *     address_id:int|null
      * } $request
-     * @return self
      */
     public static function fromRequest(array $request): self
     {
@@ -42,5 +32,4 @@ class ContractorCreateDTO extends Data
         );
 
     }
-
 }

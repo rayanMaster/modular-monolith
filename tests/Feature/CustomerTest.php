@@ -5,8 +5,11 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
-use function Pest\Laravel\{postJson,actingAs,putJson,getJson,assertDatabaseHas};
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
 
 describe('Customer routes check', function () {
     it('should have all routes for /customer', function () {
@@ -85,24 +88,24 @@ describe('Customer Update', function () {
     });
 
     it('should prevent non auth updating a Customer', function () {
-        $response = putJson("/api/v1/customer/update/" . $this->customer->id);
+        $response = putJson('/api/v1/customer/update/'.$this->customer->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin updating a Customer', function () {
-        $response = actingAs($this->notAdmin)->putJson("/api/v1/customer/update/" . $this->customer->id);
+        $response = actingAs($this->notAdmin)->putJson('/api/v1/customer/update/'.$this->customer->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should not return validation error when data is missed', function () {
-        $response = actingAs($this->admin)->putJson("/api/v1/customer/update/" . $this->customer->id, []);
+        $response = actingAs($this->admin)->putJson('/api/v1/customer/update/'.$this->customer->id, []);
         $response->assertStatus(Response::HTTP_OK);
     });
     it('should not touch a field if not updated', function () {
-        $response = actingAs($this->admin)->putJson("/api/v1/customer/update/" . $this->customer->id, []);
+        $response = actingAs($this->admin)->putJson('/api/v1/customer/update/'.$this->customer->id, []);
         assertDatabaseHas('customers', ['first_name' => 'Rayan']);
         $response->assertStatus(Response::HTTP_OK);
     });
     it('should create new Customer with valid data', function () {
-        $response = actingAs($this->admin)->putJson("/api/v1/customer/update/" . $this->customer->id, [
+        $response = actingAs($this->admin)->putJson('/api/v1/customer/update/'.$this->customer->id, [
             'first_name' => 'John',
         ]);
         assertDatabaseHas('customers', ['first_name' => 'John']);

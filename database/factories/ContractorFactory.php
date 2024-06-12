@@ -23,7 +23,7 @@ class ContractorFactory extends Factory
         return [
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
-            'address_id' => fn() => Address::query()->first() ?
+            'address_id' => fn () => Address::query()->first() ?
                 Address::query()->first()->id :
                 Address::factory()->create()->id,
         ];

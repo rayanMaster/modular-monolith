@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\ContractorController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ResourceCategoryController;
 use App\Http\Controllers\ResourceController;
-use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\WorkSiteCategoryController;
 use App\Http\Controllers\WorkSiteController;
 use App\Http\Controllers\WorkSitePaymentController;
@@ -100,25 +100,31 @@ Route::prefix('v1')->group(function () {
             });
 
             Route::group(['prefix' => '{worksiteId}/employee'], function () {
-                Route::post('assign', [WorkSiteController::class,'assignEmployee'])
+                Route::post('assign', [WorkSiteController::class, 'assignEmployee'])
                     ->middleware('can:worksite-employee-assign')
                     ->name('worksite.employee.assign');
 
-//                Route::post('list', WorkSitePaymentController::class)
-//                    ->middleware('can:worksite-resource-list')
-//                    ->name('worksite.resource.list');
-//
-//                Route::post('update/{id}', WorkSitePaymentController::class)
-//                    ->middleware('can:worksite-resource-update')
-//                    ->name('worksite.resource.update');
-//
-//                Route::post('show/{id}', WorkSitePaymentController::class)
-//                    ->middleware('can:worksite-resource-show')
-//                    ->name('worksite.resource.show');
-//
-//                Route::post('delete/{id}', WorkSitePaymentController::class)
-//                    ->middleware('can:worksite-resource-delete')
-//                    ->name('worksite.resource.delete');
+                //                Route::post('list', WorkSitePaymentController::class)
+                //                    ->middleware('can:worksite-resource-list')
+                //                    ->name('worksite.resource.list');
+                //
+                //                Route::post('update/{id}', WorkSitePaymentController::class)
+                //                    ->middleware('can:worksite-resource-update')
+                //                    ->name('worksite.resource.update');
+                //
+                //                Route::post('show/{id}', WorkSitePaymentController::class)
+                //                    ->middleware('can:worksite-resource-show')
+                //                    ->name('worksite.resource.show');
+                //
+                //                Route::post('delete/{id}', WorkSitePaymentController::class)
+                //                    ->middleware('can:worksite-resource-delete')
+                //                    ->name('worksite.resource.delete');
+            });
+
+            Route::group(['prefix' => '{worksiteId}/contractor'], function () {
+                Route::put('assign', [WorkSiteController::class, 'assignContractor'])
+                    ->middleware('can:worksite-contractor-assign')
+                    ->name('worksite.contractor.assign');
             });
         });
 

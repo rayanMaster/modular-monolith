@@ -2,10 +2,7 @@
 
 namespace App\Mapper;
 
-use App\DTO\WorkSiteCreateDTO;
 use App\DTO\WorkSiteUpdateDTO;
-use App\Enums\PaymentTypesEnum;
-use Carbon\Carbon;
 
 class WorkSiteUpdateMapper extends \Spatie\LaravelData\Data
 {
@@ -27,5 +24,4 @@ class WorkSiteUpdateMapper extends \Spatie\LaravelData\Data
             'reception_status' => $workSiteDTO->receptionStatus,
         ];
     }
-
 }

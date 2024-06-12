@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->tinyInteger('status')->default(\App\Enums\StatusEnum::Active->value);
 
-
             $table->timestamps();
             $table->softDeletes();
         });
