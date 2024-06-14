@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (ValidationException $exception, Request $request) {
             if ($request->expectsJson()) {
+
                 $errors = $exception->validator->errors()->toArray();
                 $error = $errors[array_key_first($errors)][0] ?? '';
 

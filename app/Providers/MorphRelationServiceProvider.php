@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Customer;
 use App\Models\WorkSite;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -23,6 +24,7 @@ class MorphRelationServiceProvider extends ServiceProvider
     {
         Relation::morphMap([
             'worksite' => Worksite::class,
+            'customer'=>Customer::class,
         ]);
     }
 }

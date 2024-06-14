@@ -50,8 +50,7 @@ describe('Resource routes check', function () {
     });
 
 });
-
-describe('WorkSiteResource Create', function () {
+describe(' Resource Create', function () {
     uses(RefreshDatabase::class);
 
     beforeEach(function () {
@@ -86,8 +85,7 @@ describe('WorkSiteResource Create', function () {
         $response->assertOk();
     });
 });
-
-describe('WorkSite Resource Update', function () {
+describe(' Resource Update', function () {
     uses(RefreshDatabase::class);
 
     beforeEach(function () {
@@ -128,8 +126,7 @@ describe('WorkSite Resource Update', function () {
         $response->assertOk();
     });
 });
-
-describe('WorkSite Resource List', function () {
+describe(' Resource List', function () {
     uses(RefreshDatabase::class);
 
     beforeEach(function () {
@@ -158,8 +155,7 @@ describe('WorkSite Resource List', function () {
             ]);
     });
 });
-
-describe('WorkSite Resource Details', function () {
+describe(' Resource Details', function () {
     uses(RefreshDatabase::class);
 
     beforeEach(function () {
@@ -188,8 +184,7 @@ describe('WorkSite Resource Details', function () {
             ->assertJsonFragment(['name' => 'resource 10']);
     });
 });
-
-describe('WorkSite Resource Delete', function () {
+describe(' Resource Delete', function () {
     uses(RefreshDatabase::class);
 
     beforeEach(function () {

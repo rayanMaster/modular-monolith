@@ -27,7 +27,7 @@ class CustomerController extends Controller
 
     public function show($id)
     {
-        $customer = Customer::query()->findOrFail($id);
+        $customer = Customer::query()->with(['address','payments'])->findOrFail($id);
 
         return ApiResponseHelper::sendResponse(new Result(CustomerDetailsResource::make($customer)));
     }

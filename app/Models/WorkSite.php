@@ -37,7 +37,7 @@ class WorkSite extends Model
 
     public function resources(): BelongsToMany
     {
-        return $this->belongsToMany(Resource::class)->withPivot(['quantity', 'price']);
+        return $this->belongsToMany(Resource::class,'work_site_resources')->withPivot(['quantity', 'price']);
     }
 
     public function category(): BelongsTo

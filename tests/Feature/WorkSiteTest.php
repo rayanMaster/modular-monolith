@@ -14,6 +14,7 @@ use App\Models\WorkSite;
 use App\Models\WorkSiteCategory;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
@@ -103,6 +104,14 @@ describe('WorkSite routes check', function () {
 
             'worksite.employee.assign',
             'worksite.contractor.assign',
+
+            'worksite.customer.assign',
+            'worksite.customer.update',
+            'worksite.customer.show',
+            'worksite.customer.delete',
+
+            'worksite.resource.add',
+            'worksite.resource.list',
         ];
 
         // Collect routes and filter based on the prefix
@@ -160,7 +169,7 @@ describe('Create WorkSite', function () {
 
         Storage::fake();
 
-        $file = \Illuminate\Http\UploadedFile::fake()->image('test.jpg');
+        $file = UploadedFile::fake()->image('test.jpg');
 
         $response = $this->actingAs($admin)->postJson('/api/v1/worksite/create', [
             'title' => 'worksite A',
@@ -858,24 +867,6 @@ describe('Assign Contractor to WorkSites', function () {
     });
 });
 
-describe('Manage payment to a worksite', function () {
-    test('As a non-authenticated, I cant make a payment', function () {
-
-    });
-    test('As not admin, I cant make a payment', function () {
-
-    });
-
-    it('should prevent updating existed payment', function () {
-
-    });
-    it('should prevent removing existed payment', function () {
-
-    });
-    it('should make a payment to existed worksite', function () {
-
-    });
-});
 describe('Manage resources of the worksite', function () {
     test('As a non-authenticated, I cant manage resource of a worksite', function () {
 
@@ -900,7 +891,7 @@ describe('Manage resources of the worksite', function () {
 
     });
 });
-describe('Manage workers of the worksite', function () {
+describe('Manage employees of the worksite', function () {
     test('As a non-authenticated, I cant manage workers of a worksite', function () {
 
     });

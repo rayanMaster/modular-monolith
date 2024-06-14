@@ -9,7 +9,9 @@ use App\Http\Controllers\ResourceCategoryController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\WorkSiteCategoryController;
 use App\Http\Controllers\WorkSiteController;
+use App\Http\Controllers\WorkSiteCustomerController;
 use App\Http\Controllers\WorkSitePaymentController;
+use App\Http\Controllers\WorkSiteResourceController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -64,39 +66,39 @@ Route::prefix('v1')->group(function () {
 
             Route::group(['prefix' => '{worksiteId}/payment'], function () {
 
-                Route::post('create', WorkSitePaymentController::class)
+                Route::post('create', [WorkSitePaymentController::class,'create'])
                     ->middleware('can:payment-create')
                     ->name('worksite.payment.create');
 
-                Route::post('list', WorkSitePaymentController::class)
+                Route::get('list', [WorkSitePaymentController::class,'list'])
                     ->middleware('can:payment-list')
                     ->name('worksite.payment.list');
-
-                Route::post('show/{id}', WorkSitePaymentController::class)
-                    ->middleware('can:payment-show')
-                    ->name('worksite.payment.show');
+//
+//                Route::post('show/{id}', WorkSitePaymentController::class)
+//                    ->middleware('can:payment-show')
+//                    ->name('worksite.payment.show');
             });
 
             Route::group(['prefix' => '{worksiteId}/resource'], function () {
-                Route::post('create', WorkSitePaymentController::class)
-                    ->middleware('can:worksite-resource-create')
-                    ->name('worksite.resource.create');
+                Route::post('/{resourceId}/add', [WorkSiteResourceController::class,'add'])
+                    ->middleware('can:worksite-resource-add')
+                    ->name('worksite.resource.add');
 
-                Route::post('list', WorkSitePaymentController::class)
+                Route::get('/list', [WorkSiteResourceController::class,'list'])
                     ->middleware('can:worksite-resource-list')
                     ->name('worksite.resource.list');
-
-                Route::post('update/{id}', WorkSitePaymentController::class)
-                    ->middleware('can:worksite-resource-update')
-                    ->name('worksite.resource.update');
-
-                Route::post('show/{id}', WorkSitePaymentController::class)
-                    ->middleware('can:worksite-resource-show')
-                    ->name('worksite.resource.show');
-
-                Route::post('delete/{id}', WorkSitePaymentController::class)
-                    ->middleware('can:worksite-resource-delete')
-                    ->name('worksite.resource.delete');
+//
+//                Route::post('update/{id}', WorkSitePaymentController::class)
+//                    ->middleware('can:worksite-resource-update')
+//                    ->name('worksite.resource.update');
+//
+//                Route::post('show/{id}', WorkSitePaymentController::class)
+//                    ->middleware('can:worksite-resource-show')
+//                    ->name('worksite.resource.show');
+//
+//                Route::post('delete/{id}', WorkSitePaymentController::class)
+//                    ->middleware('can:worksite-resource-delete')
+//                    ->name('worksite.resource.delete');
             });
 
             Route::group(['prefix' => '{worksiteId}/employee'], function () {
@@ -125,6 +127,12 @@ Route::prefix('v1')->group(function () {
                 Route::put('assign', [WorkSiteController::class, 'assignContractor'])
                     ->middleware('can:worksite-contractor-assign')
                     ->name('worksite.contractor.assign');
+            });
+
+            Route::group(['prefix' => '{worksiteId}/customer'], function () {
+                Route::post('/{customerId}/assign', [WorkSiteCustomerController::class, 'assignCustomer'])
+                    ->middleware('can:worksite-customer-assign')
+                    ->name('worksite.customer.assign');
             });
         });
 

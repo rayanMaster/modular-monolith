@@ -50,6 +50,9 @@ class PermissionsSeeder extends Seeder
             'close',
             'employee-assign',
             'contractor-assign',
+            'customer-assign',
+            'resource-add',
+            'resource-list',
         ]);
 
         // WorkSite Category
