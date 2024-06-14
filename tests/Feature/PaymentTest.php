@@ -8,7 +8,12 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
-use function Pest\Laravel\{assertDatabaseHas, assertDatabaseCount, actingAs, postJson, getJson};
+
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
 
 describe('Create Payment for a Worksite', function () {
 
@@ -28,19 +33,18 @@ describe('Create Payment for a Worksite', function () {
         expect($this->admin->hasRole('admin'))->toBe(true);
     });
 
-
     it('should prevent non auth making new payment for a worksite', function () {
-        $response = postJson("/api/v1/worksite/" . $this->workSite->id . "/payment/create");
+        $response = postJson('/api/v1/worksite/'.$this->workSite->id.'/payment/create');
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin making new payment for a worksite', function () {
 
-        $response = actingAs($this->notAdmin)->postJson("/api/v1/worksite/" . $this->workSite->id . "/payment/create");
+        $response = actingAs($this->notAdmin)->postJson('/api/v1/worksite/'.$this->workSite->id.'/payment/create');
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     test('As an administrator, I want to make payment to worksite', function () {
 
-        $response = actingAs($this->admin)->postJson("/api/v1/worksite/" . $this->workSite->id . "/payment/create", [
+        $response = actingAs($this->admin)->postJson('/api/v1/worksite/'.$this->workSite->id.'/payment/create', [
             'payment_amount' => 3000,
             'payment_type' => PaymentTypesEnum::CASH->value,
             'payment_date' => '2024-04-12 10:34',
@@ -49,7 +53,7 @@ describe('Create Payment for a Worksite', function () {
 
         ]);
         $expectedResult = [
-            'amount' => "3000.00",
+            'amount' => '3000.00',
             'payment_type' => PaymentTypesEnum::CASH->value,
             'payment_date' => '2024-04-12 10:34:00',
             'payable_id' => $this->workSite->id,
@@ -105,21 +109,20 @@ describe('List Payments for a Worksite', function () {
         expect($this->admin->hasRole('admin'))->toBe(true);
     });
 
-
     it('should prevent non auth show all payments of a worksite', function () {
-        $response = getJson("/api/v1/worksite/" . $this->workSite->id . "/payment/list");
+        $response = getJson('/api/v1/worksite/'.$this->workSite->id.'/payment/list');
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin show all payments of a worksite', function () {
 
-        $response = actingAs($this->notAdmin)->getJson("/api/v1/worksite/" . $this->workSite->id . "/payment/list");
+        $response = actingAs($this->notAdmin)->getJson('/api/v1/worksite/'.$this->workSite->id.'/payment/list');
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     test('As an administrator, I want to show all payments of a worksite', function () {
 
-        $query = "?date_from=2024-04-11 10:34:00&date_to=2024-04-22 10:34:00";
+        $query = '?date_from=2024-04-11 10:34:00&date_to=2024-04-22 10:34:00';
         $response = actingAs($this->admin)
-            ->getJson("/api/v1/worksite/" . $this->workSite->id . "/payment/list" . $query);
+            ->getJson('/api/v1/worksite/'.$this->workSite->id.'/payment/list'.$query);
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
@@ -127,16 +130,16 @@ describe('List Payments for a Worksite', function () {
                         'amount',
                         'payment_type',
                         'payment_date',
-                    ]
-                ]
+                    ],
+                ],
             ])
             ->assertJsonFragment([
-                'amount' => "3000.00",
+                'amount' => '3000.00',
                 'payment_type' => PaymentTypesEnum::CASH->name,
                 'payment_date' => Carbon::parse($this->firstPayment->payment_date)->format('Y-m-d H:i:s'),
             ])
             ->assertJsonFragment([
-                'amount' => "2000.00",
+                'amount' => '2000.00',
                 'payment_type' => PaymentTypesEnum::CASH->name,
                 'payment_date' => Carbon::parse($this->secondPayment->payment_date)->format('Y-m-d H:i:s'),
             ]);
@@ -144,9 +147,9 @@ describe('List Payments for a Worksite', function () {
     });
     test('As an administrator, I want to show payments in date range of a worksite', function () {
 
-        $query = "?date_from=2024-04-11 10:34:00&date_to=2024-04-18 10:34:00";
+        $query = '?date_from=2024-04-11 10:34:00&date_to=2024-04-18 10:34:00';
         $response = actingAs($this->admin)
-            ->getJson("/api/v1/worksite/" . $this->workSite->id . "/payment/list" . $query);
+            ->getJson('/api/v1/worksite/'.$this->workSite->id.'/payment/list'.$query);
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
@@ -154,16 +157,16 @@ describe('List Payments for a Worksite', function () {
                         'amount',
                         'payment_type',
                         'payment_date',
-                    ]
-                ]
+                    ],
+                ],
             ])
             ->assertJsonFragment([
-                'amount' => "3000.00",
+                'amount' => '3000.00',
                 'payment_type' => PaymentTypesEnum::CASH->name,
                 'payment_date' => Carbon::parse($this->firstPayment->payment_date)->format('Y-m-d H:i:s'),
             ])
             ->assertJsonMissingExact([
-                'amount' => "2000.00",
+                'amount' => '2000.00',
                 'payment_type' => PaymentTypesEnum::CASH->name,
                 'payment_date' => Carbon::parse($this->secondPayment->payment_date)->format('Y-m-d H:i:s'),
             ]);

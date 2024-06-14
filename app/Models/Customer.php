@@ -29,6 +29,7 @@ class Customer extends Model
             get: fn (mixed $value, array $attributes) => $attributes['first_name'].' '.$attributes['last_name']
         );
     }
+
     public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);

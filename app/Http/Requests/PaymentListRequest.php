@@ -22,8 +22,8 @@ class PaymentListRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'date_from' => ['sometimes','date'],
-            'date_to' => ['sometimes','date'],
+            'date_from' => ['sometimes', 'date'],
+            'date_to' => ['sometimes', 'date'],
         ];
     }
 }

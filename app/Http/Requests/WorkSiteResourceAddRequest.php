@@ -23,8 +23,8 @@ class WorkSiteResourceAddRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'quantity'=>['required','numeric'],
-            'price'=>['required','numeric']
+            'quantity' => ['required', 'numeric'],
+            'price' => ['required', 'numeric'],
         ];
     }
 }

@@ -6,7 +6,6 @@ use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Models\Customer;
 use App\Models\WorkSite;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class WorkSiteCustomerController extends Controller
 {
@@ -17,8 +16,9 @@ class WorkSiteCustomerController extends Controller
         $customer = Customer::query()->findOrFail($customerId);
 
         $workSite->update([
-            'customer_id' => $customer->id
+            'customer_id' => $customer->id,
         ]);
+
         return ApiResponseHelper::sendSuccessResponse();
     }
 }

@@ -16,4 +16,4 @@ parameters:
         - modules/*/tests/*
 
 #    checkMissingIterableValueType: false
-    checkGenericClassInNonGenericObjectType: false
+#    checkGenericClassInNonGenericObjectType: false

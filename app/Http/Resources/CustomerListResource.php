@@ -10,7 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property int $id
  * @property string $first_name
  * @property string|null $last_name
- * @property  Address $address
+ * @property Address $address
  * @property string $phone
  **/
 class CustomerListResource extends JsonResource

@@ -9,7 +9,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 
-use function Pest\Laravel\{actingAs, assertDatabaseHas, postJson, putJson, getJson, assertDatabaseCount};
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
 
 describe('Customer routes check', function () {
     it('should have all routes for /customer', function () {
@@ -88,24 +93,24 @@ describe('Customer Update', function () {
     });
 
     it('should prevent non auth updating a Customer', function () {
-        $response = putJson('/api/v1/customer/update/' . $this->customer->id);
+        $response = putJson('/api/v1/customer/update/'.$this->customer->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin updating a Customer', function () {
-        $response = actingAs($this->notAdmin)->putJson('/api/v1/customer/update/' . $this->customer->id);
+        $response = actingAs($this->notAdmin)->putJson('/api/v1/customer/update/'.$this->customer->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should not return validation error when data is missed', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/customer/update/' . $this->customer->id, []);
+        $response = actingAs($this->admin)->putJson('/api/v1/customer/update/'.$this->customer->id, []);
         $response->assertStatus(Response::HTTP_OK);
     });
     it('should not touch a field if not updated', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/customer/update/' . $this->customer->id, []);
+        $response = actingAs($this->admin)->putJson('/api/v1/customer/update/'.$this->customer->id, []);
         assertDatabaseHas('customers', ['first_name' => 'Rayan']);
         $response->assertStatus(Response::HTTP_OK);
     });
     it('should create new Customer with valid data', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/customer/update/' . $this->customer->id, [
+        $response = actingAs($this->admin)->putJson('/api/v1/customer/update/'.$this->customer->id, [
             'first_name' => 'John',
         ]);
         assertDatabaseHas('customers', ['first_name' => 'John']);
@@ -143,9 +148,9 @@ describe('Customers List', function () {
                         'first_name',
                         'last_name',
                         'phone',
-                        'address'
-                    ]
-                ]
+                        'address',
+                    ],
+                ],
             ]);
         assertDatabaseCount(Customer::class, 10);
     });
@@ -165,11 +170,11 @@ describe('Customer Details', function () {
     });
 
     it('should prevent non auth show details of a Customer', function () {
-        $response = getJson('/api/v1/customer/show/' . $this->customer->id);
+        $response = getJson('/api/v1/customer/show/'.$this->customer->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin show details of a Customer', function () {
-        $response = actingAs($this->notAdmin)->getJson('/api/v1/customer/show/' . $this->customer->id);
+        $response = actingAs($this->notAdmin)->getJson('/api/v1/customer/show/'.$this->customer->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should show details of a Customer', function () {
@@ -180,7 +185,7 @@ describe('Customer Details', function () {
             'payment_date' => Carbon::now(),
             'payment_type' => PaymentTypesEnum::CASH->value,
         ]);
-        actingAs($this->admin)->getJson('/api/v1/customer/show/' . $this->customer->id)
+        actingAs($this->admin)->getJson('/api/v1/customer/show/'.$this->customer->id)
             ->assertOk()
             ->assertJsonStructure([
                 'data' => [
@@ -188,8 +193,8 @@ describe('Customer Details', function () {
                     'last_name',
                     'phone',
                     'address',
-                    'payments'
-                ]
+                    'payments',
+                ],
             ])
             ->assertJsonFragment([
                 'first_name' => $this->customer->first_name,
@@ -201,11 +206,11 @@ describe('Customer Details', function () {
                         'id' => $payment->id,
                         'payable_id' => $payment->payable_id,
                         'payable_type' => $payment->payable_type,
-                        'payment_type'=>PaymentTypesEnum::CASH->value,
-                        'amount' => number_format($payment->amount,2),
+                        'payment_type' => PaymentTypesEnum::CASH->value,
+                        'amount' => number_format($payment->amount, 2),
                         'date' => Carbon::parse($payment->payment_date)->format('Y-m-d H:i:s'),
-                    ]
-                ]
+                    ],
+                ],
             ]);
     });
 });

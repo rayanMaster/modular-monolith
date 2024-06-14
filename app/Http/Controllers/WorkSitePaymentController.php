@@ -8,18 +8,15 @@ use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
 use App\Http\Requests\PaymentCreateRequest;
 use App\Http\Requests\PaymentListRequest;
-use App\Http\Resources\PaymentListResource;
 use App\Http\Resources\WorkSitePaymentListResource;
 use App\Models\Payment;
 use App\Models\WorkSite;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class WorkSitePaymentController extends Controller
 {
-
     public function list(int $workSiteId, PaymentListRequest $request): JsonResponse
     {
 

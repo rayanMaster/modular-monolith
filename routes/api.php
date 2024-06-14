@@ -66,39 +66,39 @@ Route::prefix('v1')->group(function () {
 
             Route::group(['prefix' => '{worksiteId}/payment'], function () {
 
-                Route::post('create', [WorkSitePaymentController::class,'create'])
+                Route::post('create', [WorkSitePaymentController::class, 'create'])
                     ->middleware('can:payment-create')
                     ->name('worksite.payment.create');
 
-                Route::get('list', [WorkSitePaymentController::class,'list'])
+                Route::get('list', [WorkSitePaymentController::class, 'list'])
                     ->middleware('can:payment-list')
                     ->name('worksite.payment.list');
-//
-//                Route::post('show/{id}', WorkSitePaymentController::class)
-//                    ->middleware('can:payment-show')
-//                    ->name('worksite.payment.show');
+                //
+                //                Route::post('show/{id}', WorkSitePaymentController::class)
+                //                    ->middleware('can:payment-show')
+                //                    ->name('worksite.payment.show');
             });
 
             Route::group(['prefix' => '{worksiteId}/resource'], function () {
-                Route::post('/{resourceId}/add', [WorkSiteResourceController::class,'add'])
+                Route::post('/{resourceId}/add', [WorkSiteResourceController::class, 'add'])
                     ->middleware('can:worksite-resource-add')
                     ->name('worksite.resource.add');
 
-                Route::get('/list', [WorkSiteResourceController::class,'list'])
+                Route::get('/list', [WorkSiteResourceController::class, 'list'])
                     ->middleware('can:worksite-resource-list')
                     ->name('worksite.resource.list');
-//
-//                Route::post('update/{id}', WorkSitePaymentController::class)
-//                    ->middleware('can:worksite-resource-update')
-//                    ->name('worksite.resource.update');
-//
-//                Route::post('show/{id}', WorkSitePaymentController::class)
-//                    ->middleware('can:worksite-resource-show')
-//                    ->name('worksite.resource.show');
-//
-//                Route::post('delete/{id}', WorkSitePaymentController::class)
-//                    ->middleware('can:worksite-resource-delete')
-//                    ->name('worksite.resource.delete');
+                //
+                //                Route::post('update/{id}', WorkSitePaymentController::class)
+                //                    ->middleware('can:worksite-resource-update')
+                //                    ->name('worksite.resource.update');
+                //
+                //                Route::post('show/{id}', WorkSitePaymentController::class)
+                //                    ->middleware('can:worksite-resource-show')
+                //                    ->name('worksite.resource.show');
+                //
+                //                Route::post('delete/{id}', WorkSitePaymentController::class)
+                //                    ->middleware('can:worksite-resource-delete')
+                //                    ->name('worksite.resource.delete');
             });
 
             Route::group(['prefix' => '{worksiteId}/employee'], function () {

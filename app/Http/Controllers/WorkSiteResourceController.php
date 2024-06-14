@@ -16,6 +16,7 @@ class WorkSiteResourceController extends Controller
     public function list(int $workSiteId)
     {
         $workSite = WorkSite::query()->with(['resources'])->findOrFail($workSiteId);
+
         return ApiResponseHelper::sendResponse(new Result(WorkSiteResourceListResource::collection($workSite->resources)));
     }
 
@@ -29,7 +30,7 @@ class WorkSiteResourceController extends Controller
             $resource->id => [
                 'quantity' => $dataToAdd->quantity,
                 'price' => $dataToAdd->price,
-            ]
+            ],
         ];
         $workSite->resources()->syncWithoutDetaching($resourcesData);
 
