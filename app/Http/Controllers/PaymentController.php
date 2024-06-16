@@ -33,7 +33,7 @@ class PaymentController extends Controller
     {
         Payment::query()->create(PaymentCreateDTO::fromRequest($request->validated())->toArray());
 
-        return ApiResponseHelper::sendSuccessResponse(new Result());
+        return ApiResponseHelper::sendSuccessResponse();
     }
 
     /**

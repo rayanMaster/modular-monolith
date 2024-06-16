@@ -58,6 +58,6 @@ class WorkSitePaymentController extends Controller
         $workSite = WorkSite::query()->findOrFail($workSiteId);
         $workSite->payments()->create(PaymentCreateDTO::fromRequest($request->validated())->toArray());
 
-        return ApiResponseHelper::sendSuccessResponse(new Result());
+        return ApiResponseHelper::sendSuccessResponse();
     }
 }

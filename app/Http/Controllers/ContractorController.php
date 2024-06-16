@@ -38,7 +38,7 @@ class ContractorController extends Controller
         $dataFromRequest = ContractorCreateDTO::fromRequest($request->validated());
         $this->contractorRepository->create(ContractorCreateMapper::toEloquent($dataFromRequest));
 
-        return ApiResponseHelper::sendSuccessResponse(new Result());
+        return ApiResponseHelper::sendSuccessResponse();
 
     }
 
@@ -51,7 +51,7 @@ class ContractorController extends Controller
         $dataFromRequest = ContractorUpdateDTO::fromRequest($request->validated());
         $this->contractorRepository->update($contractor->id, ContractorUpdateMapper::toEloquent($dataFromRequest));
 
-        return ApiResponseHelper::sendSuccessResponse(new Result());
+        return ApiResponseHelper::sendSuccessResponse();
 
     }
 

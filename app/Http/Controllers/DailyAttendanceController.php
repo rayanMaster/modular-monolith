@@ -89,6 +89,11 @@ class DailyAttendanceController extends Controller
         return ApiResponseHelper::sendSuccessResponse(new Result(DailyAttendanceListResource::collection($result)));
     }
 
+    /**
+     * @param string|null $from
+     * @param string|null $to
+     * @return array<string>
+     */
     private function getDates(?string $from = null, ?string $to = null): array
     {
         $from = $from ? Carbon::parse($from) : Carbon::today();
