@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
@@ -20,6 +21,9 @@ describe('Employee routes check', function () {
             'employee.list',
             'employee.show',
             'employee.delete',
+
+            'employee.dailyAttendance.add',
+            'employee.dailyAttendance.list',
         ];
 
         // Collect routes and filter based on the prefix
@@ -84,7 +88,7 @@ describe('Update  Employee', function () {
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
-        $this->employee = \App\Models\Employee::factory()->create(['first_name' => 'Rayan']);
+        $this->employee = Employee::factory()->create(['first_name' => 'Rayan']);
     });
 
     it('should prevent non auth updating a Employee', function () {
@@ -120,7 +124,7 @@ describe('Show  Employees list', function () {
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
-        $this->employee = \App\Models\Employee::factory(10)->create(['first_name' => 'Rayan']);
+        $this->employee = Employee::factory(10)->create(['first_name' => 'Rayan']);
     });
     it('should prevent non auth show list of Employees', function () {
         $response = $this->getJson('/api/v1/employee/list');
@@ -133,7 +137,7 @@ describe('Show  Employees list', function () {
     it('should return right number of Employees in database', function () {
         $response = actingAs($this->admin)->getJson('/api/v1/employee/list');
         $response->assertStatus(Response::HTTP_OK);
-        assertDatabaseCount(\App\Models\Employee::class, 10);
+        assertDatabaseCount(Employee::class, 10);
     });
     it('should return list of employees', function () {
         $response = actingAs($this->admin)->getJson('/api/v1/employee/list');
@@ -152,7 +156,7 @@ describe('Show  Employee details', function () {
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
-        $this->employee = \App\Models\Employee::factory()->create(['first_name' => 'Rayan']);
+        $this->employee = Employee::factory()->create(['first_name' => 'Rayan']);
     });
     it('should prevent non auth show details of a Employee', function () {
         $response = $this->getJson('/api/v1/employee/show/'.$this->employee->id);
@@ -184,7 +188,7 @@ describe('Delete Employee', function () {
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
-        $this->employee = \App\Models\Employee::factory()->create();
+        $this->employee = Employee::factory()->create();
     });
     it('should prevent non auth delete a Employee', function () {
         $response = $this->deleteJson('/api/v1/employee/delete/'.$this->employee->id);
@@ -202,6 +206,6 @@ describe('Delete Employee', function () {
     it('should delete a employee', function () {
         $response = actingAs($this->admin)->deleteJson('/api/v1/employee/delete/'.$this->employee->id);
         $response->assertStatus(Response::HTTP_OK);
-        assertDatabaseCount(\App\Models\Employee::class, 0);
+        assertDatabaseCount(Employee::class, 0);
     });
 });

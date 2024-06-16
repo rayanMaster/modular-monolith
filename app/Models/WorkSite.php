@@ -27,12 +27,12 @@ class WorkSite extends Model
 
     public function subWorkSites(): HasMany
     {
-        return $this->hasMany(WorkSite::class, 'parent_worksite_id');
+        return $this->hasMany(WorkSite::class, 'parent_work_site_id');
     }
 
     public function parentWorksite(): BelongsTo
     {
-        return $this->belongsTo(WorkSite::class, 'parent_worksite_id');
+        return $this->belongsTo(WorkSite::class, 'parent_work_site_id');
     }
 
     public function resources(): BelongsToMany

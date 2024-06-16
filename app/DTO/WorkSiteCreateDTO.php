@@ -4,9 +4,21 @@ namespace App\DTO;
 
 use App\Enums\WorkSiteCompletionStatusEnum;
 use App\Enums\WorkSiteReceptionStatusEnum;
+use Spatie\LaravelData\Data;
 
-class WorkSiteCreateDTO extends \Spatie\LaravelData\Data
+class WorkSiteCreateDTO extends Data
 {
+    /**
+     * @param array{
+     *     id:int,
+     *     quantity:int,
+     *     price:float
+     * }|null $workSiteResources
+     * @param array{
+     *     payment_amount:float,
+     *     payment_date: string
+     * }|null $payments
+     */
     public function __construct(
         public string $title,
         public string $description,
@@ -14,8 +26,8 @@ class WorkSiteCreateDTO extends \Spatie\LaravelData\Data
         public ?int $categoryId,
         public ?int $contractorId,
         public ?int $parentWorksiteId,
-        public ?int $startingBudget,
-        public ?int $cost,
+        public ?float $startingBudget,
+        public ?float $cost,
         public ?int $addressId,
         public ?int $workersCount,
         public ?string $receiptDate,
@@ -25,7 +37,6 @@ class WorkSiteCreateDTO extends \Spatie\LaravelData\Data
         public ?int $completionStatus,
         public ?array $workSiteResources,
         public ?array $payments,
-        public ?FileDTO $image // Adjust namespace according to your application
     ) {
     }
 
@@ -36,7 +47,7 @@ class WorkSiteCreateDTO extends \Spatie\LaravelData\Data
      *  customer_id?: int|null,
      *  category_id?: int|null,
      *  contractor_id?: int|null,
-     *  parent_worksite_id?: int|null,
+     *  parent_work_site_id?: int|null,
      *  starting_budget?: float|null,
      *  cost?: float|null,
      *  address_id?: int|null,
@@ -46,9 +57,15 @@ class WorkSiteCreateDTO extends \Spatie\LaravelData\Data
      *  deliver_date?: string|null,
      *  reception_status?: int|null,
      *  completion_status?: int|null,
-     *  resources?: array|null,
-     *  payments: array|null,
-     *  image?: array|null
+     *  resources?: array{
+     *      id:int,
+     *      quantity:int,
+     *      price:float
+     *  }|null,
+     *  payments: array{
+     *      payment_amount:float,
+     *      payment_date: string
+     *  }|null
      * } $request
      */
     public static function fromRequest(array $request): WorkSiteCreateDTO
@@ -59,7 +76,7 @@ class WorkSiteCreateDTO extends \Spatie\LaravelData\Data
             customerId: $request['customer_id'] ?? null,
             categoryId: $request['category_id'] ?? null,
             contractorId: $request['contractor_id'] ?? null,
-            parentWorksiteId: $request['parent_worksite_id'] ?? null,
+            parentWorksiteId: $request['parent_work_site_id'] ?? null,
             startingBudget: $request['starting_budget'] ?? 0,
             cost: $request['cost'] ?? 0,
             addressId: $request['address_id'] ?? null,
@@ -71,7 +88,6 @@ class WorkSiteCreateDTO extends \Spatie\LaravelData\Data
             completionStatus: $request['completion_status'] ?? WorkSiteCompletionStatusEnum::PENDING->value,
             workSiteResources: $request['resources'] ?? null,
             payments: $request['payments'] ?? null,
-            image: FileDTO::fromRequest($request)
         );
     }
 }

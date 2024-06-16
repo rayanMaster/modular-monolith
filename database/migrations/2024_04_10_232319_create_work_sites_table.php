@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('description');
             $table->foreignIdFor(Customer::class)->nullable();
             $table->foreignIdFor(WorkSiteCategory::class, 'category_id')->nullable();
-            $table->foreignIdFor(WorkSite::class, 'parent_worksite_id')->nullable();
+            $table->foreignIdFor(WorkSite::class, 'parent_work_site_id')->nullable();
             $table->foreignIdFor(Contractor::class)->nullable();
             $table->decimal('starting_budget', 8, 2)->nullable()->default(0);
             $table->decimal('cost', 8, 2)->nullable()->default(0);

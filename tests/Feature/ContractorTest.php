@@ -42,7 +42,7 @@ describe('Contractor routes check', function () {
 
 });
 
-describe('Create Contractor of worksite Test', function () {
+describe('Create Contractor of workSite Test', function () {
     uses(RefreshDatabase::class);
     beforeEach(function () {
         $this->artisan('storage:link');
@@ -80,7 +80,7 @@ describe('Create Contractor of worksite Test', function () {
     });
 
 });
-describe('Update Contractor of worksite Test', function () {
+describe('Update Contractor of workSite Test', function () {
     uses(RefreshDatabase::class);
     beforeEach(function () {
         $this->artisan('storage:link');

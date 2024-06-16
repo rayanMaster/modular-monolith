@@ -41,7 +41,7 @@ class PermissionsSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
         // WorkSite
-        $this->addPermission('Work Site', 'worksite', [
+        $this->addPermission('Work Site', 'workSite', [
             'list',
             'show',
             'create',
@@ -56,7 +56,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         // WorkSite Category
-        $this->addPermission('Work Site Category', 'worksite-category', ['list', 'show', 'create', 'update', 'delete']);
+        $this->addPermission('Work Site Category', 'workSite-category', ['list', 'show', 'create', 'update', 'delete']);
 
         // Resource
         $this->addPermission('Resource', 'resource', ['list', 'show', 'create', 'update', 'delete']);
@@ -71,7 +71,16 @@ class PermissionsSeeder extends Seeder
         $this->addPermission('Payment', 'payment', ['list', 'show', 'create']);
 
         //Employee
-        $this->addPermission('Employee', 'employee', ['list', 'show', 'create', 'update', 'delete']);
+        $this->addPermission('Employee', 'employee',
+            [
+                'list',
+                'show',
+                'create',
+                'update',
+                'delete',
+                'attendance-add',
+                'attendance-list',
+            ]);
 
         //Contractor
         $this->addPermission('Contractor', 'contractor', ['list', 'show', 'create', 'update', 'delete']);

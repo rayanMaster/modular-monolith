@@ -2,10 +2,11 @@
 
 namespace App\DTO;
 
-class ResourceCreateDTO extends \Spatie\LaravelData\Data
+use Spatie\LaravelData\Data;
+
+class ResourceCreateDTO extends Data
 {
     public function __construct(
-        public int $id,
         public float $quantity,
         public float $price
     ) {

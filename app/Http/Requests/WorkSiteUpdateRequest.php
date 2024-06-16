@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\WorkSiteCompletionStatusEnum;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
@@ -20,7 +21,7 @@ class WorkSiteUpdateRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
@@ -29,10 +30,10 @@ class WorkSiteUpdateRequest extends FormRequest
             'description' => 'sometimes|string',
             'customer_id' => 'sometimes|integer',
             'category_id' => 'sometimes|integer',
-            'parent_worksite_id' => 'nullable|int',
+            'parent_work_site_id' => 'nullable|int',
             'starting_budget' => 'sometimes|integer|min:0',
             'cost' => 'sometimes|integer|min:0',
-            'address' => 'sometimes|integer|min:0',
+            'address_id' => 'sometimes|integer|exists:addresses,id',
             'workers_count' => 'sometimes|integer|min:0',
             'receipt_date' => 'sometimes|date',
             'starting_date' => 'sometimes|date',

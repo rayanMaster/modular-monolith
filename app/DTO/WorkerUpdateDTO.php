@@ -7,10 +7,15 @@ use Spatie\LaravelData\Data;
 class WorkerUpdateDTO extends Data
 {
     public function __construct(
-        public ?string $firstName = null,
+        public ?string $firstName,
     ) {
     }
 
+    /**
+     * @param array{
+     *     first_name : string | null
+     * } $request
+     */
     public static function fromRequest(array $request): self
     {
         return new self(

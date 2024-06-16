@@ -3,24 +3,24 @@
 <h3>Worksite Management Module:</h3>
 <ul>
 <li>
-As an administrator, I want to create a main worksite,
+As an administrator, I want to create a main workSite,
 so that I can organize multiple sub-worksites under it.
 </li>
 <li>
-As an administrator, I want to create a sub-worksite,
-and attach it to main worksite.
+As an administrator, I want to create a sub-workSite,
+and attach it to main workSite.
 </li>
 <li>
 As an administrator, I should be able to manage 
-resources for a worksite.
+resources for a workSite.
 </li>
 <li>
 As an administrator, I should be able to make 
-payments to a worksite, and see all payments for it.
+payments to a workSite, and see all payments for it.
 </li>
 <li>
 As an administrator, I should be able to make 
-add new worker to a worksite.
+add new worker to a workSite.
 </li>
 </ul>
 
@@ -28,16 +28,16 @@ add new worker to a worksite.
 <ul>
 <li>
 As an administrator, I should manage categories
-of worksite.
+of workSite.
 </li>
 <li>
-As an administrator, I should manage customers of worksite.
+As an administrator, I should manage customers of workSite.
 </li>
 <li>
-As an administrator, I should manage resources and theirs categories of worksite.
+As an administrator, I should manage resources and theirs categories of workSite.
 </li>
 <li>
-As an administrator, I should manage workers of worksite.
+As an administrator, I should manage workers of workSite.
 </li>
 </ul>
 <h3>Admin Module:</h3>

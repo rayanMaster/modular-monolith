@@ -14,6 +14,11 @@ class FileDTO
     ) {
     }
 
+    /**
+     * @param array{
+     *     image : File|UploadedFile|null
+     * } $request
+     */
     public static function fromRequest(array $request): FileDTO
     {
         $image = $request['image'] ?? null;

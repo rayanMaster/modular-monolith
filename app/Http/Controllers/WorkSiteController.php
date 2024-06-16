@@ -64,24 +64,26 @@ class WorkSiteController extends Controller
                     $workSite->payments()->create($payment);
                 }
 
-                $file = $request->file('image');
-                if ($file) {
-                    $fileNameParts = explode('.', $file->getClientOriginalName());
-                    $fileName = $fileNameParts[0];
-                    $path = lcfirst('WorkSite');
-                    $name = $fileName.'_'.now()->format('YmdH');
+                $files = $request->file('images');
+                if (isset($files)) {
+                    foreach ($files as $file) {
+                        $fileNameParts = explode('.', $file->getClientOriginalName());
+                        $fileName = $fileNameParts[0];
+                        $path = lcfirst('WorkSite');
+                        $name = $fileName.'_'.now()->format('YmdH');
 
-                    if (! File::exists(public_path('storage/'.$path))) {
-                        File::makeDirectory(public_path('storage/'.$path));
+                        if (! File::exists(public_path('storage/'.$path))) {
+                            File::makeDirectory(public_path('storage/'.$path));
+                        }
+
+                        $fullPath = public_path('storage/'.$path).'/'.$name.'.webp';
+
+                        // create new manager instance with desired driver
+                        $manager = new \Intervention\Image\ImageManager(new Driver());
+
+                        // read image from filesystem
+                        $image = $manager->read($file)->save($fullPath);
                     }
-
-                    $fullPath = public_path('storage/'.$path).'/'.$name.'.webp';
-
-                    // create new manager instance with desired driver
-                    $manager = new \Intervention\Image\ImageManager(new Driver());
-
-                    // read image from filesystem
-                    $image = $manager->read($file)->save($fullPath);
                 }
                 //        $this->fileManager->upload($files);
             },
@@ -106,7 +108,7 @@ class WorkSiteController extends Controller
      *
      * @throws \Throwable
      */
-    public function update(WorkSiteUpdateRequest $request, $id)
+    public function update(WorkSiteUpdateRequest $request, $id): JsonResponse
     {
         DB::transaction(
             callback: function () use ($request, $id) {
@@ -142,11 +144,11 @@ class WorkSiteController extends Controller
         $workSitePayments = $workSite->payments->sum('amount');
 
         if ($relatedActiveSubWorkSitesCount > 0) {
-            throw new UnAbleToCloseWorkSiteException("You can't close a worksite with active sub-worksites");
+            throw new UnAbleToCloseWorkSiteException("You can't close a workSite with active sub-worksites");
         }
 
         if ($workSitePayments < $workSite->cost) {
-            throw new UnAbleToCloseWorkSiteException("You can't close a worksite with unpaid payment");
+            throw new UnAbleToCloseWorkSiteException("You can't close a workSite with unpaid payment");
         }
 
         $workSite->update([

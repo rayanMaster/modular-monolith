@@ -7,10 +7,10 @@ use Intervention\Image\Drivers\Gd\Driver;
 
 class ImageManager implements IFileManager
 {
-    public function upload($files)
+    public function upload(mixed $files): void
     {
         $path = lcfirst('WorkSite');
-        $name = $name ?? now()->format('YmdHisu');
+        $name = now()->format('YmdHisu');
 
         if (! File::exists(public_path('storage/'.$path))) {
             File::makeDirectory(public_path('storage/'.$path));

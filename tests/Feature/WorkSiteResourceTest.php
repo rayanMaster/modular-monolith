@@ -24,23 +24,23 @@ describe('WorkSite Resource assign', function () {
         $this->notAdmin = User::factory()->worker()->create();
         $this->admin = User::factory()->admin()->create();
 
-        $this->worksite = Worksite::factory()->create();
+        $this->workSite = Worksite::factory()->create();
         $this->resource = Resource::factory()->create();
     });
 
-    it('should prevent non auth adding a resource to a worksite', function () {
-        $response = postJson('/api/v1/worksite/'.$this->worksite->id.'/resource/'.$this->resource->id.'/add');
+    it('should prevent non auth adding a resource to a workSite', function () {
+        $response = postJson('/api/v1/workSite/'.$this->workSite->id.'/resource/'.$this->resource->id.'/add');
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
-    it('should prevent non admin adding a resource to a worksite', function () {
+    it('should prevent non admin adding a resource to a workSite', function () {
         $response = actingAs($this->notAdmin)
-            ->postJson('/api/v1/worksite/'.$this->worksite->id.'/resource/'.$this->resource->id.'/add');
+            ->postJson('/api/v1/workSite/'.$this->workSite->id.'/resource/'.$this->resource->id.'/add');
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
-    it('should return not found error when worksite not found', function () {
+    it('should return not found error when workSite not found', function () {
         $undefinedWorkSiteId = rand(222, 333);
         $response = actingAs($this->admin)
-            ->postJson('/api/v1/worksite/'.$undefinedWorkSiteId.'/resource/'.$this->resource->id.'/add', [
+            ->postJson('/api/v1/workSite/'.$undefinedWorkSiteId.'/resource/'.$this->resource->id.'/add', [
                 'quantity' => 10,
                 'price' => 30,
             ]);
@@ -49,21 +49,21 @@ describe('WorkSite Resource assign', function () {
     it('should return not found error when resource not found', function () {
         $undefinedResourceId = rand(222, 333);
         $response = actingAs($this->admin)
-            ->postJson('/api/v1/worksite/'.$this->worksite->id.'/resource/'.$undefinedResourceId.'/add', [
+            ->postJson('/api/v1/workSite/'.$this->workSite->id.'/resource/'.$undefinedResourceId.'/add', [
                 'quantity' => 10,
                 'price' => 30,
             ]);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
-    it('should add valid resource to a valid worksite', function () {
+    it('should add valid resource to a valid workSite', function () {
         $response = actingAs($this->admin)
-            ->postJson('/api/v1/worksite/'.$this->worksite->id.'/resource/'.$this->resource->id.'/add', [
+            ->postJson('/api/v1/workSite/'.$this->workSite->id.'/resource/'.$this->resource->id.'/add', [
                 'quantity' => 10,
                 'price' => 30,
             ]);
         $response->assertOk();
         assertDatabaseHas(WorkSiteResource::class, [
-            'work_site_id' => $this->worksite->id,
+            'work_site_id' => $this->workSite->id,
             'resource_id' => $this->resource->id,
             'quantity' => 10,
             'price' => '30.00',
@@ -81,36 +81,36 @@ describe('WorkSite Resource list', function () {
         $this->notAdmin = User::factory()->worker()->create();
         $this->admin = User::factory()->admin()->create();
 
-        $this->worksite = Worksite::factory()->create();
+        $this->workSite = Worksite::factory()->create();
         $this->resource = Resource::factory()->create([
             'name' => 'Iron',
         ]);
         $this->workSiteResource = WorkSiteResource::factory()->create([
             'quantity' => 10,
             'price' => 3000,
-            'work_site_id' => $this->worksite->id,
+            'work_site_id' => $this->workSite->id,
             'resource_id' => $this->resource->id,
         ]);
     });
 
-    it('should prevent non auth show list resources of a worksite', function () {
-        $response = getJson('/api/v1/worksite/'.$this->worksite->id.'/resource/list');
+    it('should prevent non auth show list resources of a workSite', function () {
+        $response = getJson('/api/v1/workSite/'.$this->workSite->id.'/resource/list');
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
-    it('should prevent non admin show list resources of a worksite', function () {
+    it('should prevent non admin show list resources of a workSite', function () {
         $response = actingAs($this->notAdmin)
-            ->getJson('/api/v1/worksite/'.$this->worksite->id.'/resource/list');
+            ->getJson('/api/v1/workSite/'.$this->workSite->id.'/resource/list');
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
-    it('should return not found error when worksite not found', function () {
+    it('should return not found error when workSite not found', function () {
         $undefinedWorkSiteId = rand(222, 333);
         $response = actingAs($this->admin)
-            ->getJson('/api/v1/worksite/'.$undefinedWorkSiteId.'/resource/list');
+            ->getJson('/api/v1/workSite/'.$undefinedWorkSiteId.'/resource/list');
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
-    it('should return list of resources of a  valid worksite', function () {
+    it('should return list of resources of a  valid workSite', function () {
         $response = actingAs($this->admin)
-            ->getJson('/api/v1/worksite/'.$this->worksite->id.'/resource/list');
+            ->getJson('/api/v1/workSite/'.$this->workSite->id.'/resource/list');
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [

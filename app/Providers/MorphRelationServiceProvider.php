@@ -23,7 +23,7 @@ class MorphRelationServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Relation::morphMap([
-            'worksite' => Worksite::class,
+            'workSite' => Worksite::class,
             'customer' => Customer::class,
         ]);
     }

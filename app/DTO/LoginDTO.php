@@ -6,9 +6,6 @@ use Spatie\LaravelData\Data;
 
 class LoginDTO extends Data
 {
-    /**
-     * @param  string  $email
-     */
     public function __construct(
         public string $phone,
         public string $password
