@@ -2,21 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\WorkSiteContractorAssignDTO;
 use App\DTO\WorkSiteCreateDTO;
 use App\DTO\WorkSiteUpdateDTO;
-use App\Enums\ConfirmEnum;
 use App\Enums\WorkSiteCompletionStatusEnum;
 use App\Exceptions\UnAbleToCloseWorkSiteException;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
-use App\Http\Requests\WorkSiteContractorAssignRequest;
 use App\Http\Requests\WorkSiteCreateRequest;
 use App\Http\Requests\WorkSiteUpdateRequest;
 use App\Http\Resources\WorkSiteDetailsResource;
 use App\Http\Resources\WorkSiteListResource;
 use App\Mapper\WorkSiteCreateMapper;
 use App\Mapper\WorkSiteUpdateMapper;
+use App\Models\Contractor;
 use App\Models\WorkSite;
 use App\Repository\WorkSiteRepository;
 use Illuminate\Database\Eloquent\Builder;
@@ -65,7 +63,7 @@ class WorkSiteController extends Controller
                 }
 
                 $files = $request->file('images');
-                if (isset($files)) {
+                if (isset($files) && is_array($files)) {
                     foreach ($files as $file) {
                         $fileNameParts = explode('.', $file->getClientOriginalName());
                         $fileName = $fileNameParts[0];
@@ -96,7 +94,7 @@ class WorkSiteController extends Controller
     /**
      * Show the specified resource.
      */
-    public function show($id): JsonResponse
+    public function show(int $id): JsonResponse
     {
         $worksite = WorkSite::query()->with(['customer', 'payments', 'resources'])->findOrFail($id);
 
@@ -108,7 +106,7 @@ class WorkSiteController extends Controller
      *
      * @throws \Throwable
      */
-    public function update(WorkSiteUpdateRequest $request, $id): JsonResponse
+    public function update(WorkSiteUpdateRequest $request, int $id): JsonResponse
     {
         DB::transaction(
             callback: function () use ($request, $id) {
@@ -130,7 +128,7 @@ class WorkSiteController extends Controller
     /**
      * @throws UnAbleToCloseWorkSiteException
      */
-    public function close(int $id)
+    public function close(int $id): JsonResponse
     {
         $workSite = WorkSite::query()->with(['subWorksites'])->findOrFail($id);
         $relatedActiveSubWorkSitesCount = $workSite->whereHas('subWorksites', function (Builder $query) {
@@ -155,23 +153,16 @@ class WorkSiteController extends Controller
             'completion_status' => WorkSiteCompletionStatusEnum::CLOSED,
         ]);
 
-        return ApiResponseHelper::sendSuccessResponse(
-            new Result());
-    }
-
-    public function assignEmployee()
-    {
-
+        return ApiResponseHelper::sendSuccessResponse();
     }
 
     /**
      * @throws \Throwable
      */
-    public function assignContractor(int $workSiteId, WorkSiteContractorAssignRequest $request): JsonResponse
+    public function assignContractor(int $workSiteId, int $contractorId): JsonResponse
     {
         $workSite = WorkSite::query()->findOrFail($workSiteId);
-        $dataFromRequest = WorkSiteContractorAssignDTO::fromRequest($request->validated());
-        $contractorId = $dataFromRequest->shouldRemove == ConfirmEnum::YES->value ? null : $dataFromRequest->contractorId;
+        Contractor::query()->findOrFail($contractorId);
         $this->workSiteRepository->update($workSite->id, [
             'contractor_id' => $contractorId,
         ], true);
@@ -179,11 +170,15 @@ class WorkSiteController extends Controller
         return ApiResponseHelper::sendSuccessResponse();
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
+    public function unAssignContractor(int $workSiteId, int $contractorId): JsonResponse
     {
-        //
+        $workSite = WorkSite::query()->findOrFail($workSiteId);
+        Contractor::query()->findOrFail($contractorId);
+
+        $this->workSiteRepository->update($workSite->id, [
+            'contractor_id' => null,
+        ], true);
+
+        return ApiResponseHelper::sendSuccessResponse();
     }
 }

@@ -28,12 +28,11 @@ class DailyAttendanceListRequest extends FormRequest
             'date_to' => 'sometimes|date_format:Y-m-d|after_or_equal:date_from',
         ];
     }
+
     /**
-     * @param $key
-     * @param $default
      * @return array{employee_id:int|null,date_from:string|null,date_to:string|null}
      */
-    public function validated($key = null, $default = null) : array
+    public function validated($key = null, $default = null): array
     {
         return parent::validated($key, $default);
     }

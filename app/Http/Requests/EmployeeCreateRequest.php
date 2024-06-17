@@ -28,8 +28,6 @@ class EmployeeCreateRequest extends FormRequest
     }
 
     /**
-     * @param $key
-     * @param $default
      * @return array{first_name:string}
      */
     public function validated($key = null, $default = null): array

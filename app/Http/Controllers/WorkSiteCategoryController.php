@@ -9,49 +9,46 @@ use App\Http\Requests\WorkSiteCategoryUpdateRequest;
 use App\Http\Resources\WorkSiteCategoryDetailsResource;
 use App\Http\Resources\WorkSiteCategoryListResource;
 use App\Models\WorkSiteCategory;
+use Illuminate\Http\JsonResponse;
 
 class WorkSiteCategoryController extends Controller
 {
-    public function list()
+    public function list(): JsonResponse
     {
         $categories = WorkSiteCategory::query()->get();
 
         return ApiResponseHelper::sendResponse(new Result(WorkSiteCategoryListResource::collection($categories)));
     }
 
-    public function create(WorkSiteCategoryCreateRequest $request)
+    public function store(WorkSiteCategoryCreateRequest $request): JsonResponse
     {
         WorkSiteCategory::query()->create($request->validated());
+
+        return ApiResponseHelper::sendSuccessResponse();
     }
 
-    public function store()
-    {
-
-    }
-
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
         $category = WorkSiteCategory::query()->findOrFail($id);
 
         return ApiResponseHelper::sendResponse(new Result(WorkSiteCategoryDetailsResource::make($category)));
     }
 
-    public function edit($id)
-    {
-
-    }
-
-    public function update(WorkSiteCategoryUpdateRequest $request, int $id)
+    public function update(WorkSiteCategoryUpdateRequest $request, int $id): JsonResponse
     {
 
         $workSiteCategory = WorkSiteCategory::query()->findOrFail($id);
-        $workSiteCategory->update(['name' => $request->name]);
+        $workSiteCategory->update($request->validated());
+
+        return ApiResponseHelper::sendSuccessResponse();
 
     }
 
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
         $workSiteCategory = WorkSiteCategory::query()->findOrFail($id);
         $workSiteCategory->delete();
+
+        return ApiResponseHelper::sendSuccessResponse();
     }
 }

@@ -58,24 +58,24 @@ describe('WorkSiteCategory Create', function () {
 
     });
     it('should prevent non auth creating new category', function () {
-        $response = postJson('/api/v1/workSite/category/create', [
+        $response = postJson('/api/v1/workSite/category/store', [
             'name' => 'new',
         ]);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin creating new category', function () {
 
-        $response = actingAs($this->notAdmin)->postJson('/api/v1/workSite/category/create', [
+        $response = actingAs($this->notAdmin)->postJson('/api/v1/workSite/category/store', [
             'name' => 'new',
         ]);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return validation error when data is missed', function () {
-        $response = actingAs($this->admin)->postJson('/api/v1/workSite/category/create', []);
+        $response = actingAs($this->admin)->postJson('/api/v1/workSite/category/store', []);
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     });
-    it('should create new category with valid data', function () {
-        $response = actingAs($this->admin)->postJson('/api/v1/workSite/category/create', [
+    it('should store new category with valid data', function () {
+        $response = actingAs($this->admin)->postJson('/api/v1/workSite/category/store', [
             'name' => 'new',
         ]);
         $response->assertOk();
@@ -111,7 +111,7 @@ describe('WorkSiteCategory Update', function () {
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should not return validation error when data is missed', function () {
-        $response = actingAs($this->admin)->postJson('/api/v1/workSite/category/create', []);
+        $response = actingAs($this->admin)->postJson('/api/v1/workSite/category/store', []);
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     });
     it('should update existed category with valid data', function () {

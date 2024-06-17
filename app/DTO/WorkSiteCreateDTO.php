@@ -62,7 +62,7 @@ class WorkSiteCreateDTO extends Data
      *      quantity:int,
      *      price:float
      *  }|null,
-     *  payments: array{
+     *  payments?: array{
      *      payment_amount:float,
      *      payment_date: string
      *  }|null

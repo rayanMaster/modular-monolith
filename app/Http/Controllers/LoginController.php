@@ -9,6 +9,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Resources\LoginResource;
 use App\Models\User;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
@@ -16,7 +17,7 @@ class LoginController extends Controller
     /**
      * @throws AuthenticationException
      */
-    public function __invoke(LoginRequest $request): \Illuminate\Http\JsonResponse
+    public function __invoke(LoginRequest $request): JsonResponse
     {
 
         $data = LoginDTO::fromRequest($request->validated());

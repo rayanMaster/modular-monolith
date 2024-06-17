@@ -5,7 +5,6 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DailyAttendanceController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LoginController;
-use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ResourceCategoryController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\WorkSiteCategoryController;
@@ -52,7 +51,7 @@ Route::prefix('v1')->group(function () {
                     ->middleware('can:workSite-category-show')
                     ->name('workSite.category.show');
 
-                Route::post('/create', [WorkSiteCategoryController::class, 'create'])
+                Route::post('/store', [WorkSiteCategoryController::class, 'store'])
                     ->middleware('can:workSite-category-create')
                     ->name('workSite.category.create');
 
@@ -125,7 +124,11 @@ Route::prefix('v1')->group(function () {
             });
 
             Route::group(['prefix' => '{worksiteId}/contractor'], function () {
-                Route::put('assign', [WorkSiteController::class, 'assignContractor'])
+                Route::put('{contractorId}/assign', [WorkSiteController::class, 'assignContractor'])
+                    ->middleware('can:workSite-contractor-assign')
+                    ->name('workSite.contractor.assign');
+
+                Route::put('{contractorId}/unAssign', [WorkSiteController::class, 'unAssignContractor'])
                     ->middleware('can:workSite-contractor-assign')
                     ->name('workSite.contractor.assign');
             });
@@ -249,16 +252,16 @@ Route::prefix('v1')->group(function () {
             });
 
         });
-        Route::group(['prefix' => 'payment'], function () {
-            Route::get('/list', [PaymentController::class, 'list'])
-                ->middleware('can:payment-list')
-                ->name('payment.list');
-
-            Route::get('/show/{id}', [PaymentController::class, 'show'])
-                ->middleware('can:payment-show')
-                ->name('payment.show');
-
-        });
+        //        Route::group(['prefix' => 'payment'], function () {
+        //            Route::get('/list', [PaymentController::class, 'list'])
+        //                ->middleware('can:payment-list')
+        //                ->name('payment.list');
+        //
+        //            Route::get('/show/{id}', [PaymentController::class, 'show'])
+        //                ->middleware('can:payment-show')
+        //                ->name('payment.show');
+        //
+        //        });
     });
 
     Route::group(['prefix' => 'auth'], function () {

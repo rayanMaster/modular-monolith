@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\ConfirmEnum;
 use App\Enums\PaymentTypesEnum;
 use App\Enums\WorkSiteCompletionStatusEnum;
 use App\Enums\WorkSiteReceptionStatusEnum;
@@ -799,30 +798,24 @@ describe('Assign Contractor to WorkSites', function () {
 
     });
     test('As a non-authenticated, I cant assign contractor to a workSite', function () {
-        $response = putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/assign', []);
+        $response = putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     test('As not admin, I cant assign contractor to a workSite', function () {
-        $response = actingAs($this->notAdmin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/assign', []);
+        $response = actingAs($this->notAdmin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found error if workSite not existed in database and if contractor not existed', function () {
         $unExistedWorkSiteId = rand(200, 333);
         $unExistedContractorId = rand(200, 333);
-        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$unExistedWorkSiteId.'/contractor/assign', [
-            'contractor_id' => $this->contractor->id,
-        ]);
+        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$unExistedWorkSiteId.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_NOT_FOUND);
 
-        $otherResponse = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/assign', [
-            'contractor_id' => $unExistedContractorId,
-        ]);
-        $otherResponse->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $otherResponse = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$unExistedContractorId.'/assign');
+        $otherResponse->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should add contractor of a workSite', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/assign', [
-            'contractor_id' => $this->contractor->id,
-        ]);
+        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(WorkSite::class, [
             'contractor_id' => $this->contractor->id,
@@ -830,9 +823,7 @@ describe('Assign Contractor to WorkSites', function () {
 
     });
     it('should update contractor of a workSite', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/assign', [
-            'contractor_id' => $this->contractor->id,
-        ]);
+        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(WorkSite::class, [
             'contractor_id' => $this->contractor->id,
@@ -840,9 +831,7 @@ describe('Assign Contractor to WorkSites', function () {
 
         $otherContractor = Contractor::factory()->create();
 
-        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/assign', [
-            'contractor_id' => $otherContractor->id,
-        ]);
+        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$otherContractor->id.'/assign');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(WorkSite::class, [
             'contractor_id' => $otherContractor->id,
@@ -850,18 +839,13 @@ describe('Assign Contractor to WorkSites', function () {
 
     });
     test('As an admin i can remove contractor of a workSite ', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/assign', [
-            'contractor_id' => $this->contractor->id,
-        ]);
+        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(WorkSite::class, [
             'contractor_id' => $this->contractor->id,
         ]);
 
-        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/assign', [
-            'contractor_id' => $this->contractor->id,
-            'should_remove' => ConfirmEnum::YES->value,
-        ]);
+        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$this->contractor->id.'/unAssign');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(WorkSite::class, [
             'contractor_id' => null,
