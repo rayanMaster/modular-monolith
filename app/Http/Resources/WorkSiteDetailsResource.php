@@ -6,6 +6,26 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property mixed $id
+ * @property mixed $title
+ * @property mixed $description
+ * @property mixed $customer
+ * @property mixed $category
+ * @property mixed $subWorksites
+ * @property mixed $starting_budget
+ * @property mixed $cost
+ * @property mixed $address
+ * @property mixed $workers_count
+ * @property mixed $receipt_date
+ * @property mixed $starting_date
+ * @property mixed $deliver_date
+ * @property mixed $reception_status
+ * @property mixed $created_at
+ * @property mixed $updated_at
+ * @property mixed $resources
+ * @property mixed $payments
+ */
 class WorkSiteDetailsResource extends JsonResource
 {
     /**

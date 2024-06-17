@@ -15,6 +15,7 @@ use App\Mapper\ContractorUpdateMapper;
 use App\Models\Contractor;
 use App\Repository\ContractorRepository;
 use Illuminate\Http\JsonResponse;
+use Throwable;
 
 class ContractorController extends Controller
 {
@@ -31,11 +32,20 @@ class ContractorController extends Controller
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function store(ContractorCreateRequest $request): JsonResponse
     {
-        $dataFromRequest = ContractorCreateDTO::fromRequest($request->validated());
+        /** @var array{
+         * first_name: string,
+         * last_name: string|null,
+         * phone: string|null,
+         * address_id: int|null
+         * } $requestData
+         */
+        $requestData = $request->validated();
+
+        $dataFromRequest = ContractorCreateDTO::fromRequest($requestData);
         $this->contractorRepository->create(ContractorCreateMapper::toEloquent($dataFromRequest));
 
         return ApiResponseHelper::sendSuccessResponse();
@@ -43,12 +53,21 @@ class ContractorController extends Controller
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function update(ContractorUpdateRequest $request, int $id): JsonResponse
     {
+        /** @var array{
+         * first_name: string|null,
+         * last_name: string|null,
+         * phone: string|null,
+         * address_id: int|null
+         * } $requestData
+         */
+        $requestData = $request->validated();
+
         $contractor = Contractor::query()->findOrFail($id);
-        $dataFromRequest = ContractorUpdateDTO::fromRequest($request->validated());
+        $dataFromRequest = ContractorUpdateDTO::fromRequest($requestData);
         $this->contractorRepository->update($contractor->id, ContractorUpdateMapper::toEloquent($dataFromRequest));
 
         return ApiResponseHelper::sendSuccessResponse();

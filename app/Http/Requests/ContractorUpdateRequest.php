@@ -18,7 +18,7 @@ class ContractorUpdateRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array|string>
+     * @return array<string, array<int,ValidationRule|string>>
      */
     public function rules(): array
     {
@@ -28,15 +28,5 @@ class ContractorUpdateRequest extends FormRequest
             'phone' => ['sometimes', 'string'],
             'address_id' => ['sometimes', 'int'],
         ];
-    }
-
-    /**
-     * @param  null  $key
-     * @param  null  $default
-     * @return array{first_name: string|null, last_name: string|null, phone: string|null, address_id: int|null}
-     */
-    public function validated($key = null, $default = null): array
-    {
-        return parent::validated();
     }
 }

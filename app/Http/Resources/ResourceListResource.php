@@ -5,6 +5,12 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property mixed $name
+ * @property mixed $description
+ * @property mixed $category
+ * @property mixed $pivot
+ */
 class ResourceListResource extends JsonResource
 {
     /**

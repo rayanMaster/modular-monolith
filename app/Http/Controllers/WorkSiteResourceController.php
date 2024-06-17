@@ -13,7 +13,7 @@ use Illuminate\Http\JsonResponse;
 
 class WorkSiteResourceController extends Controller
 {
-    public function list(int $workSiteId)
+    public function list(int $workSiteId): JsonResponse
     {
         $workSite = WorkSite::query()->with(['resources'])->findOrFail($workSiteId);
 
@@ -35,25 +35,5 @@ class WorkSiteResourceController extends Controller
         $workSite->resources()->syncWithoutDetaching($resourcesData);
 
         return ApiResponseHelper::sendSuccessResponse();
-    }
-
-    public function show($id)
-    {
-
-    }
-
-    public function edit($id)
-    {
-
-    }
-
-    public function update($request, $id)
-    {
-
-    }
-
-    public function destroy($id)
-    {
-
     }
 }

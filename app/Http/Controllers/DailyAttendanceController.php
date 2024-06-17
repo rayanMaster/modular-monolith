@@ -24,9 +24,17 @@ class DailyAttendanceController extends Controller
     public function store(int $employeeId, DailyAttendanceCreateRequest $request): JsonResponse
     {
 
-        $employee = User::query()->findOrFail($employeeId);
+        /** @var array{
+         *     employee_id : int | null,
+         *     work_site_id : int,
+         *     date_from : string | null,
+         *     date_to : string | null
+         * } $requestedData
+         */
+        $requestedData = $request->validated();
+        User::query()->findOrFail($employeeId);
 
-        $dataFromRequest = DailyAttendanceCreateDTO::fromRequest($request->validated(), $employeeId);
+        $dataFromRequest = DailyAttendanceCreateDTO::fromRequest($requestedData, $employeeId);
         $dateFrom = $dataFromRequest->dateFrom ?? Carbon::today();
         $dateTo = $dataFromRequest->dateTo ?? Carbon::today();
 
@@ -68,9 +76,17 @@ class DailyAttendanceController extends Controller
 
     public function list(int $employeeId, DailyAttendanceListRequest $request): JsonResponse
     {
-        $employee = User::query()->findOrFail($employeeId);
+        /** @var array{
+         *     employee_id : int | null,
+         *     date_from : string | null,
+         *     date_to : string | null
+         * } $requestedData
+         */
+        $requestedData = $request->validated();
 
-        $dataFromRequest = DailyAttendanceListDTO::fromRequest($request->validated(), $employeeId);
+        User::query()->findOrFail($employeeId);
+
+        $dataFromRequest = DailyAttendanceListDTO::fromRequest($requestedData, $employeeId);
         $dateFrom = $dataFromRequest->dateFrom ?? Carbon::today();
         $dateTo = $dataFromRequest->dateTo ?? Carbon::today();
         $result = DailyAttendance::query()

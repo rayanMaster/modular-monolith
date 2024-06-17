@@ -5,6 +5,14 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property mixed $id
+ * @property mixed $payable_id
+ * @property mixed $payable_type
+ * @property mixed $amount
+ * @property mixed $payment_date
+ * @property mixed $payment_type
+ */
 class PaymentListResource extends JsonResource
 {
     /**

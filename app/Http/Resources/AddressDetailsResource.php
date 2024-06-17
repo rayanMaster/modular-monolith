@@ -5,6 +5,13 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property mixed $id
+ * @property mixed $city
+ * @property mixed $street
+ * @property mixed $state
+ * @property mixed $zipcode
+ */
 class AddressDetailsResource extends JsonResource
 {
     /**

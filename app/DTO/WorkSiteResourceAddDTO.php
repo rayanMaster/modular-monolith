@@ -7,15 +7,15 @@ use Spatie\LaravelData\Data;
 class WorkSiteResourceAddDTO extends Data
 {
     public function __construct(
-        public int $quantity,
-        public int $price,
+        public float $quantity,
+        public float $price,
     ) {
     }
 
     /**
      * @param array{
-     *    price : int,
-     *    quantity : int
+     *    price : float,
+     *    quantity : float
      * } $request
      */
     public static function fromRequest(array $request): WorkSiteResourceAddDTO

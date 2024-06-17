@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CustomerCreateRequest extends FormRequest
@@ -9,11 +10,14 @@ class CustomerCreateRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      */
+    /**
+     * @return array<string,array<int,string|ValidationRule>>
+     */
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string',
-            'last_name' => 'string',
+            'first_name' => ['required','string'],
+            'last_name' => ['sometimes','string'],
         ];
     }
 
