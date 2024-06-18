@@ -20,7 +20,8 @@ class EmployeeController extends Controller
 {
     public function __construct(
         private readonly WorkerRepository $workerRepository
-    ) {
+    )
+    {
 
     }
 
@@ -33,7 +34,13 @@ class EmployeeController extends Controller
 
     public function store(EmployeeCreateRequest $request): JsonResponse
     {
-        $toSave = EmployeeCreateMapper::fromEloquent(WorkerCreateDTO::fromRequest($request->validated()));
+        /**
+         * @var array{
+         *     first_name:string
+         * } $requestedData
+         */
+        $requestedData = $request->validated();
+        $toSave = EmployeeCreateMapper::fromEloquent(WorkerCreateDTO::fromRequest($requestedData));
         Employee::query()->create($toSave);
 
         return ApiResponseHelper::sendSuccessResponse();
@@ -44,7 +51,13 @@ class EmployeeController extends Controller
      */
     public function update(EmployeeUpdateRequest $request, int $workerId): JsonResponse
     {
-        $toUpdate = EmployeeUpdateMapper::fromEloquent(WorkerUpdateDTO::fromRequest($request->validated()));
+        /**
+         * @var array{
+         *     first_name:string|null
+         * } $requestedData
+         */
+        $requestedData = $request->validated();
+        $toUpdate = EmployeeUpdateMapper::fromEloquent(WorkerUpdateDTO::fromRequest($requestedData));
         $this->workerRepository->update($workerId, $toUpdate);
 
         return ApiResponseHelper::sendSuccessResponse();

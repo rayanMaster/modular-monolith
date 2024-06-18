@@ -28,7 +28,8 @@ class WorkSiteController extends Controller
     public function __construct(
         //            private readonly IFileManager $fileManager
         private readonly WorkSiteRepository $workSiteRepository,
-    ) {
+    )
+    {
     }
 
     public function list(): JsonResponse
@@ -45,9 +46,42 @@ class WorkSiteController extends Controller
      */
     public function store(WorkSiteCreateRequest $request): JsonResponse
     {
+
+
         DB::transaction(
             callback: function () use ($request) {
-                $data = WorkSiteCreateDTO::fromRequest($request->validated());
+                /**
+                 * @var array{
+                 *  title: string,
+                 *  description: string,
+                 *  customer_id?: int|null,
+                 *  category_id?: int|null,
+                 *  parent_work_site_id?: int|null,
+                 *  contractor_id?: int|null,
+                 *  starting_budget?: float|null,
+                 *  cost?: float|null,
+                 *  address_id?: int|null,
+                 *  workers_count?: int|null,
+                 *  receipt_date?: string|null,
+                 *  starting_date?: string|null,
+                 *  deliver_date?: string|null,
+                 *  reception_status?: int|null,
+                 *  completion_status?: int|null,
+                 *  resources?: array{
+                 *       id:int,
+                 *       quantity:int,
+                 *       price:float
+                 *   }|null,
+                 *  payments?: array{
+                 *       payment_amount:float,
+                 *       payment_date: string
+                 *   }|null,
+                 *  images?: string|null
+                 *  } $requestedData
+                 */
+
+                $requestedData = $request->validated();
+                $data = WorkSiteCreateDTO::fromRequest($requestedData);
 
                 $workSiteData = WorkSiteCreateMapper::toWorkSiteEloquent($data);
 
@@ -68,13 +102,13 @@ class WorkSiteController extends Controller
                         $fileNameParts = explode('.', $file->getClientOriginalName());
                         $fileName = $fileNameParts[0];
                         $path = lcfirst('WorkSite');
-                        $name = $fileName.'_'.now()->format('YmdH');
+                        $name = $fileName . '_' . now()->format('YmdH');
 
-                        if (! File::exists(public_path('storage/'.$path))) {
-                            File::makeDirectory(public_path('storage/'.$path));
+                        if (!File::exists(public_path('storage/' . $path))) {
+                            File::makeDirectory(public_path('storage/' . $path));
                         }
 
-                        $fullPath = public_path('storage/'.$path).'/'.$name.'.webp';
+                        $fullPath = public_path('storage/' . $path) . '/' . $name . '.webp';
 
                         // create new manager instance with desired driver
                         $manager = new \Intervention\Image\ImageManager(new Driver());
@@ -108,12 +142,42 @@ class WorkSiteController extends Controller
      */
     public function update(WorkSiteUpdateRequest $request, int $id): JsonResponse
     {
+
         DB::transaction(
             callback: function () use ($request, $id) {
-
+                /**
+                 * @var array{
+                 *  title: string |null,
+                 *  description: string|null,
+                 *  customer_id?: int|null,
+                 *  category_id?: int|null,
+                 *  parent_work_site_id?: int|null,
+                 *  contractor_id?: float|null,
+                 *  starting_budget?: float|null,
+                 *  cost?: float|null,
+                 *  address_id?: int|null,
+                 *  workers_count?: int|null,
+                 *  receipt_date?: string|null,
+                 *  starting_date?: string|null,
+                 *  deliver_date?: string|null,
+                 *  reception_status?: int|null,
+                 *  completion_status?: int|null,
+                 *  resources?: array{
+                 *    id:int,
+                 *    quantity:int,
+                 *    price:float
+                 *  }|null,
+                 *  payments?: array{
+                 *    payment_amount:float,
+                 *    payment_date: string
+                 *  }|null,
+                 *  image?: string|null
+                 *  } $requestedData
+                 */
+                $requestedData = $request->validated();
                 $workSite = WorkSite::query()->findOrFail($id);
 
-                $data = WorkSiteUpdateDTO::fromRequest($request->validated());
+                $data = WorkSiteUpdateDTO::fromRequest($requestedData);
 
                 $workSiteData = WorkSiteUpdateMapper::toWorkSiteEloquent($data);
                 $this->workSiteRepository->update($workSite->id, $workSiteData);

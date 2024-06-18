@@ -18,7 +18,7 @@ class WorkSiteResourceAddRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array|string>
+     * @return array<string, array<int,ValidationRule|string>>
      */
     public function rules(): array
     {
@@ -28,14 +28,4 @@ class WorkSiteResourceAddRequest extends FormRequest
         ];
     }
 
-    /**
-     * @return array{
-     *    quantity:float,
-     *    price:float
-     * }
-     */
-    public function validated($key = null, $default = null): array
-    {
-        return parent::validated();
-    }
 }

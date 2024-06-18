@@ -20,7 +20,14 @@ class LoginController extends Controller
     public function __invoke(LoginRequest $request): JsonResponse
     {
 
-        $data = LoginDTO::fromRequest($request->validated());
+        /**
+         * @var array{
+         *     user_name : string,
+         *     password:string
+         * }$requestedData
+         */
+        $requestedData = $request->validated();
+        $data = LoginDTO::fromRequest($requestedData);
         $user = User::query()->where('phone', $data->phone)->first();
 
         if (! $user || ! Hash::check($data->password, $user->password)) {

@@ -18,14 +18,14 @@ class DailyAttendanceListRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array|string>
+     * @return array<string, array<int,ValidationRule|string>>
      */
     public function rules(): array
     {
         return [
-            'employee_id' => 'sometimes|exists:users,id',
-            'date_from' => 'sometimes|date_format:Y-m-d',
-            'date_to' => 'sometimes|date_format:Y-m-d|after_or_equal:date_from',
+            'employee_id' => ['sometimes','exists:users,id'],
+            'date_from' => ['sometimes','date_format:Y-m-d'],
+            'date_to' => ['sometimes','date_format:Y-m-d','after_or_equal:date_from'],
         ];
     }
 }
