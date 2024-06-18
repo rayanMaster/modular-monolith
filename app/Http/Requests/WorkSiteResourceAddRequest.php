@@ -27,5 +27,4 @@ class WorkSiteResourceAddRequest extends FormRequest
             'price' => ['required', 'numeric'],
         ];
     }
-
 }

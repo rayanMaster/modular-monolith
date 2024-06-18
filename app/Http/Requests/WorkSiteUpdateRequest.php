@@ -6,7 +6,6 @@ use App\Enums\WorkSiteCompletionStatusEnum;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\File;
 
 class WorkSiteUpdateRequest extends FormRequest
 {
@@ -48,5 +47,4 @@ class WorkSiteUpdateRequest extends FormRequest
             'images.*' => ['sometimes', 'file', 'mimes:jpeg,png,gif,webp', 'max:2048'], // max:2048 for 2MB
         ];
     }
-
 }

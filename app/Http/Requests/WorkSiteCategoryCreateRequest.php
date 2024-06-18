@@ -26,5 +26,4 @@ class WorkSiteCategoryCreateRequest extends FormRequest
     {
         return true;
     }
-
 }

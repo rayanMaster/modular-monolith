@@ -29,5 +29,4 @@ class DailyAttendanceCreateRequest extends FormRequest
             'date_to' => ['sometimes', 'date_format:Y-m-d', 'after_or_equal:date_from'],
         ];
     }
-
 }

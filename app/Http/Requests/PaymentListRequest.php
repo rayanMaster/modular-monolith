@@ -27,5 +27,4 @@ class PaymentListRequest extends FormRequest
             'date_to' => ['sometimes', 'date'],
         ];
     }
-
 }

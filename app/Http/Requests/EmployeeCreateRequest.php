@@ -26,5 +26,4 @@ class EmployeeCreateRequest extends FormRequest
             'first_name' => ['required', 'string'],
         ];
     }
-
 }

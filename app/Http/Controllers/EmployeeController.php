@@ -20,8 +20,7 @@ class EmployeeController extends Controller
 {
     public function __construct(
         private readonly WorkerRepository $workerRepository
-    )
-    {
+    ) {
 
     }
 

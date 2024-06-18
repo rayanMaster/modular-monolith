@@ -9,14 +9,15 @@ class ResourceCreateRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
+     *
      * @return array<string,array<int,ValidationRule|string>>
      */
     public function rules(): array
     {
         return [
-            'name' => ['required','string'],
-            'description' => ['sometimes','string'],
-            'resource_category_id' => ['required','exists:resource_categories,id'],
+            'name' => ['required', 'string'],
+            'description' => ['sometimes', 'string'],
+            'resource_category_id' => ['required', 'exists:resource_categories,id'],
         ];
     }
 
@@ -35,5 +36,4 @@ class ResourceCreateRequest extends FormRequest
      *     resource_category_id : int
      * }
      */
-
 }

@@ -14,11 +14,8 @@ use Throwable;
  */
 abstract readonly class MainRepository implements MainRepositoryInterface
 {
-
-
     /**
-     * @param Builder<TModelClass>|null $query
-     * @param DatabaseManager $databaseManager
+     * @param  Builder<TModelClass>|null  $query
      */
     public function __construct(
         private ?Builder $query,
@@ -39,7 +36,6 @@ abstract readonly class MainRepository implements MainRepositoryInterface
     }
 
     /**
-     * @param int $id
      * @return Model|Collection<int,TModelClass>|Builder<TModelClass>|array<TModelClass>|null
      */
     public function show(int $id): Model|Collection|Builder|array|null
@@ -48,11 +44,11 @@ abstract readonly class MainRepository implements MainRepositoryInterface
     }
 
     /**
-     * @param array<string,mixed>$attributes
-     * @return Model|null
+     * @param  array<string,mixed>  $attributes
+     *
      * @throws Throwable
      */
-    public function create(array $attributes): Model|null
+    public function create(array $attributes): ?Model
     {
         return $this->databaseManager->transaction(
             callback: function () use ($attributes) {
@@ -61,13 +57,11 @@ abstract readonly class MainRepository implements MainRepositoryInterface
     }
 
     /**
-     * @param int $id
-     * @param array<string,mixed> $attributes
-     * @param bool $passNull
-     * @return Model|null
+     * @param  array<string,mixed>  $attributes
+     *
      * @throws Throwable
      */
-    public function update(int $id, array $attributes, bool $passNull = false): Model|null
+    public function update(int $id, array $attributes, bool $passNull = false): ?Model
     {
         if ($this->query === null) {
             throw new RuntimeException('Query builder is not set.');
@@ -79,13 +73,14 @@ abstract readonly class MainRepository implements MainRepositoryInterface
                 $filteredAttributes = array_filter($attributes, fn ($attribute) => $attribute != null);
                 $record->update($passNull ? $attributes : $filteredAttributes);
                 $record->refresh();
+
                 return $record;
             }, attempts: 3);
     }
 
     /**
-     * @param int $id
-     * @return void
+     * @param  int  $id
+     *
      * @throws Throwable
      */
     public function delete($id): void

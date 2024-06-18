@@ -23,9 +23,9 @@ class ResourceUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['sometimes','string'],
-            'description' => ['sometimes','string'],
-            'resource_category_id' => ['sometimes','exists:resource_categories,id'],
+            'name' => ['sometimes', 'string'],
+            'description' => ['sometimes', 'string'],
+            'resource_category_id' => ['sometimes', 'exists:resource_categories,id'],
         ];
     }
 
@@ -36,5 +36,4 @@ class ResourceUpdateRequest extends FormRequest
      *     resource_category_id : int
      * }
      */
-
 }

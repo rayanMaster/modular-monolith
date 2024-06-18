@@ -23,8 +23,8 @@ class CustomerUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => ['sometimes','string'],
-            'last_name' => ['sometimes','string'],
+            'first_name' => ['sometimes', 'string'],
+            'last_name' => ['sometimes', 'string'],
         ];
     }
 }

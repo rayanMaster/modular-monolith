@@ -9,12 +9,13 @@ class ResourceCategoryCreateRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
+     *
      * @return array<string,array<int,ValidationRule|string>>
      */
     public function rules(): array
     {
         return [
-            'name' => ['required','string'],
+            'name' => ['required', 'string'],
         ];
     }
 
@@ -25,5 +26,4 @@ class ResourceCategoryCreateRequest extends FormRequest
     {
         return true;
     }
-
 }

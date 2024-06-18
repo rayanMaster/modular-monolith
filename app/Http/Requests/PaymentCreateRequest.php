@@ -9,6 +9,7 @@ class PaymentCreateRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
+     *
      * @return array<string,array<int,ValidationRule|string>>
      */
     public function rules(): array
@@ -30,13 +31,13 @@ class PaymentCreateRequest extends FormRequest
         return true;
     }
 
-//    /**
-//     * @return array{
-//     *     payable_id:int|null,
-//     *     payable_type:string|null,
-//     *     payment_date:string,
-//     *     payment_amount:float,
-//     *     payment_type:int|null,
-//     * }
-//     */
+    //    /**
+    //     * @return array{
+    //     *     payable_id:int|null,
+    //     *     payable_type:string|null,
+    //     *     payment_date:string,
+    //     *     payment_amount:float,
+    //     *     payment_type:int|null,
+    //     * }
+    //     */
 }

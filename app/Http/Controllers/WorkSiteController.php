@@ -28,8 +28,7 @@ class WorkSiteController extends Controller
     public function __construct(
         //            private readonly IFileManager $fileManager
         private readonly WorkSiteRepository $workSiteRepository,
-    )
-    {
+    ) {
     }
 
     public function list(): JsonResponse
@@ -46,7 +45,6 @@ class WorkSiteController extends Controller
      */
     public function store(WorkSiteCreateRequest $request): JsonResponse
     {
-
 
         DB::transaction(
             callback: function () use ($request) {
@@ -79,7 +77,6 @@ class WorkSiteController extends Controller
                  *  images?: string|null
                  *  } $requestedData
                  */
-
                 $requestedData = $request->validated();
                 $data = WorkSiteCreateDTO::fromRequest($requestedData);
 
@@ -102,13 +99,13 @@ class WorkSiteController extends Controller
                         $fileNameParts = explode('.', $file->getClientOriginalName());
                         $fileName = $fileNameParts[0];
                         $path = lcfirst('WorkSite');
-                        $name = $fileName . '_' . now()->format('YmdH');
+                        $name = $fileName.'_'.now()->format('YmdH');
 
-                        if (!File::exists(public_path('storage/' . $path))) {
-                            File::makeDirectory(public_path('storage/' . $path));
+                        if (! File::exists(public_path('storage/'.$path))) {
+                            File::makeDirectory(public_path('storage/'.$path));
                         }
 
-                        $fullPath = public_path('storage/' . $path) . '/' . $name . '.webp';
+                        $fullPath = public_path('storage/'.$path).'/'.$name.'.webp';
 
                         // create new manager instance with desired driver
                         $manager = new \Intervention\Image\ImageManager(new Driver());

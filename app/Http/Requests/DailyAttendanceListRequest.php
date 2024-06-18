@@ -23,9 +23,9 @@ class DailyAttendanceListRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'employee_id' => ['sometimes','exists:users,id'],
-            'date_from' => ['sometimes','date_format:Y-m-d'],
-            'date_to' => ['sometimes','date_format:Y-m-d','after_or_equal:date_from'],
+            'employee_id' => ['sometimes', 'exists:users,id'],
+            'date_from' => ['sometimes', 'date_format:Y-m-d'],
+            'date_to' => ['sometimes', 'date_format:Y-m-d', 'after_or_equal:date_from'],
         ];
     }
 }
