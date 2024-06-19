@@ -9,35 +9,36 @@ use Spatie\LaravelData\Data;
 class WorkSiteCreateDTO extends Data
 {
     /**
-     * @param array{
+     * @param array<int,array{
      *     id:int,
      *     quantity:int,
      *     price:float
-     * }|null $workSiteResources
-     * @param array{
+     * }>|null $workSiteResources
+     * @param array<int,array{
      *     payment_amount:float,
      *     payment_date: string
-     * }|null $payments
+     * }>|null $payments
      */
     public function __construct(
-        public string $title,
-        public string $description,
-        public ?int $customerId,
-        public ?int $categoryId,
-        public ?int $contractorId,
-        public ?int $parentWorksiteId,
-        public ?float $startingBudget,
-        public ?float $cost,
-        public ?int $addressId,
-        public ?int $workersCount,
+        public string  $title,
+        public string  $description,
+        public ?int    $customerId,
+        public ?int    $categoryId,
+        public ?int    $contractorId,
+        public ?int    $parentWorksiteId,
+        public ?float  $startingBudget,
+        public ?float  $cost,
+        public ?int    $addressId,
+        public ?int    $workersCount,
         public ?string $receiptDate,
         public ?string $startingDate,
         public ?string $deliverDate,
-        public ?int $receptionStatus,
-        public ?int $completionStatus,
-        public ?array $workSiteResources,
-        public ?array $payments,
-    ) {
+        public ?int    $receptionStatus,
+        public ?int    $completionStatus,
+        public ?array  $workSiteResources,
+        public ?array  $payments,
+    )
+    {
     }
 
     /**
@@ -57,15 +58,15 @@ class WorkSiteCreateDTO extends Data
      *  deliver_date?: string|null,
      *  reception_status?: int|null,
      *  completion_status?: int|null,
-     *  resources?: array{
+     *  resources?: array<int,array{
      *      id:int,
      *      quantity:int,
      *      price:float
-     *  }|null,
-     *  payments?: array{
+     *  }>|null,
+     *  payments?: array<int,array{
      *      payment_amount:float,
      *      payment_date: string
-     *  }|null
+     *  }>|null
      * } $request
      */
     public static function fromRequest(array $request): WorkSiteCreateDTO

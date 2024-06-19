@@ -11,6 +11,7 @@ use Throwable;
 
 /**
  * @template TModelClass of Model
+ *
  * @implements MainRepositoryInterface<TModelClass>
  */
 abstract readonly class MainRepository implements MainRepositoryInterface

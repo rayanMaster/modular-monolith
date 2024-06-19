@@ -20,7 +20,15 @@ class WorkSitePaymentController extends Controller
     public function list(int $workSiteId, PaymentListRequest $request): JsonResponse
     {
 
-        $filteredData = PaymentListDTO::fromRequest($request->validated());
+        /**
+         * @var array{
+         *   date_from:string|null,
+         *  date_to:string|null
+         * } $requestedData
+         */
+        $requestedData = $request->validated();
+
+        $filteredData = PaymentListDTO::fromRequest($requestedData);
         $payments = Payment::query()->where(
             column: 'payable_id',
             operator: '=',
@@ -56,7 +64,17 @@ class WorkSitePaymentController extends Controller
     public function create(PaymentCreateRequest $request, int $workSiteId): JsonResponse
     {
         $workSite = WorkSite::query()->findOrFail($workSiteId);
-        $workSite->payments()->create(PaymentCreateDTO::fromRequest($request->validated())->toArray());
+        /**
+         * @var array{
+         *   payable_id : int|null,
+         * payable_type :string|null,
+         * payment_date :string,
+         * payment_amount :int,
+         * payment_type :int|null,
+         * } $requestedData
+         */
+        $requestedData = $request->validated();
+        $workSite->payments()->create(PaymentCreateDTO::fromRequest($requestedData)->toArray());
 
         return ApiResponseHelper::sendSuccessResponse();
     }

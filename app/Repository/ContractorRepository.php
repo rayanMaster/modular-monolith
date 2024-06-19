@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Models\Contractor;
 use Illuminate\Database\DatabaseManager;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @extends MainRepository<Contractor>

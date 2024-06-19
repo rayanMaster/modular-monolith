@@ -25,7 +25,14 @@ class WorkSiteResourceController extends Controller
         $workSite = WorkSite::query()->findOrFail($workSiteId);
         $resource = Resource::query()->findOrFail($resourceId);
 
-        $dataToAdd = WorkSiteResourceAddDTO::fromRequest($request->validated());
+        /**
+         * @var array{
+         *   quantity:int,
+         *  price:int
+         * } $requestedData
+         */
+        $requestedData = $request->validated();
+        $dataToAdd = WorkSiteResourceAddDTO::fromRequest($requestedData);
         $resourcesData = [
             $resource->id => [
                 'quantity' => $dataToAdd->quantity,

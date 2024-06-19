@@ -8,8 +8,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @property int $id
- * @property resource $resource
- * @property mixed $pivot
+ * @property Resource $resource
+ * @property object{
+ *     quantity:int,
+ *     price:float
+ * } $pivot
  */
 class WorkSiteResourceListResource extends JsonResource
 {
@@ -24,7 +27,7 @@ class WorkSiteResourceListResource extends JsonResource
             'id' => $this->id,
             'quantity' => $this->pivot->quantity,
             'price' => $this->pivot->price,
-            'resource' => $this->resource?->name,
+            'resource' => $this->resource->name,
         ];
     }
 }

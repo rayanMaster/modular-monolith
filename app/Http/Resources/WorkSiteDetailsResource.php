@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Customer;
+use App\Models\WorkSiteCategory;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -10,8 +12,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $id
  * @property mixed $title
  * @property mixed $description
- * @property mixed $customer
- * @property mixed $category
+ * @property Customer $customer
+ * @property WorkSiteCategory $category
  * @property mixed $subWorksites
  * @property mixed $starting_budget
  * @property mixed $cost
@@ -21,8 +23,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $starting_date
  * @property mixed $deliver_date
  * @property mixed $reception_status
- * @property mixed $created_at
- * @property mixed $updated_at
+ * @property string $created_at
+ * @property string $updated_at
  * @property mixed $resources
  * @property mixed $payments
  */
@@ -39,8 +41,8 @@ class WorkSiteDetailsResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
-            'customer' => $this->customer?->fullName,
-            'category' => $this->category?->name,
+            'customer' => $this->customer->fullName,
+            'category' => $this->category->name,
             'sub_worksites' => WorkSiteDetailsResource::collection($this->subWorksites),
             'starting_budget' => $this->starting_budget,
             'cost' => $this->cost,

@@ -65,15 +65,15 @@ class WorkSiteController extends Controller
                  *  deliver_date?: string|null,
                  *  reception_status?: int|null,
                  *  completion_status?: int|null,
-                 *  resources?: array{
+                 *  resources?: array<int,array{
                  *       id:int,
                  *       quantity:int,
                  *       price:float
-                 *   }|null,
-                 *  payments?: array{
+                 *   }>|null,
+                 *  payments?: array<int,array{
                  *       payment_amount:float,
                  *       payment_date: string
-                 *   }|null,
+                 *   }>|null,
                  *  images?: string|null
                  *  } $requestedData
                  */

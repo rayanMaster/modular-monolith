@@ -15,5 +15,6 @@ parameters:
     excludePaths:
         - modules/*/tests/*
 
+#    treatPhpDocTypesAsCertain: false
 #    checkMissingIterableValueType: false
 #    checkGenericClassInNonGenericObjectType: false

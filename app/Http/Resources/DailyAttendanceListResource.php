@@ -2,11 +2,12 @@
 
 namespace App\Http\Resources;
 
+use App\Models\WorkSite;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property mixed $workSite
+ * @property WorkSite $workSite
  * @property mixed $date
  */
 class DailyAttendanceListResource extends JsonResource

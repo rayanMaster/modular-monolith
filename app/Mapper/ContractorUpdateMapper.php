@@ -6,6 +6,15 @@ use App\DTO\ContractorUpdateDTO;
 
 class ContractorUpdateMapper
 {
+    /**
+     * @param ContractorUpdateDTO $createDTO
+     * @return array{
+     *     first_name:string|null,
+     *     last_name:string|null,
+     *     phone:string|null,
+     *     address_id:int|null,
+     * }
+     */
     public static function toEloquent(ContractorUpdateDTO $createDTO): array
     {
         return [

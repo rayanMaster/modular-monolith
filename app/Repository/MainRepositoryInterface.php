@@ -17,28 +17,19 @@ interface MainRepositoryInterface
     public function list(): Collection|array;
 
     /**
-     * @param int $id
      * @return Model|Collection<int,TModelClass>|Builder<TModelClass>|array<TModelClass>|null
      */
     public function show(int $id): Model|Collection|Builder|array|null;
 
     /**
-     * @param array<string,mixed> $attributes
-     * @return Model|null
+     * @param  array<string,mixed>  $attributes
      */
-    public function create(array $attributes): Model|null;
+    public function create(array $attributes): ?Model;
 
     /**
-     * @param int $id
-     * @param array<string,mixed>$attributes
-     * @param bool $passNull
-     * @return Model|null
+     * @param  array<string,mixed>  $attributes
      */
     public function update(int $id, array $attributes, bool $passNull = false): ?Model;
 
-    /**
-     * @param int $id
-     * @return void
-     */
     public function delete(int $id): void;
 }

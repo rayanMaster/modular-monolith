@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\WorkSiteResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -9,7 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $name
  * @property mixed $description
  * @property mixed $category
- * @property mixed $pivot
+ * @property WorkSiteResource $pivot
  */
 class ResourceListResource extends JsonResource
 {
@@ -24,10 +25,10 @@ class ResourceListResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'resource_category' => ResourceCategoryDetailsResource::make($this->category),
-            'work_site_id' => $this->pivot?->work_site_id,
-            'resource_id' => $this->pivot?->resource_id,
-            'price' => $this->pivot?->price,
-            'quantity' => $this->pivot?->quantity,
+            'work_site_id' => $this->pivot->work_site_id,
+            'resource_id' => $this->pivot->resource_id,
+            'price' => $this->pivot->price,
+            'quantity' => $this->pivot->quantity,
         ];
     }
 }

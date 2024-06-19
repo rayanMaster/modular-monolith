@@ -16,7 +16,7 @@ class ResourceCategoryController extends Controller
 {
     public function list(): JsonResponse
     {
-        $resourceCategories = ResourceCategory::all();
+        $resourceCategories = ResourceCategory::get();
 
         return ApiResponseHelper::sendResponse(new Result(ResourceCategoryListResource::collection($resourceCategories)));
     }

@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Models\WorkSite;
 use Illuminate\Database\DatabaseManager;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @extends MainRepository<WorkSite>
