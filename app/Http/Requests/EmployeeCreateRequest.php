@@ -24,6 +24,9 @@ class EmployeeCreateRequest extends FormRequest
     {
         return [
             'first_name' => ['required', 'string'],
+            'last_name' => ['nullable', 'string'],
+            'phone' => ['required', 'string'],
+            'password' => ['sometimes', 'string'],
         ];
     }
 }

@@ -12,7 +12,8 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => 'Rayan',
+            'first_name' => fake()->firstName,
+            'last_name' => fake()->lastName(),
             'email' => fake()->email(),
             'phone' => fake()->phoneNumber(),
             'password' => 'Rayan123@@',
@@ -22,9 +23,10 @@ class UserFactory extends Factory
     public function mainAdmin(): static
     {
         return $this->state(fn (array $attributes) => [
-            'name' => 'Main Admin',
-            'phone' => '0945795749',
-            'email' => 'main_admin@admin.com',
+            'first_name' => fake()->firstName,
+            'last_name' => fake()->lastName(),
+            'email' => fake()->email(),
+            'phone' => fake()->phoneNumber(),
             'password' => 'admin123',
         ])->afterCreating(function (User $user) {
             return $user->assignRole('admin');
@@ -34,9 +36,10 @@ class UserFactory extends Factory
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [
-            'name' => 'Admin',
-            'phone' => fake()->phoneNumber(),
+            'first_name' => fake()->firstName,
+            'last_name' => fake()->lastName(),
             'email' => fake()->email(),
+            'phone' => fake()->phoneNumber(),
             'password' => 'admin123',
         ])->afterCreating(function (User $user) {
             return $user->assignRole('admin');

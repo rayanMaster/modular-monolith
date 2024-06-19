@@ -159,11 +159,7 @@ describe('Create WorkSite', function () {
             'resource_category_id' => $workSiteResourceCategory->id,
         ]);
 
-        $admin = User::factory()->admin()->create([
-            'name' => 'Admin1',
-            'email' => 'admin1@admin.com',
-            'password' => 'admin123',
-        ]);
+        $admin = User::factory()->admin()->create();
         expect($admin->hasRole('admin'))->toBe(true);
 
         Storage::fake();

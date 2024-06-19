@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\StatusEnum;
+use App\Models\ResourceCategory;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description')->nullable();
-            $table->foreignIdFor(\App\Models\ResourceCategory::class, 'resource_category_id');
-            $table->tinyInteger('status')->default(\App\Enums\StatusEnum::Active->value);
+            $table->foreignIdFor(ResourceCategory::class, 'resource_category_id');
+            $table->tinyInteger('status')->default(StatusEnum::Active->value);
 
             $table->timestamps();
             $table->softDeletes();

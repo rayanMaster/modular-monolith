@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\StatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +15,7 @@ return new class extends Migration
         Schema::create('work_site_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->tinyInteger('status')->default(\App\Enums\StatusEnum::Active->value);
+            $table->tinyInteger('status')->default(StatusEnum::Active->value);
 
             $table->softDeletes();
             $table->timestamps();

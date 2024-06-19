@@ -24,6 +24,8 @@ class EmployeeUpdateRequest extends FormRequest
     {
         return [
             'first_name' => ['nullable', 'string'],
+            'last_name' => ['nullable', 'string'],
+            'phone' => ['nullable', 'string'],
         ];
     }
 }

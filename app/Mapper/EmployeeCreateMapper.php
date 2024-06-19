@@ -9,7 +9,10 @@ class EmployeeCreateMapper
     /**
      * @param WorkerCreateDTO $workerCreateDTO
      * @return array{
-     *     first_name:string|null
+     *     first_name:string,
+     *     last_name:string|null,
+     *     phone:string,
+     *     password:string|null
      * }
      */
     public static function fromEloquent(WorkerCreateDTO $workerCreateDTO): array
@@ -17,6 +20,9 @@ class EmployeeCreateMapper
 
         return [
             'first_name' => $workerCreateDTO->firstName,
+            'last_name' => $workerCreateDTO->lastName,
+            'phone' => $workerCreateDTO->phone,
+            'password'=>$workerCreateDTO->password,
         ];
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\StatusEnum;
+use App\Models\Address;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,8 +19,8 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name')->nullable();
             $table->string('phone')->nullable();
-            $table->string('status')->default(\App\Enums\StatusEnum::Active->value);
-            $table->foreignIdFor(\App\Models\Address::class)->nullable();
+            $table->string('status')->default(StatusEnum::Active->value);
+            $table->foreignIdFor(Address::class)->nullable();
 
             $table->timestamps();
             $table->softDeletes();
