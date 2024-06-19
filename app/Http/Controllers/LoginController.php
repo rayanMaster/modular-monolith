@@ -37,7 +37,7 @@ class LoginController extends Controller
         $result['user'] = $user;
         $result['token'] = $user->createToken('token')->plainTextToken;
 
-        return ApiResponseHelper::sendResponse(new Result(LoginResource::make($result)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(LoginResource::make($result)));
 
     }
 }

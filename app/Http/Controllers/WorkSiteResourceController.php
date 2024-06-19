@@ -17,7 +17,7 @@ class WorkSiteResourceController extends Controller
     {
         $workSite = WorkSite::query()->with(['resources'])->findOrFail($workSiteId);
 
-        return ApiResponseHelper::sendResponse(new Result(WorkSiteResourceListResource::collection($workSite->resources)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(WorkSiteResourceListResource::collection($workSite->resources)));
     }
 
     public function add(int $workSiteId, int $resourceId, WorkSiteResourceAddRequest $request): JsonResponse
@@ -28,7 +28,7 @@ class WorkSiteResourceController extends Controller
         /**
          * @var array{
          *   quantity:int,
-         *  price:int
+         *   price:int
          * } $requestedData
          */
         $requestedData = $request->validated();

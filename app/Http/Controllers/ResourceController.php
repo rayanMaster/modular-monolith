@@ -20,7 +20,7 @@ class ResourceController extends Controller
     {
         $resources = Resource::query()->get();
 
-        return ApiResponseHelper::sendResponse(new Result(ResourceListResource::collection($resources)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(ResourceListResource::collection($resources)));
     }
 
     public function store(ResourceCreateRequest $request): JsonResponse
@@ -37,7 +37,7 @@ class ResourceController extends Controller
     {
         $resource = Resource::query()->findOrFail($id);
 
-        return ApiResponseHelper::sendResponse(new Result(ResourceDetailsResource::make($resource)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(ResourceDetailsResource::make($resource)));
     }
 
     /**

@@ -12,8 +12,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $id
  * @property mixed $title
  * @property mixed $description
- * @property Customer $customer
- * @property WorkSiteCategory $category
+ * @property Customer|null $customer
+ * @property WorkSiteCategory|null $category
  * @property mixed $subWorksites
  * @property mixed $starting_budget
  * @property mixed $cost
@@ -41,8 +41,8 @@ class WorkSiteListResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
-            'customer' => $this->customer->fullName,
-            'category' => $this->category->name,
+            'customer' => $this->customer?->fullName,
+            'category' => $this->category?->name,
             'sub_worksites' => $this->subWorksites,
             'starting_budget' => $this->starting_budget,
             'cost' => $this->cost,

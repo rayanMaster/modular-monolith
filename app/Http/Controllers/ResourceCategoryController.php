@@ -18,7 +18,7 @@ class ResourceCategoryController extends Controller
     {
         $resourceCategories = ResourceCategory::get();
 
-        return ApiResponseHelper::sendResponse(new Result(ResourceCategoryListResource::collection($resourceCategories)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(ResourceCategoryListResource::collection($resourceCategories)));
     }
 
     public function store(ResourceCategoryCreateRequest $request): JsonResponse
@@ -33,7 +33,7 @@ class ResourceCategoryController extends Controller
         Resource::query()->findOrFail($resourceId);
         $resourceCategory = ResourceCategory::query()->findOrFail($resourceCategoryId);
 
-        return ApiResponseHelper::sendResponse(new Result(ResourceCategoryDetailsResource::make($resourceCategory)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(ResourceCategoryDetailsResource::make($resourceCategory)));
 
     }
 

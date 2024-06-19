@@ -28,7 +28,7 @@ class EmployeeController extends Controller
     {
         $workers = Employee::query()->get();
 
-        return ApiResponseHelper::sendResponse(new Result(EmployeeListResource::collection($workers)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(EmployeeListResource::collection($workers)));
     }
 
     public function store(EmployeeCreateRequest $request): JsonResponse
@@ -66,7 +66,7 @@ class EmployeeController extends Controller
     {
         $worker = Employee::query()->findOrFail($workerId);
 
-        return ApiResponseHelper::sendResponse(new Result(EmployeeDetailsResource::make($worker)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(EmployeeDetailsResource::make($worker)));
     }
 
     public function destroy(int $workerId): JsonResponse

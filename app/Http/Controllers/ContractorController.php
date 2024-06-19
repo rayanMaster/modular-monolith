@@ -28,7 +28,7 @@ class ContractorController extends Controller
     {
         $result = $this->contractorRepository->list();
 
-        return ApiResponseHelper::sendResponse(new Result(ContractorListResource::collection($result)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(ContractorListResource::collection($result)));
     }
 
     /**

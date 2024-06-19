@@ -28,7 +28,7 @@ class WorkSiteUpdateRequest extends FormRequest
             'title' => ['sometimes', 'string'],
             'description' => ['sometimes', 'string'],
             'customer_id' => ['sometimes', 'integer', 'exists:customers,id'],
-            'category_id' => ['sometimes', 'integer', 'exists:categories,id'],
+            'category_id' => ['sometimes', 'integer', 'exists:work_site_categories,id'],
             'parent_work_site_id' => ['nullable', 'integer', 'exists:work_sites,id'],
             'starting_budget' => ['sometimes', 'numeric', 'min:0'],
             'cost' => ['sometimes', 'numeric', 'min:0'],

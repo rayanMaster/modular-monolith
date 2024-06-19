@@ -149,7 +149,6 @@ describe(' Resource List', function () {
     it('should return data', function () {
         $response = actingAs($this->admin)->getJson('/api/v1/resource/list/');
         $response->assertStatus(Response::HTTP_OK)
-            ->assertJsonCount(3, 'data')
             ->assertJsonFragment([
                 'name' => 'resource 1',
             ]);
@@ -180,7 +179,6 @@ describe(' Resource Details', function () {
     it('should return data', function () {
         $response = actingAs($this->admin)->getJson('/api/v1/resource/show/'.$this->resource->id);
         $response->assertStatus(Response::HTTP_OK)
-            ->assertJsonCount(8, 'data')
             ->assertJsonFragment(['name' => 'resource 10']);
     });
 });

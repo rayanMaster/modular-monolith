@@ -17,7 +17,7 @@ class CustomerController extends Controller
     {
         $customers = Customer::query()->get();
 
-        return ApiResponseHelper::sendResponse(new Result(CustomerListResource::collection($customers)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(CustomerListResource::collection($customers)));
     }
 
     public function store(CustomerCreateRequest $request): JsonResponse
@@ -32,7 +32,7 @@ class CustomerController extends Controller
     {
         $customer = Customer::query()->with(['address', 'payments'])->findOrFail($id);
 
-        return ApiResponseHelper::sendResponse(new Result(CustomerDetailsResource::make($customer)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(CustomerDetailsResource::make($customer)));
     }
 
     public function update(CustomerUpdateRequest $request, int $id): void

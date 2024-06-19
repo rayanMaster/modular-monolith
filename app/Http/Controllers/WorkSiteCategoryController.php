@@ -17,7 +17,7 @@ class WorkSiteCategoryController extends Controller
     {
         $categories = WorkSiteCategory::query()->get();
 
-        return ApiResponseHelper::sendResponse(new Result(WorkSiteCategoryListResource::collection($categories)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(WorkSiteCategoryListResource::collection($categories)));
     }
 
     public function store(WorkSiteCategoryCreateRequest $request): JsonResponse
@@ -31,7 +31,7 @@ class WorkSiteCategoryController extends Controller
     {
         $category = WorkSiteCategory::query()->findOrFail($id);
 
-        return ApiResponseHelper::sendResponse(new Result(WorkSiteCategoryDetailsResource::make($category)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(WorkSiteCategoryDetailsResource::make($category)));
     }
 
     public function update(WorkSiteCategoryUpdateRequest $request, int $id): JsonResponse

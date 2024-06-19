@@ -35,7 +35,7 @@ class WorkSiteController extends Controller
     {
         $workSites = WorkSite::query()->with(['payments', 'address'])->get();
 
-        return ApiResponseHelper::sendResponse(new Result(WorkSiteListResource::collection($workSites)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(WorkSiteListResource::collection($workSites)));
     }
 
     /**
@@ -129,7 +129,7 @@ class WorkSiteController extends Controller
     {
         $worksite = WorkSite::query()->with(['customer', 'payments', 'resources'])->findOrFail($id);
 
-        return ApiResponseHelper::sendResponse(new Result(WorkSiteDetailsResource::make($worksite)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(WorkSiteDetailsResource::make($worksite)));
     }
 
     /**

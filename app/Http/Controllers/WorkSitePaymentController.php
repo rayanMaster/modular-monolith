@@ -66,11 +66,11 @@ class WorkSitePaymentController extends Controller
         $workSite = WorkSite::query()->findOrFail($workSiteId);
         /**
          * @var array{
-         *   payable_id : int|null,
-         * payable_type :string|null,
-         * payment_date :string,
-         * payment_amount :int,
-         * payment_type :int|null,
+         *  payable_id : int|null,
+         *  payable_type :string|null,
+         *  payment_date :string,
+         *  payment_amount :int,
+         *  payment_type :int|null,
          * } $requestedData
          */
         $requestedData = $request->validated();
