@@ -5,25 +5,25 @@ namespace App\Http\Controllers;
 use App\DTO\WorkSiteResourceAddDTO;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
-use App\Http\Requests\WorkSiteResourceAddRequest;
-use App\Http\Resources\WorkSiteResourceListResource;
-use App\Models\Resource;
+use App\Http\Requests\WorkSiteItemAddRequest;
+use App\Http\Resources\WorkSiteItemListResource;
+use App\Models\Item;
 use App\Models\WorkSite;
 use Illuminate\Http\JsonResponse;
 
-class WorkSiteResourceController extends Controller
+class WorkSiteItemController extends Controller
 {
     public function list(int $workSiteId): JsonResponse
     {
-        $workSite = WorkSite::query()->with(['resources'])->findOrFail($workSiteId);
+        $workSite = WorkSite::query()->with(['items'])->findOrFail($workSiteId);
 
-        return ApiResponseHelper::sendSuccessResponse(new Result(WorkSiteResourceListResource::collection($workSite->resources)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(WorkSiteItemListResource::collection($workSite->items)));
     }
 
-    public function add(int $workSiteId, int $resourceId, WorkSiteResourceAddRequest $request): JsonResponse
+    public function add(int $workSiteId, int $resourceId, WorkSiteItemAddRequest $request): JsonResponse
     {
         $workSite = WorkSite::query()->findOrFail($workSiteId);
-        $resource = Resource::query()->findOrFail($resourceId);
+        $resource = Item::query()->findOrFail($resourceId);
 
         /**
          * @var array{
@@ -39,7 +39,7 @@ class WorkSiteResourceController extends Controller
                 'price' => $dataToAdd->price,
             ],
         ];
-        $workSite->resources()->syncWithoutDetaching($resourcesData);
+        $workSite->items()->syncWithoutDetaching($resourcesData);
 
         return ApiResponseHelper::sendSuccessResponse();
     }

@@ -9,7 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $id
  * @property mixed $name
  */
-class ResourceCategoryDetailsResource extends JsonResource
+class ItemCategoryDetailsResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

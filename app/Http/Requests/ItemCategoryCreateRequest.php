@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ResourceCategoryCreateRequest extends FormRequest
+class ItemCategoryCreateRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.

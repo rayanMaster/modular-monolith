@@ -2,15 +2,15 @@
 
 namespace Database\Factories;
 
-use App\Models\ResourceCategory;
+use App\Models\ItemCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ResourceCategory>
+ * @extends Factory<ItemCategory>
  */
-class ResourceCategoryFactory extends Factory
+class ItemCategoryFactory extends Factory
 {
-    protected $model = ResourceCategory::class;
+    protected $model = ItemCategory::class;
 
     /**
      * Define the model's default state.
@@ -20,7 +20,7 @@ class ResourceCategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => 'Main Resource Category',
+            'name' => 'Main Item Category',
         ];
     }
 }

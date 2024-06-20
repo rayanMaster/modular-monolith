@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources;
 
-use App\Models\WorkSiteResource;
+use App\Models\WorkSiteItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -10,9 +10,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $name
  * @property mixed $description
  * @property mixed $category
- * @property WorkSiteResource|null $pivot
+ * @property WorkSiteItem|null $pivot
  */
-class ResourceListResource extends JsonResource
+class ItemDetailsResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -24,9 +24,9 @@ class ResourceListResource extends JsonResource
         return [
             'name' => $this->name,
             'description' => $this->description,
-            'resource_category' => ResourceCategoryDetailsResource::make($this->category),
+            'item_category' => ItemCategoryDetailsResource::make($this->category),
             'work_site_id' => $this->pivot?->work_site_id,
-            'resource_id' => $this->pivot?->resource_id,
+            'item_id' => $this->pivot?->item_id,
             'price' => $this->pivot?->price,
             'quantity' => $this->pivot?->quantity,
         ];

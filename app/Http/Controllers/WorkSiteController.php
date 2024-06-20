@@ -59,7 +59,7 @@ class WorkSiteController extends Controller
                  *  deliver_date?: string|null,
                  *  reception_status?: int|null,
                  *  completion_status?: int|null,
-                 *  resources?: array<int,array{
+                 *  items?: array<int,array{
                  *       id:int,
                  *       quantity:int,
                  *       price:float
@@ -96,8 +96,8 @@ class WorkSiteController extends Controller
 
 
                 $resourcesData = [];
-                if (is_array($data->workSiteResources) && count($data->workSiteResources) > 0) {
-                    foreach ($data->workSiteResources as $resource) {
+                if (is_array($data->workSiteItems) && count($data->workSiteItems) > 0) {
+                    foreach ($data->workSiteItems as $resource) {
                         if (is_array($resource)) {
                             $item = [
                                 'quantity' => $resource['quantity'],
@@ -107,7 +107,7 @@ class WorkSiteController extends Controller
                         }
                     }
                 }
-                $workSite->resources()->syncWithoutDetaching($resourcesData);
+                $workSite->items()->syncWithoutDetaching($resourcesData);
                 $paymentData = [];
                 if (is_array($data->payments) && count($data->payments) > 0) {
                     foreach ($data->payments as $payment) {
@@ -160,7 +160,7 @@ class WorkSiteController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $worksite = WorkSite::query()->with(['customer', 'payments', 'resources'])->findOrFail($id);
+        $worksite = WorkSite::query()->with(['customer', 'payments', 'items'])->findOrFail($id);
 
         return ApiResponseHelper::sendSuccessResponse(new Result(WorkSiteDetailsResource::make($worksite)));
     }
@@ -192,7 +192,7 @@ class WorkSiteController extends Controller
                  *  deliver_date?: string|null,
                  *  reception_status?: int|null,
                  *  completion_status?: int|null,
-                 *  resources?: array{
+                 *  items?: array{
                  *    id:int,
                  *    quantity:int,
                  *    price:float

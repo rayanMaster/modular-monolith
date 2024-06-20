@@ -5,13 +5,13 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DailyAttendanceController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LoginController;
-use App\Http\Controllers\ResourceCategoryController;
-use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\ItemCategoryController;
+use App\Http\Controllers\ItemController;
 use App\Http\Controllers\WorkSiteCategoryController;
 use App\Http\Controllers\WorkSiteController;
 use App\Http\Controllers\WorkSiteCustomerController;
+use App\Http\Controllers\WorkSiteItemController;
 use App\Http\Controllers\WorkSitePaymentController;
-use App\Http\Controllers\WorkSiteResourceController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -79,26 +79,26 @@ Route::prefix('v1')->group(function () {
                 //                    ->name('workSite.payment.show');
             });
 
-            Route::group(['prefix' => '{worksiteId}/resource'], function () {
-                Route::post('/{resourceId}/add', [WorkSiteResourceController::class, 'add'])
-                    ->middleware('can:workSite-resource-add')
-                    ->name('workSite.resource.add');
+            Route::group(['prefix' => '{worksiteId}/item'], function () {
+                Route::post('/{itemId}/add', [WorkSiteItemController::class, 'add'])
+                    ->middleware('can:workSite-item-add')
+                    ->name('workSite.item.add');
 
-                Route::get('/list', [WorkSiteResourceController::class, 'list'])
-                    ->middleware('can:workSite-resource-list')
-                    ->name('workSite.resource.list');
+                Route::get('/list', [WorkSiteItemController::class, 'list'])
+                    ->middleware('can:workSite-item-list')
+                    ->name('workSite.item.list');
                 //
                 //                Route::post('update/{id}', WorkSitePaymentController::class)
-                //                    ->middleware('can:workSite-resource-update')
-                //                    ->name('workSite.resource.update');
+                //                    ->middleware('can:workSite-item-update')
+                //                    ->name('workSite.item.update');
                 //
                 //                Route::post('show/{id}', WorkSitePaymentController::class)
-                //                    ->middleware('can:workSite-resource-show')
-                //                    ->name('workSite.resource.show');
+                //                    ->middleware('can:workSite-item-show')
+                //                    ->name('workSite.item.show');
                 //
                 //                Route::post('delete/{id}', WorkSitePaymentController::class)
-                //                    ->middleware('can:workSite-resource-delete')
-                //                    ->name('workSite.resource.delete');
+                //                    ->middleware('can:workSite-item-delete')
+                //                    ->name('workSite.item.delete');
             });
 
             Route::group(['prefix' => '{worksiteId}/employee'], function () {
@@ -107,20 +107,20 @@ Route::prefix('v1')->group(function () {
                     ->name('workSite.employee.assign');
 
                 //                Route::post('list', WorkSitePaymentController::class)
-                //                    ->middleware('can:workSite-resource-list')
-                //                    ->name('workSite.resource.list');
+                //                    ->middleware('can:workSite-item-list')
+                //                    ->name('workSite.item.list');
                 //
                 //                Route::post('update/{id}', WorkSitePaymentController::class)
-                //                    ->middleware('can:workSite-resource-update')
-                //                    ->name('workSite.resource.update');
+                //                    ->middleware('can:workSite-item-update')
+                //                    ->name('workSite.item.update');
                 //
                 //                Route::post('show/{id}', WorkSitePaymentController::class)
-                //                    ->middleware('can:workSite-resource-show')
-                //                    ->name('workSite.resource.show');
+                //                    ->middleware('can:workSite-item-show')
+                //                    ->name('workSite.item.show');
                 //
                 //                Route::post('delete/{id}', WorkSitePaymentController::class)
-                //                    ->middleware('can:workSite-resource-delete')
-                //                    ->name('workSite.resource.delete');
+                //                    ->middleware('can:workSite-item-delete')
+                //                    ->name('workSite.item.delete');
             });
 
             Route::group(['prefix' => '{worksiteId}/contractor'], function () {
@@ -140,39 +140,39 @@ Route::prefix('v1')->group(function () {
             });
         });
 
-        Route::group(['prefix' => 'resource'], function () {
-            Route::get('/list', [ResourceController::class, 'list'])
-                ->middleware('can:resource-list')
-                ->name('resource.list');
-            Route::get('/show/{id}', [ResourceController::class, 'show'])
-                ->middleware('can:resource-show')
-                ->name('resource.show');
-            Route::post('/create', [ResourceController::class, 'store'])
-                ->middleware('can:resource-create')
-                ->name('resource.create');
-            Route::put('/update/{id}', [ResourceController::class, 'update'])
-                ->middleware('can:resource-update')
-                ->name('resource.update');
-            Route::delete('/delete/{id}', [ResourceController::class, 'destroy'])
-                ->middleware('can:resource-delete')
-                ->name('resource.delete');
+        Route::group(['prefix' => 'item'], function () {
+            Route::get('/list', [ItemController::class, 'list'])
+                ->middleware('can:item-list')
+                ->name('item.list');
+            Route::get('/show/{id}', [ItemController::class, 'show'])
+                ->middleware('can:item-show')
+                ->name('item.show');
+            Route::post('/create', [ItemController::class, 'store'])
+                ->middleware('can:item-create')
+                ->name('item.create');
+            Route::put('/update/{id}', [ItemController::class, 'update'])
+                ->middleware('can:item-update')
+                ->name('item.update');
+            Route::delete('/delete/{id}', [ItemController::class, 'destroy'])
+                ->middleware('can:item-delete')
+                ->name('item.delete');
 
-            Route::group(['prefix' => '{resourceId}/category'], function () {
-                Route::get('/list', [ResourceCategoryController::class, 'list'])
-                    ->middleware('can:resource-category-list')
-                    ->name('resource.category.list');
-                Route::get('/show/{id}', [ResourceCategoryController::class, 'show'])
-                    ->middleware('can:resource-category-show')
-                    ->name('resource.category.show');
-                Route::post('/create', [ResourceCategoryController::class, 'store'])
-                    ->middleware('can:resource-category-create')
-                    ->name('resource.category.create');
-                Route::put('/update/{id}', [ResourceCategoryController::class, 'update'])
-                    ->middleware('can:resource-category-update')
-                    ->name('resource.category.update');
-                Route::delete('/delete/{id}', [ResourceCategoryController::class, 'destroy'])
-                    ->middleware('can:resource-category-delete')
-                    ->name('resource.category.delete');
+            Route::group(['prefix' => '{itemId}/category'], function () {
+                Route::get('/list', [ItemCategoryController::class, 'list'])
+                    ->middleware('can:item-category-list')
+                    ->name('item.category.list');
+                Route::get('/show/{id}', [ItemCategoryController::class, 'show'])
+                    ->middleware('can:item-category-show')
+                    ->name('item.category.show');
+                Route::post('/create', [ItemCategoryController::class, 'store'])
+                    ->middleware('can:item-category-create')
+                    ->name('item.category.create');
+                Route::put('/update/{id}', [ItemCategoryController::class, 'update'])
+                    ->middleware('can:item-category-update')
+                    ->name('item.category.update');
+                Route::delete('/delete/{id}', [ItemCategoryController::class, 'destroy'])
+                    ->middleware('can:item-category-delete')
+                    ->name('item.category.delete');
             });
         });
         Route::group(['prefix' => 'customer'], function () {

@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ResourceCreateRequest extends FormRequest
+class ItemCreateRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -17,7 +17,7 @@ class ResourceCreateRequest extends FormRequest
         return [
             'name' => ['required', 'string'],
             'description' => ['sometimes', 'string'],
-            'resource_category_id' => ['required', 'exists:resource_categories,id'],
+            'item_category_id' => ['required', 'exists:item_categories,id'],
         ];
     }
 
@@ -33,7 +33,7 @@ class ResourceCreateRequest extends FormRequest
      * @return array{
      *     name:string,
      *     description:string | null,
-     *     resource_category_id : int
+     *     item_category_id : int
      * }
      */
 }

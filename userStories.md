@@ -12,7 +12,7 @@ and attach it to main workSite.
 </li>
 <li>
 As an administrator, I should be able to manage 
-resources for a workSite.
+items for a workSite.
 </li>
 <li>
 As an administrator, I should be able to make 
@@ -34,7 +34,7 @@ of workSite.
 As an administrator, I should manage customers of workSite.
 </li>
 <li>
-As an administrator, I should manage resources and theirs categories of workSite.
+As an administrator, I should manage items and theirs categories of workSite.
 </li>
 <li>
 As an administrator, I should manage workers of workSite.
@@ -49,7 +49,7 @@ As an administrator, I should manage categories.
 As an administrator, I should manage customers.
 </li>
 <li>
-As an administrator, I should manage resources and theirs categories.
+As an administrator, I should manage items and theirs categories.
 </li>
 <li>
 As an administrator, I should manage all payments.

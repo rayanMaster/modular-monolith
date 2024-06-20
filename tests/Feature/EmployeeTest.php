@@ -154,8 +154,8 @@ describe('Show  Employee details', function () {
         $this->assertDatabaseCount(Role::class, 0);
         $this->artisan('db:seed');
         $this->assertDatabaseCount(Role::class, 4);
-        $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
-        $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
+        $this->notAdmin = User::factory()->worker()->create();
+        $this->admin = User::factory()->admin()->create();
 
         $this->employee = User::factory()->create(['first_name' => 'Rayan']);
     });

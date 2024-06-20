@@ -40,7 +40,7 @@ use Illuminate\Support\Carbon;
  * @property-read WorkSite|null $parentWorksite
  * @property-read Collection<int, Payment> $payments
  * @property-read int|null $payments_count
- * @property-read Collection<int, resource> $resources
+ * @property-read Collection<int, Item> $resources
  * @property-read int|null $resources_count
  * @property-read Collection<int, WorkSite> $subWorkSites
  * @property-read int|null $sub_work_sites_count
@@ -100,11 +100,11 @@ class WorkSite extends Model
     }
 
     /**
-     * @return BelongsToMany<Resource>
+     * @return BelongsToMany<Item>
      */
-    public function resources(): BelongsToMany
+    public function items(): BelongsToMany
     {
-        return $this->belongsToMany(Resource::class, 'work_site_resources')->withPivot(['quantity', 'price']);
+        return $this->belongsToMany(Item::class, 'work_site_items')->withPivot(['quantity', 'price']);
     }
 
     /**

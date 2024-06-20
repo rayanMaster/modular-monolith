@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ResourceCategoryUpdateRequest extends FormRequest
+class ItemUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,17 @@ class ResourceCategoryUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['sometimes','string'],
+            'name' => ['sometimes', 'string'],
+            'description' => ['sometimes', 'string'],
+            'item_category_id' => ['sometimes', 'exists:item_categories,id'],
         ];
     }
 
+    /**
+     * @return array{
+     *     name:string | null,
+     *     description:string | null,
+     *     item_category_id : int
+     * }
+     */
 }

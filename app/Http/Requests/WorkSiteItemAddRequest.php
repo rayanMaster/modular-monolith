@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ResourceUpdateRequest extends FormRequest
+class WorkSiteItemAddRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,17 +23,8 @@ class ResourceUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['sometimes', 'string'],
-            'description' => ['sometimes', 'string'],
-            'resource_category_id' => ['sometimes', 'exists:resource_categories,id'],
+            'quantity' => ['required', 'numeric'],
+            'price' => ['required', 'numeric'],
         ];
     }
-
-    /**
-     * @return array{
-     *     name:string | null,
-     *     description:string | null,
-     *     resource_category_id : int
-     * }
-     */
 }

@@ -25,7 +25,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $reception_status
  * @property string $created_at
  * @property string $updated_at
- * @property mixed $resources
+ * @property mixed $items
  * @property mixed $payments
  */
 class WorkSiteDetailsResource extends JsonResource
@@ -55,7 +55,7 @@ class WorkSiteDetailsResource extends JsonResource
             'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
             'updated_at' => Carbon::parse($this->updated_at)->toDateTimeString(),
             'payments' => PaymentListResource::collection($this->payments),
-            'resources' => ResourceListResource::collection($this->resources),
+            'items' => ItemListResource::collection($this->items),
         ];
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Resource;
-use App\Models\ResourceCategory;
+use App\Models\Item;
+use App\Models\ItemCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
@@ -16,26 +16,26 @@ use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
 
-describe('Resource routes check', function () {
-    it('should have all routes for /resource/', function () {
+describe('Item routes check', function () {
+    it('should have all routes for /item/', function () {
         $this->artisan('optimize:clear');
         // Define the expected route names
         $expectedRouteNames = [
-            'resource.create',
-            'resource.update',
-            'resource.list',
-            'resource.show',
-            'resource.delete',
-            'resource.category.create',
-            'resource.category.update',
-            'resource.category.list',
-            'resource.category.show',
-            'resource.category.delete',
+            'item.create',
+            'item.update',
+            'item.list',
+            'item.show',
+            'item.delete',
+            'item.category.create',
+            'item.category.update',
+            'item.category.list',
+            'item.category.show',
+            'item.category.delete',
         ];
 
         // Collect routes and filter based on the prefix
         $customerRoutes = collect(Route::getRoutes())->filter(function ($route) {
-            return str_starts_with($route->uri, 'api/v1/resource');
+            return str_starts_with($route->uri, 'api/v1/item');
         });
 
         // Assert that only the expected routes exist
@@ -44,13 +44,13 @@ describe('Resource routes check', function () {
                 "Route {$route->getName()} does not match expected routes.");
 
         });
-        // Assert that there are routes found for /resource/category/
-        $this->assertFalse($customerRoutes->isEmpty(), 'No routes found for /resource');
+        // Assert that there are routes found for /item/category/
+        $this->assertFalse($customerRoutes->isEmpty(), 'No routes found for /item');
 
     });
 
 });
-describe(' Resource Create', function () {
+describe(' Item Create', function () {
     uses(RefreshDatabase::class);
 
     beforeEach(function () {
@@ -60,32 +60,32 @@ describe(' Resource Create', function () {
         $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
-        $this->resourceCategory = ResourceCategory::factory()->create();
+        $this->resourceCategory = ItemCategory::factory()->create();
 
     });
-    it('should prevent non auth creating new Resource', function () {
-        $response = postJson('/api/v1/resource/create');
+    it('should prevent non auth creating new Item', function () {
+        $response = postJson('/api/v1/item/create');
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
-    it('should prevent non admin creating new Resource', function () {
+    it('should prevent non admin creating new Item', function () {
 
-        $response = actingAs($this->notAdmin)->postJson('/api/v1/resource/create');
+        $response = actingAs($this->notAdmin)->postJson('/api/v1/item/create');
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return validation error when data is missed', function () {
-        $response = actingAs($this->admin)->postJson('/api/v1/resource/create', []);
+        $response = actingAs($this->admin)->postJson('/api/v1/item/create', []);
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     });
-    it('should create new Resource with valid data', function () {
-        $response = actingAs($this->admin)->postJson('/api/v1/resource/create', [
+    it('should create new Item with valid data', function () {
+        $response = actingAs($this->admin)->postJson('/api/v1/item/create', [
             'name' => 'new',
             'description' => 'new',
-            'resource_category_id' => $this->resourceCategory->id,
+            'item_category_id' => $this->resourceCategory->id,
         ]);
         $response->assertOk();
     });
 });
-describe(' Resource Update', function () {
+describe(' Item Update', function () {
     uses(RefreshDatabase::class);
 
     beforeEach(function () {
@@ -96,37 +96,37 @@ describe(' Resource Update', function () {
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
-        $this->resource = \App\Models\Resource::factory()->create(['name' => 'new']);
+        $this->item = \App\Models\Item::factory()->create(['name' => 'new']);
 
     });
 
-    it('should prevent non auth updating existed Resource', function () {
-        $response = putJson('/api/v1/resource/update/'.$this->resource->id, [
+    it('should prevent non auth updating existed Item', function () {
+        $response = putJson('/api/v1/item/update/'.$this->item->id, [
             'name' => 'new1',
         ]);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
-    it('should prevent non admin updating existed Resource', function () {
+    it('should prevent non admin updating existed Item', function () {
 
-        $response = actingAs($this->notAdmin)->putJson('/api/v1/resource/update/'.$this->resource->id, [
+        $response = actingAs($this->notAdmin)->putJson('/api/v1/item/update/'.$this->item->id, [
             'name' => 'new1',
         ]);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should not return validation error when data is missed', function () {
-        $response = actingAs($this->admin)->postJson('/api/v1/resource/create', []);
+        $response = actingAs($this->admin)->postJson('/api/v1/item/create', []);
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     });
-    it('should update existed Resource with valid data', function () {
+    it('should update existed Item with valid data', function () {
 
-        $response = actingAs($this->admin)->putJson('/api/v1/resource/update/'.$this->resource->id, [
+        $response = actingAs($this->admin)->putJson('/api/v1/item/update/'.$this->item->id, [
             'name' => 'new1',
         ]);
-        assertDatabaseHas('resources', ['name' => 'new1']);
+        assertDatabaseHas('items', ['name' => 'new1']);
         $response->assertOk();
     });
 });
-describe(' Resource List', function () {
+describe(' Item List', function () {
     uses(RefreshDatabase::class);
 
     beforeEach(function () {
@@ -137,24 +137,24 @@ describe(' Resource List', function () {
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
-        $this->resource1 = Resource::factory()->create(['name' => 'resource 1']);
-        $this->resource2 = Resource::factory()->create(['name' => 'resource 2']);
-        $this->resource3 = Resource::factory()->create(['name' => 'resource 3']);
+        $this->resource1 = Item::factory()->create(['name' => 'item 1']);
+        $this->resource2 = Item::factory()->create(['name' => 'item 2']);
+        $this->resource3 = Item::factory()->create(['name' => 'item 3']);
 
     });
-    it('should prevent non auth updating existed resource', function () {
-        $response = getJson('/api/v1/resource/list/');
+    it('should prevent non auth updating existed item', function () {
+        $response = getJson('/api/v1/item/list/');
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should return data', function () {
-        $response = actingAs($this->admin)->getJson('/api/v1/resource/list/');
+        $response = actingAs($this->admin)->getJson('/api/v1/item/list/');
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment([
-                'name' => 'resource 1',
+                'name' => 'item 1',
             ]);
     });
 });
-describe(' Resource Details', function () {
+describe(' Item Details', function () {
     uses(RefreshDatabase::class);
 
     beforeEach(function () {
@@ -165,24 +165,24 @@ describe(' Resource Details', function () {
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
-        $this->resource = Resource::factory()->create(['id' => 10, 'name' => 'resource 10']);
+        $this->item = Item::factory()->create(['id' => 10, 'name' => 'item 10']);
 
     });
-    it('should prevent non auth show resource', function () {
-        $response = getJson('/api/v1/resource/show/'.$this->resource->id);
+    it('should prevent non auth show item', function () {
+        $response = getJson('/api/v1/item/show/'.$this->item->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
-    it('should return not found for un-existed resource', function () {
-        $response = actingAs($this->admin)->getJson('/api/v1/resource/show/2');
+    it('should return not found for un-existed item', function () {
+        $response = actingAs($this->admin)->getJson('/api/v1/item/show/2');
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should return data', function () {
-        $response = actingAs($this->admin)->getJson('/api/v1/resource/show/'.$this->resource->id);
+        $response = actingAs($this->admin)->getJson('/api/v1/item/show/'.$this->item->id);
         $response->assertStatus(Response::HTTP_OK)
-            ->assertJsonFragment(['name' => 'resource 10']);
+            ->assertJsonFragment(['name' => 'item 10']);
     });
 });
-describe(' Resource Delete', function () {
+describe(' Item Delete', function () {
     uses(RefreshDatabase::class);
 
     beforeEach(function () {
@@ -193,24 +193,24 @@ describe(' Resource Delete', function () {
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
-        $this->resource = Resource::factory()->create(['id' => 10, 'name' => 'resource 10']);
+        $this->item = Item::factory()->create(['id' => 10, 'name' => 'item 10']);
 
     });
-    it('should prevent non auth delete resource', function () {
-        $response = deleteJson('/api/v1/resource/delete/'.$this->resource->id);
+    it('should prevent non auth delete item', function () {
+        $response = deleteJson('/api/v1/item/delete/'.$this->item->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
-    it('should prevent non admin delete existed resource', function () {
-        $response = actingAs($this->notAdmin)->deleteJson('/api/v1/resource/delete/'.$this->resource->id);
+    it('should prevent non admin delete existed item', function () {
+        $response = actingAs($this->notAdmin)->deleteJson('/api/v1/item/delete/'.$this->item->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
-    it('should return not found for un-existed resource', function () {
-        $response = actingAs($this->admin)->deleteJson('/api/v1/resource/delete/2');
+    it('should return not found for un-existed item', function () {
+        $response = actingAs($this->admin)->deleteJson('/api/v1/item/delete/2');
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
-    it('should delete resource from database', function () {
-        assertDatabaseCount(Resource::class, 1);
-        actingAs($this->admin)->deleteJson('/api/v1/resource/delete/'.$this->resource->id);
-        assertSoftDeleted('resources', ['id' => $this->resource->id]);
+    it('should delete item from database', function () {
+        assertDatabaseCount(Item::class, 1);
+        actingAs($this->admin)->deleteJson('/api/v1/item/delete/'.$this->item->id);
+        assertSoftDeleted('items', ['id' => $this->item->id]);
     });
 });

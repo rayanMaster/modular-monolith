@@ -6,8 +6,8 @@ use App\Enums\WorkSiteReceptionStatusEnum;
 use App\Models\Address;
 use App\Models\Contractor;
 use App\Models\Customer;
-use App\Models\Resource;
-use App\Models\ResourceCategory;
+use App\Models\Item;
+use App\Models\ItemCategory;
 use App\Models\User;
 use App\Models\WorkSite;
 use App\Models\WorkSiteCategory;
@@ -109,8 +109,8 @@ describe('WorkSite routes check', function () {
             'workSite.customer.show',
             'workSite.customer.delete',
 
-            'workSite.resource.add',
-            'workSite.resource.list',
+            'workSite.item.add',
+            'workSite.item.list',
         ];
 
         // Collect routes and filter based on the prefix
@@ -150,13 +150,13 @@ describe('Create WorkSite', function () {
         $address = Address::factory()->create();
         $contractor = Contractor::factory()->create();
 
-        $workSiteResourceCategory = ResourceCategory::factory()->create();
+        $workSiteResourceCategory = ItemCategory::factory()->create();
 
-        $workSiteResource1 = Resource::factory()->create([
-            'resource_category_id' => $workSiteResourceCategory->id,
+        $workSiteResource1 = Item::factory()->create([
+            'item_category_id' => $workSiteResourceCategory->id,
         ]);
-        $workSiteResource2 = Resource::factory()->create([
-            'resource_category_id' => $workSiteResourceCategory->id,
+        $workSiteResource2 = Item::factory()->create([
+            'item_category_id' => $workSiteResourceCategory->id,
         ]);
 
         $admin = User::factory()->admin()->create();
@@ -182,7 +182,7 @@ describe('Create WorkSite', function () {
             'deliver_date' => '2024-04-12',
             'reception_status' => WorkSiteReceptionStatusEnum::SCRATCH->value,
             'completion_status' => WorkSiteCompletionStatusEnum::PENDING->value,
-            'resources' => [
+            'items' => [
                 ['id' => $workSiteResource1?->id, 'quantity' => 23, 'price' => 34],
                 ['id' => $workSiteResource2?->id, 'quantity' => 30, 'price' => 30],
             ],
@@ -213,14 +213,14 @@ describe('Create WorkSite', function () {
         expect($workSite->parentWorksite)->toBeNull('that indicates that workSite is main')
             ->and($workSite?->title)->toBe('workSite A')
             ->and($workSite?->description)->toBe('this workSite is for freeTown')
-            ->and($workSite?->resources[0]->pivot->getAttributes())->toBe(
+            ->and($workSite?->items[0]->pivot->getAttributes())->toBe(
                 ['work_site_id' => $workSite->id,
-                    'resource_id' => $workSiteResource1->id,
+                    'item_id' => $workSiteResource1->id,
                     'quantity' => 23,
                     'price' => '34.00'])
-            ->and($workSite?->resources[1]->pivot->getAttributes())->toBe(
+            ->and($workSite?->items[1]->pivot->getAttributes())->toBe(
                 ['work_site_id' => $workSite->id,
-                    'resource_id' => $workSiteResource2->id,
+                    'item_id' => $workSiteResource2->id,
                     'quantity' => 30,
                     'price' => '30.00'])
             ->and($workSite->lastPayment->payable_id)->toBe($workSite->id)
@@ -592,19 +592,19 @@ describe('Show WorkSites Details', function () {
                     'created_at' => Carbon::parse($this->subWorkSite->created_at)->toDateTimeString(),
                     'updated_at' => Carbon::parse($this->subWorkSite->updated_at)->toDateTimeString(),
                     'payments' => [],
-                    'resources' => [],
+                    'items' => [],
                 ],
             ]);
     });
-    test('As an admin, I can show details of a workSite with payments and resources', function () {
+    test('As an admin, I can show details of a workSite with payments and items', function () {
 
-        $workSiteResourceCategory = ResourceCategory::factory()->create();
+        $workSiteResourceCategory = ItemCategory::factory()->create();
 
-        $workSiteResource1 = Resource::factory()->create([
-            'resource_category_id' => $workSiteResourceCategory->id,
+        $workSiteResource1 = Item::factory()->create([
+            'item_category_id' => $workSiteResourceCategory->id,
         ]);
-        $workSiteResource2 = Resource::factory()->create([
-            'resource_category_id' => $workSiteResourceCategory->id,
+        $workSiteResource2 = Item::factory()->create([
+            'item_category_id' => $workSiteResourceCategory->id,
         ]);
         $data = [
             'title' => 'workSite sub',
@@ -633,7 +633,7 @@ describe('Show WorkSites Details', function () {
             'payment_type' => PaymentTypesEnum::CASH->value,
         ]);
 
-        $workSite->resources()->syncWithoutDetaching([
+        $workSite->items()->syncWithoutDetaching([
             $workSiteResource1->id => [
                 'quantity' => 23,
                 'price' => '34.00',
@@ -674,16 +674,16 @@ describe('Show WorkSites Details', function () {
                         'payment_type' => PaymentTypesEnum::CASH->value,
                     ],
                 ],
-                'resources' => [
+                'items' => [
                     [
                         'name' => $workSiteResource1->name,
                         'description' => $workSiteResource1->description,
-                        'resource_category' => [
+                        'item_category' => [
                             'id' => $workSiteResourceCategory->id,
                             'name' => $workSiteResourceCategory->name,
                         ],
                         'work_site_id' => $workSite->id,
-                        'resource_id' => $workSiteResource1->id,
+                        'item_id' => $workSiteResource1->id,
                         'quantity' => 23,
                         'price' => '34.00',
                     ],
@@ -853,7 +853,7 @@ describe('Assign Contractor to WorkSites', function () {
 
     });
 });
-describe('Manage resources of the workSite', function () {
+describe('Manage items of the workSite', function () {
     test('As a non-authenticated, I cant manage resource of a workSite', function () {
 
     });
@@ -867,10 +867,10 @@ describe('Manage resources of the workSite', function () {
     it('should update existed resource of a workSite', function () {
 
     });
-    it('should delete resources of a workSite', function () {
+    it('should delete items of a workSite', function () {
 
     });
-    it('should show all resources a workSite', function () {
+    it('should show all items a workSite', function () {
 
     });
     it('should show details of a resource in the workSite', function () {

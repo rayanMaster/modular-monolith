@@ -13,7 +13,7 @@ class WorkSiteCreateDTO extends Data
      *     id:int,
      *     quantity:int,
      *     price:float
-     * }>|null $workSiteResources
+     * }>|null $workSiteItems
      * @param array<int,array{
      *     payment_amount:float,
      *     payment_date: string
@@ -35,7 +35,7 @@ class WorkSiteCreateDTO extends Data
         public ?string $deliverDate,
         public ?int    $receptionStatus,
         public ?int    $completionStatus,
-        public ?array  $workSiteResources,
+        public ?array  $workSiteItems,
         public ?array  $payments,
     )
     {
@@ -58,7 +58,7 @@ class WorkSiteCreateDTO extends Data
      *  deliver_date?: string|null,
      *  reception_status?: int|null,
      *  completion_status?: int|null,
-     *  resources?: array<int,array{
+     *  items?: array<int,array{
      *      id:int,
      *      quantity:int,
      *      price:float
@@ -87,7 +87,7 @@ class WorkSiteCreateDTO extends Data
             deliverDate: $request['deliver_date'] ?? null,
             receptionStatus: $request['reception_status'] ?? WorkSiteReceptionStatusEnum::SCRATCH->value,
             completionStatus: $request['completion_status'] ?? WorkSiteCompletionStatusEnum::PENDING->value,
-            workSiteResources: $request['resources'] ?? null,
+            workSiteItems: $request['items'] ?? null,
             payments: $request['payments'] ?? null,
         );
     }

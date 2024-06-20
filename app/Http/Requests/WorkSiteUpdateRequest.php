@@ -39,7 +39,7 @@ class WorkSiteUpdateRequest extends FormRequest
             'deliver_date' => ['sometimes', 'date'],
             'completion_status' => ['sometimes', 'integer', Rule::in(WorkSiteCompletionStatusEnum::cases())],
             'reception_status' => ['sometimes', 'integer'],
-            'resources' => ['sometimes', 'array'],
+            'items' => ['sometimes', 'array'],
             'resources.*.quantity' => ['sometimes', 'numeric'],
             'resources.*.price' => ['sometimes', 'numeric'],
             'resources.*.id' => ['sometimes', 'integer'],

@@ -2,19 +2,19 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Resource;
+use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @property int $id
- * @property Resource $resource
+ * @property Item $item
  * @property object{
  *     quantity:int,
  *     price:float
  * } $pivot
  */
-class WorkSiteResourceListResource extends JsonResource
+class WorkSiteItemListResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -27,7 +27,7 @@ class WorkSiteResourceListResource extends JsonResource
             'id' => $this->id,
             'quantity' => $this->pivot->quantity,
             'price' => $this->pivot->price,
-            'resource' => $this->resource->name,
+            'item' => $this->name,
         ];
     }
 }

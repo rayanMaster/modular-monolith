@@ -12,7 +12,7 @@ class WorkSiteUpdateDTO extends Data
      *   id:int,
      *   quantity:int,
      *   price:float
-     * }|null $workSiteResources
+     * }|null $workSiteItems
      * @param array{
      *   payment_amount:float,
      *   payment_date: string
@@ -32,7 +32,7 @@ class WorkSiteUpdateDTO extends Data
         public ?string $startingDate,
         public ?string $deliverDate,
         public ?int $receptionStatus,
-        public ?array $workSiteResources,
+        public ?array $workSiteItems,
         public ?array $payments,
     ) {
     }
@@ -52,7 +52,7 @@ class WorkSiteUpdateDTO extends Data
      *  starting_date?: string|null,
      *  deliver_date?: string|null,
      *  reception_status?: int|null,
-     * resources?: array{
+     * items?: array{
      *    id:int,
      *    quantity:int,
      *    price:float
@@ -79,7 +79,7 @@ class WorkSiteUpdateDTO extends Data
             startingDate: $request['starting_date'] ?? null,
             deliverDate: $request['deliver_date'] ?? null,
             receptionStatus: $request['reception_status'] ?? WorkSiteReceptionStatusEnum::SCRATCH->value,
-            workSiteResources: $request['resources'] ?? null,
+            workSiteItems: $request['items'] ?? null,
             payments: $request['payments'] ?? null,
         );
     }
