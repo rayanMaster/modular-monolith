@@ -7,12 +7,11 @@ use Spatie\LaravelData\Data;
 class WorkerCreateDTO extends Data
 {
     public function __construct(
-        public string  $firstName,
+        public string $firstName,
         public ?string $lastName,
-        public string  $phone,
-        public ?string  $password,
-    )
-    {
+        public string $phone,
+        public ?string $password,
+    ) {
     }
 
     /**
@@ -29,7 +28,7 @@ class WorkerCreateDTO extends Data
             firstName: $request['first_name'],
             lastName: $request['last_name'] ?? null,
             phone: $request['phone'],
-            password: $request['password'] ?? "12345678",
+            password: $request['password'] ?? '12345678',
         );
 
     }

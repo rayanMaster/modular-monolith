@@ -15,8 +15,6 @@ use Illuminate\Http\JsonResponse;
 
 class EmployeeController extends Controller
 {
-
-
     public function list(): JsonResponse
     {
         $workers = User::query()->get();

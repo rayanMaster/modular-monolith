@@ -10,8 +10,7 @@ class WorkerUpdateDTO extends Data
         public ?string $firstName,
         public ?string $lastName,
         public ?string $phone,
-    )
-    {
+    ) {
     }
 
     /**
@@ -31,4 +30,3 @@ class WorkerUpdateDTO extends Data
 
     }
 }
-

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder|WorkSiteItem query()
  *
  * @mixin Eloquent
+ *
  * @property mixed $work_site_id
  * @property mixed $item_id
  * @property mixed $price

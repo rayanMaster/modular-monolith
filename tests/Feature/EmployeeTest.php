@@ -1,6 +1,5 @@
 <?php
 
-
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
@@ -73,7 +72,7 @@ describe('Create  Employee', function () {
     it('should create new Employee with valid data', function () {
         $response = actingAs($this->admin)->postJson('/api/v1/employee/create', [
             'first_name' => 'Rayan',
-            'phone' => '0945795748'
+            'phone' => '0945795748',
         ]);
         $response->assertOk();
         assertDatabaseHas(User::class, ['first_name' => 'Rayan']);
@@ -94,16 +93,16 @@ describe('Update  Employee', function () {
     });
 
     it('should prevent non auth updating a Employee', function () {
-        $response = $this->putJson('/api/v1/employee/update/' . $this->employee->id);
+        $response = $this->putJson('/api/v1/employee/update/'.$this->employee->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin updating a Employee', function () {
 
-        $response = actingAs($this->notAdmin)->putJson('/api/v1/employee/update/' . $this->employee->id);
+        $response = actingAs($this->notAdmin)->putJson('/api/v1/employee/update/'.$this->employee->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should update a Employee with valid data', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/employee/update/' . $this->employee->id, [
+        $response = actingAs($this->admin)->putJson('/api/v1/employee/update/'.$this->employee->id, [
             'first_name' => 'Komay',
         ]);
         $response->assertOk();
@@ -120,7 +119,6 @@ describe('Show  Employees list', function () {
         $this->assertDatabaseCount(Role::class, 4);
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
-
 
     });
     it('should prevent non auth show list of Employees', function () {
@@ -160,20 +158,20 @@ describe('Show  Employee details', function () {
         $this->employee = User::factory()->create(['first_name' => 'Rayan']);
     });
     it('should prevent non auth show details of a Employee', function () {
-        $response = $this->getJson('/api/v1/employee/show/' . $this->employee->id);
+        $response = $this->getJson('/api/v1/employee/show/'.$this->employee->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin show details of a Employee', function () {
-        $response = actingAs($this->notAdmin)->getJson('/api/v1/employee/show/' . $this->employee->id);
+        $response = actingAs($this->notAdmin)->getJson('/api/v1/employee/show/'.$this->employee->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return error if employee not existed', function () {
         $nonExistedWorker = rand(100, 200);
-        $response = actingAs($this->admin)->getJson('/api/v1/employee/show/' . $nonExistedWorker);
+        $response = actingAs($this->admin)->getJson('/api/v1/employee/show/'.$nonExistedWorker);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should return details of a Employee', function () {
-        $response = actingAs($this->admin)->getJson('/api/v1/employee/show/' . $this->employee->id);
+        $response = actingAs($this->admin)->getJson('/api/v1/employee/show/'.$this->employee->id);
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment(['first_name' => 'Rayan']);
     });
@@ -192,23 +190,23 @@ describe('Delete Employee', function () {
         $this->employee = User::factory()->create();
     });
     it('should prevent non auth delete a Employee', function () {
-        $response = $this->deleteJson('/api/v1/employee/delete/' . $this->employee->id);
+        $response = $this->deleteJson('/api/v1/employee/delete/'.$this->employee->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin delete a Employee', function () {
-        $response = actingAs($this->notAdmin)->deleteJson('/api/v1/employee/delete/' . $this->employee->id);
+        $response = actingAs($this->notAdmin)->deleteJson('/api/v1/employee/delete/'.$this->employee->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return error if employee not existed', function () {
         $nonExistedWorker = rand(100, 200);
-        $response = actingAs($this->admin)->deleteJson('/api/v1/employee/delete/' . $nonExistedWorker);
+        $response = actingAs($this->admin)->deleteJson('/api/v1/employee/delete/'.$nonExistedWorker);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should delete a employee', function () {
         $alreadyExistsUsers = User::count();
-        $response = actingAs($this->admin)->deleteJson('/api/v1/employee/delete/' . $this->employee->id);
+        $response = actingAs($this->admin)->deleteJson('/api/v1/employee/delete/'.$this->employee->id);
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseCount(User::class, $alreadyExistsUsers);
-        assertSoftDeleted(User::class, ['id'=>$this->employee->id]);
+        assertSoftDeleted(User::class, ['id' => $this->employee->id]);
     });
 });

@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('work_site_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(WorkSite::class,'work_site_id');
-            $table->foreignIdFor(Item::class,'item_id');
+            $table->foreignIdFor(WorkSite::class, 'work_site_id');
+            $table->foreignIdFor(Item::class, 'item_id');
             $table->integer('quantity');
             $table->decimal('price', 8, 2);
 

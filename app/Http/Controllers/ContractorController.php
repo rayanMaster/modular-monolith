@@ -16,7 +16,6 @@ use Throwable;
 
 class ContractorController extends Controller
 {
-
     public function list(): JsonResponse
     {
         $result = Contractor::query()->get();
@@ -71,7 +70,7 @@ class ContractorController extends Controller
             'last_name' => $dataFromRequest->lastName ?? null,
             'phone' => $dataFromRequest->phone ?? null,
             'address_id' => $dataFromRequest->addressId ?? null,
-        ], fn($value) => $value != null);
+        ], fn ($value) => $value != null);
         $contractor->update($filteredData);
 
         return ApiResponseHelper::sendSuccessResponse();

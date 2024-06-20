@@ -24,7 +24,6 @@ use Intervention\Image\Drivers\Gd\Driver;
 
 class WorkSiteController extends Controller
 {
-
     public function list(): JsonResponse
     {
         $workSites = WorkSite::query()->with(['payments', 'address'])->get();
@@ -93,7 +92,6 @@ class WorkSiteController extends Controller
                 ];
 
                 $workSite = WorkSite::query()->create($workSiteData);
-
 
                 $resourcesData = [];
                 if (is_array($data->workSiteItems) && count($data->workSiteItems) > 0) {

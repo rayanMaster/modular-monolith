@@ -20,25 +20,24 @@ class WorkSiteCreateDTO extends Data
      * }>|null $payments
      */
     public function __construct(
-        public string  $title,
-        public string  $description,
-        public ?int    $customerId,
-        public ?int    $categoryId,
-        public ?int    $contractorId,
-        public ?int    $parentWorksiteId,
-        public ?float  $startingBudget,
-        public ?float  $cost,
-        public ?int    $addressId,
-        public ?int    $workersCount,
+        public string $title,
+        public string $description,
+        public ?int $customerId,
+        public ?int $categoryId,
+        public ?int $contractorId,
+        public ?int $parentWorksiteId,
+        public ?float $startingBudget,
+        public ?float $cost,
+        public ?int $addressId,
+        public ?int $workersCount,
         public ?string $receiptDate,
         public ?string $startingDate,
         public ?string $deliverDate,
-        public ?int    $receptionStatus,
-        public ?int    $completionStatus,
-        public ?array  $workSiteItems,
-        public ?array  $payments,
-    )
-    {
+        public ?int $receptionStatus,
+        public ?int $completionStatus,
+        public ?array $workSiteItems,
+        public ?array $payments,
+    ) {
     }
 
     /**

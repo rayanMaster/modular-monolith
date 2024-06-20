@@ -12,7 +12,6 @@ use App\Http\Resources\CustomerDetailsResource;
 use App\Http\Resources\CustomerListResource;
 use App\Models\Customer;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -54,10 +53,10 @@ class CustomerController extends Controller
         $customer = Customer::query()->findOrFail($id);
 
         $relatedWorkSite = $customer->whereHas('workSite', function ($query) {
-            $query->where('completion_status','<>',WorkSiteCompletionStatusEnum::CLOSED);
+            $query->where('completion_status', '<>', WorkSiteCompletionStatusEnum::CLOSED);
         })->exists();
         if ($relatedWorkSite) {
-            throw new UnAbleToDeleteCustomerException("Unable to delete customer with a not closed work site");
+            throw new UnAbleToDeleteCustomerException('Unable to delete customer with a not closed work site');
         }
         $customer->delete();
 

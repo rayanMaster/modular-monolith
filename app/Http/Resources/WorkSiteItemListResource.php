@@ -9,6 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property int $id
  * @property Item $item
+ * @property string $name
  * @property object{
  *     quantity:int,
  *     price:float

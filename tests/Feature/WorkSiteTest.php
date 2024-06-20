@@ -56,7 +56,7 @@ describe('Worksite entity fields check', function () {
         $tableColumns = collect(Schema::getColumns('work_sites'));
 
         $requiredColumns = $tableColumns->filter(function ($item) {
-            return !$item['nullable'];
+            return ! $item['nullable'];
         })->map(function ($subItem) {
             return $subItem['name'];
         })->toArray();
@@ -198,8 +198,8 @@ describe('Create WorkSite', function () {
 
         // Assert the file was stored...
         $path = 'workSite';
-        $name = 'test' . '_' . now()->format('YmdH');
-        $fullPath = public_path('storage/' . $path) . '/' . $name . '.webp';
+        $name = 'test'.'_'.now()->format('YmdH');
+        $fullPath = public_path('storage/'.$path).'/'.$name.'.webp';
 
         $this->assertFileExists($fullPath);
 
@@ -326,7 +326,7 @@ describe('Update WorkSite', function () {
     });
 
     test('As a non-authenticated, I cant update a main workSite', function () {
-        $response = putJson('/api/v1/workSite/update/' . $this->workSite->id, []);
+        $response = putJson('/api/v1/workSite/update/'.$this->workSite->id, []);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
 
     });
@@ -335,7 +335,7 @@ describe('Update WorkSite', function () {
         $siteManager = User::factory()->siteManager()->create();
         expect($siteManager->hasRole('site_manager'))->toBe(true);
 
-        $response = actingAs($siteManager)->putJson('/api/v1/workSite/update/' . $this->workSite->id, []);
+        $response = actingAs($siteManager)->putJson('/api/v1/workSite/update/'.$this->workSite->id, []);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
 
     });
@@ -343,7 +343,7 @@ describe('Update WorkSite', function () {
 
         $address = Address::factory()->create();
         assertDatabaseCount(WorkSite::class, 1);
-        $response = actingAs($this->admin)->putJson('/api/v1/workSite/update/' . $this->workSite->id, [
+        $response = actingAs($this->admin)->putJson('/api/v1/workSite/update/'.$this->workSite->id, [
             'address_id' => $address->id,
             'title' => 'workSite AB',
             'description' => 'this workSite is for freeTown new',
@@ -407,8 +407,8 @@ describe('List WorkSites', function () {
         actingAs($this->admin)->getJson('/api/v1/workSite/list')
             ->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment([
-                "success" => true,
-                "error_code" => null,
+                'success' => true,
+                'error_code' => null,
             ])
             ->assertJsonFragment([
                 'id' => $workSite->id,
@@ -529,20 +529,20 @@ describe('Show WorkSites Details', function () {
         $this->subWorkSite = WorkSite::factory()->create($data);
     });
     test('As a non-authenticated, I cant show details of a workSite', function () {
-        $response = getJson('/api/v1/workSite/show/' . $this->workSite->id);
+        $response = getJson('/api/v1/workSite/show/'.$this->workSite->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     test('As not admin, I cant show details of a workSite', function () {
-        $response = actingAs($this->notAdmin)->getJson('/api/v1/workSite/show/' . $this->workSite->id);
+        $response = actingAs($this->notAdmin)->getJson('/api/v1/workSite/show/'.$this->workSite->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found error if workSite not existed in database', function () {
         $unExistedWorkSiteId = rand(200, 333);
-        $response = actingAs($this->admin)->getJson('/api/v1/workSite/show/' . $unExistedWorkSiteId);
+        $response = actingAs($this->admin)->getJson('/api/v1/workSite/show/'.$unExistedWorkSiteId);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     test('As an admin, I can show details of a workSite', function () {
-        $response = actingAs($this->admin)->getJson('/api/v1/workSite/show/' . $this->workSite->id);
+        $response = actingAs($this->admin)->getJson('/api/v1/workSite/show/'.$this->workSite->id);
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment([
                 'id' => $this->workSite->id,
@@ -640,7 +640,7 @@ describe('Show WorkSites Details', function () {
             ],
         ]);
 
-        $response = actingAs($this->admin)->getJson('/api/v1/workSite/show/' . $workSite->id);
+        $response = actingAs($this->admin)->getJson('/api/v1/workSite/show/'.$workSite->id);
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment([
                 'id' => $workSite->id,
@@ -712,16 +712,16 @@ describe('Close WorkSites', function () {
 
     });
     test('As a non-authenticated, I cant close a workSite', function () {
-        $response = postJson('/api/v1/workSite/close/' . $this->workSite->id);
+        $response = postJson('/api/v1/workSite/close/'.$this->workSite->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     test('As not admin, I cant close a workSite', function () {
-        $response = actingAs($this->notAdmin)->postJson('/api/v1/workSite/close/' . $this->workSite->id);
+        $response = actingAs($this->notAdmin)->postJson('/api/v1/workSite/close/'.$this->workSite->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found error if workSite not existed in database', function () {
         $unExistedWorkSiteId = rand(200, 333);
-        $response = actingAs($this->admin)->postJson('/api/v1/workSite/close/' . $unExistedWorkSiteId);
+        $response = actingAs($this->admin)->postJson('/api/v1/workSite/close/'.$unExistedWorkSiteId);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should prevent me closing workSite with active worksites', function () {
@@ -729,7 +729,7 @@ describe('Close WorkSites', function () {
             'completion_status' => WorkSiteCompletionStatusEnum::STARTED,
             'parent_work_site_id' => $this->workSite->id,
         ]);
-        $response = actingAs($this->admin)->postJson('/api/v1/workSite/close/' . $this->workSite->id);
+        $response = actingAs($this->admin)->postJson('/api/v1/workSite/close/'.$this->workSite->id);
         $response->assertStatus(Response::HTTP_CONFLICT)
             ->assertJson([
                 'message' => "You can't close a workSite with active sub-worksites",
@@ -751,7 +751,7 @@ describe('Close WorkSites', function () {
             'payment_date' => Carbon::now(),
             'payment_type' => PaymentTypesEnum::CASH->value,
         ]);
-        $response = actingAs($this->admin)->postJson('/api/v1/workSite/close/' . $this->workSite->id);
+        $response = actingAs($this->admin)->postJson('/api/v1/workSite/close/'.$this->workSite->id);
 
         $response->assertStatus(Response::HTTP_CONFLICT)
             ->assertJson([
@@ -770,7 +770,7 @@ describe('Close WorkSites', function () {
             'completion_status' => WorkSiteCompletionStatusEnum::CLOSED,
             'parent_work_site_id' => $this->workSite->id,
         ]);
-        $response = actingAs($this->admin)->postJson('/api/v1/workSite/close/' . $this->workSite->id);
+        $response = actingAs($this->admin)->postJson('/api/v1/workSite/close/'.$this->workSite->id);
         $response->assertStatus(Response::HTTP_OK);
 
         assertDatabaseHas(WorkSite::class, [
@@ -798,24 +798,24 @@ describe('Assign Contractor to WorkSites', function () {
 
     });
     test('As a non-authenticated, I cant assign contractor to a workSite', function () {
-        $response = putJson('/api/v1/workSite/' . $this->workSite->id . '/contractor/' . $this->contractor->id . '/assign');
+        $response = putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     test('As not admin, I cant assign contractor to a workSite', function () {
-        $response = actingAs($this->notAdmin)->putJson('/api/v1/workSite/' . $this->workSite->id . '/contractor/' . $this->contractor->id . '/assign');
+        $response = actingAs($this->notAdmin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found error if workSite not existed in database and if contractor not existed', function () {
         $unExistedWorkSiteId = rand(200, 333);
         $unExistedContractorId = rand(200, 333);
-        $response = actingAs($this->admin)->putJson('/api/v1/workSite/' . $unExistedWorkSiteId . '/contractor/' . $this->contractor->id . '/assign');
+        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$unExistedWorkSiteId.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_NOT_FOUND);
 
-        $otherResponse = actingAs($this->admin)->putJson('/api/v1/workSite/' . $this->workSite->id . '/contractor/' . $unExistedContractorId . '/assign');
+        $otherResponse = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$unExistedContractorId.'/assign');
         $otherResponse->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should add contractor of a workSite', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/workSite/' . $this->workSite->id . '/contractor/' . $this->contractor->id . '/assign');
+        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(WorkSite::class, [
             'contractor_id' => $this->contractor->id,
@@ -823,7 +823,7 @@ describe('Assign Contractor to WorkSites', function () {
 
     });
     it('should update contractor of a workSite', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/workSite/' . $this->workSite->id . '/contractor/' . $this->contractor->id . '/assign');
+        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(WorkSite::class, [
             'contractor_id' => $this->contractor->id,
@@ -831,7 +831,7 @@ describe('Assign Contractor to WorkSites', function () {
 
         $otherContractor = Contractor::factory()->create();
 
-        $response = actingAs($this->admin)->putJson('/api/v1/workSite/' . $this->workSite->id . '/contractor/' . $otherContractor->id . '/assign');
+        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$otherContractor->id.'/assign');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(WorkSite::class, [
             'contractor_id' => $otherContractor->id,
@@ -839,13 +839,13 @@ describe('Assign Contractor to WorkSites', function () {
 
     });
     test('As an admin i can remove contractor of a workSite ', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/workSite/' . $this->workSite->id . '/contractor/' . $this->contractor->id . '/assign');
+        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(WorkSite::class, [
             'contractor_id' => $this->contractor->id,
         ]);
 
-        $response = actingAs($this->admin)->putJson('/api/v1/workSite/' . $this->workSite->id . '/contractor/' . $this->contractor->id . '/unAssign');
+        $response = actingAs($this->admin)->putJson('/api/v1/workSite/'.$this->workSite->id.'/contractor/'.$this->contractor->id.'/unAssign');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(WorkSite::class, [
             'contractor_id' => null,

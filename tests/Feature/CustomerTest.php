@@ -11,8 +11,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 
-
-use function Pest\Laravel\{deleteJson,postJson,putJson,getJson,actingAs,assertDatabaseCount,assertDatabaseHas,assertSoftDeleted};
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertSoftDeleted;
+use function Pest\Laravel\deleteJson;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
 
 describe('Customer routes check', function () {
     it('should have all routes for /customer', function () {
@@ -227,7 +233,7 @@ describe('Customer Delete', function () {
     });
 
     it('should prevent non auth delete a Customer', function () {
-        $response =deleteJson('/api/v1/customer/delete/'.$this->customer->id);
+        $response = deleteJson('/api/v1/customer/delete/'.$this->customer->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin delete a Customer', function () {
@@ -237,7 +243,7 @@ describe('Customer Delete', function () {
     it('should prevent delete a Customer related to un closed worksite', function () {
         $worksite = Worksite::factory()->create([
             'customer_id' => $this->customer->id,
-            'completion_status'=> WorkSiteCompletionStatusEnum::STARTED->value
+            'completion_status' => WorkSiteCompletionStatusEnum::STARTED->value,
         ]);
         $response = actingAs($this->admin)->deleteJson('/api/v1/customer/delete/'.$this->customer->id);
         $response->assertStatus(Response::HTTP_CONFLICT)
@@ -248,7 +254,7 @@ describe('Customer Delete', function () {
     it('should delete a Customer', function () {
         actingAs($this->admin)->deleteJson('/api/v1/customer/delete/'.$this->customer->id)
             ->assertOk();
-        assertSoftDeleted(Customer::class, ['id'=>$this->customer->id]);
+        assertSoftDeleted(Customer::class, ['id' => $this->customer->id]);
     });
 
 });
