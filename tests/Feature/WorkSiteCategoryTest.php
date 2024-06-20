@@ -44,7 +44,6 @@ describe('WorkSiteCategory routes check', function () {
     });
 
 });
-
 describe('WorkSiteCategory Create', function () {
     uses(RefreshDatabase::class);
 
@@ -81,7 +80,6 @@ describe('WorkSiteCategory Create', function () {
         $response->assertOk();
     });
 });
-
 describe('WorkSiteCategory Update', function () {
     uses(RefreshDatabase::class);
 
@@ -123,7 +121,6 @@ describe('WorkSiteCategory Update', function () {
         $response->assertOk();
     });
 });
-
 describe('WorkSiteCategory List', function () {
     uses(RefreshDatabase::class);
 
@@ -151,7 +148,6 @@ describe('WorkSiteCategory List', function () {
             ->assertJsonFragment(['name' => 'category 1']);
     });
 });
-
 describe('WorkSiteCategory Details', function () {
     uses(RefreshDatabase::class);
 
@@ -181,7 +177,6 @@ describe('WorkSiteCategory Details', function () {
             ->assertJsonFragment(['name' => 'category 10']);
     });
 });
-
 describe('WorkSiteCategory Delete', function () {
     uses(RefreshDatabase::class);
 

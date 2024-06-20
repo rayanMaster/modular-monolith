@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\WorkSiteCompletionStatusEnum;
+use App\Exceptions\UnAbleToDeleteCustomerException;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
 use App\Http\Requests\CustomerCreateRequest;
@@ -10,6 +12,7 @@ use App\Http\Resources\CustomerDetailsResource;
 use App\Http\Resources\CustomerListResource;
 use App\Models\Customer;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -41,9 +44,21 @@ class CustomerController extends Controller
         $customer->update($request->validated());
     }
 
+    /**
+     * @throws UnAbleToDeleteCustomerException
+     */
     public function destroy(int $id): void
     {
+
+        \DB::enableQueryLog();
         $customer = Customer::query()->findOrFail($id);
+
+        $relatedWorkSite = $customer->whereHas('workSite', function ($query) {
+            $query->where('completion_status','<>',WorkSiteCompletionStatusEnum::CLOSED);
+        })->exists();
+        if ($relatedWorkSite) {
+            throw new UnAbleToDeleteCustomerException("Unable to delete customer with a not closed work site");
+        }
         $customer->delete();
 
     }
