@@ -10,23 +10,16 @@ use App\Http\Requests\ContractorCreateRequest;
 use App\Http\Requests\ContractorUpdateRequest;
 use App\Http\Resources\ContractorDetailsResource;
 use App\Http\Resources\ContractorListResource;
-use App\Mapper\ContractorCreateMapper;
-use App\Mapper\ContractorUpdateMapper;
 use App\Models\Contractor;
-use App\Repository\ContractorRepository;
 use Illuminate\Http\JsonResponse;
 use Throwable;
 
 class ContractorController extends Controller
 {
-    public function __construct(
-        private readonly ContractorRepository $contractorRepository
-    ) {
-    }
 
     public function list(): JsonResponse
     {
-        $result = $this->contractorRepository->list();
+        $result = Contractor::query()->get();
 
         return ApiResponseHelper::sendSuccessResponse(new Result(ContractorListResource::collection($result)));
     }
@@ -46,7 +39,12 @@ class ContractorController extends Controller
         $requestData = $request->validated();
 
         $dataFromRequest = ContractorCreateDTO::fromRequest($requestData);
-        $this->contractorRepository->create(ContractorCreateMapper::toEloquent($dataFromRequest));
+        Contractor::query()->create([
+            'first_name' => $dataFromRequest->firstName,
+            'last_name' => $dataFromRequest->lastName ?? null,
+            'phone' => $dataFromRequest->phone ?? null,
+            'address_id' => $dataFromRequest->addressId ?? null,
+        ]);
 
         return ApiResponseHelper::sendSuccessResponse();
 
@@ -68,7 +66,13 @@ class ContractorController extends Controller
 
         $contractor = Contractor::query()->findOrFail($id);
         $dataFromRequest = ContractorUpdateDTO::fromRequest($requestData);
-        $this->contractorRepository->update($contractor->id, ContractorUpdateMapper::toEloquent($dataFromRequest));
+        $filteredData = array_filter([
+            'first_name' => $dataFromRequest->firstName ?? null,
+            'last_name' => $dataFromRequest->lastName ?? null,
+            'phone' => $dataFromRequest->phone ?? null,
+            'address_id' => $dataFromRequest->addressId ?? null,
+        ], fn($value) => $value != null);
+        $contractor->update($filteredData);
 
         return ApiResponseHelper::sendSuccessResponse();
 

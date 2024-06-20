@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\DTO\WorkSiteCreateDTO;
 use App\DTO\WorkSiteUpdateDTO;
+use App\Enums\PaymentTypesEnum;
 use App\Enums\WorkSiteCompletionStatusEnum;
 use App\Exceptions\UnAbleToCloseWorkSiteException;
 use App\Helpers\ApiResponse\ApiResponseHelper;
@@ -12,11 +13,9 @@ use App\Http\Requests\WorkSiteCreateRequest;
 use App\Http\Requests\WorkSiteUpdateRequest;
 use App\Http\Resources\WorkSiteDetailsResource;
 use App\Http\Resources\WorkSiteListResource;
-use App\Mapper\WorkSiteCreateMapper;
-use App\Mapper\WorkSiteUpdateMapper;
 use App\Models\Contractor;
 use App\Models\WorkSite;
-use App\Repository\WorkSiteRepository;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -25,11 +24,6 @@ use Intervention\Image\Drivers\Gd\Driver;
 
 class WorkSiteController extends Controller
 {
-    public function __construct(
-        //            private readonly IFileManager $fileManager
-        private readonly WorkSiteRepository $workSiteRepository,
-    ) {
-    }
 
     public function list(): JsonResponse
     {
@@ -80,14 +74,53 @@ class WorkSiteController extends Controller
                 $requestedData = $request->validated();
                 $data = WorkSiteCreateDTO::fromRequest($requestedData);
 
-                $workSiteData = WorkSiteCreateMapper::toWorkSiteEloquent($data);
+                $workSiteData = [
+                    'title' => $data->title,
+                    'description' => $data->description,
+                    'customer_id' => $data->customerId,
+                    'category_id' => $data->categoryId,
+                    'contractor_id' => $data->contractorId,
+                    'parent_work_site_id' => $data->parentWorksiteId,
+                    'starting_budget' => $data->startingBudget,
+                    'cost' => $data->cost,
+                    'address_id' => $data->addressId,
+                    'workers_count' => $data->workersCount,
+                    'receipt_date' => $data->receiptDate,
+                    'starting_date' => $data->startingDate,
+                    'deliver_date' => $data->deliverDate,
+                    'reception_status' => $data->receptionStatus,
+                    'completion_status' => $data->completionStatus,
+                ];
 
                 $workSite = WorkSite::query()->create($workSiteData);
 
-                $resourcesData = WorkSiteCreateMapper::toWorkSiteResourcesEloquent($data);
-                $workSite->resources()->syncWithoutDetaching($resourcesData);
 
-                $paymentData = WorkSiteCreateMapper::toPaymentEloquent($data);
+                $resourcesData = [];
+                if (is_array($data->workSiteResources) && count($data->workSiteResources) > 0) {
+                    foreach ($data->workSiteResources as $resource) {
+                        if (is_array($resource)) {
+                            $item = [
+                                'quantity' => $resource['quantity'],
+                                'price' => $resource['price'],
+                            ];
+                            $resourcesData[$resource['id']] = $item;
+                        }
+                    }
+                }
+                $workSite->resources()->syncWithoutDetaching($resourcesData);
+                $paymentData = [];
+                if (is_array($data->payments) && count($data->payments) > 0) {
+                    foreach ($data->payments as $payment) {
+                        if (is_array($payment)) {
+                            $item = [
+                                'amount' => $payment['payment_amount'],
+                                'payment_date' => Carbon::parse($payment['payment_date']),
+                                'payment_type' => PaymentTypesEnum::CASH->value,
+                            ];
+                            $paymentData[] = $item;
+                        }
+                    }
+                }
 
                 foreach ($paymentData as $payment) {
                     $workSite->payments()->create($payment);
@@ -176,8 +209,21 @@ class WorkSiteController extends Controller
 
                 $data = WorkSiteUpdateDTO::fromRequest($requestedData);
 
-                $workSiteData = WorkSiteUpdateMapper::toWorkSiteEloquent($data);
-                $this->workSiteRepository->update($workSite->id, $workSiteData);
+                $workSite->update([
+                    'title' => $data->title,
+                    'description' => $data->description,
+                    'customer_id' => $data->customerId,
+                    'category_id' => $data->categoryId,
+                    'parent_work_site_id' => $data->parentWorkSiteId,
+                    'starting_budget' => $data->startingBudget,
+                    'cost' => $data->cost,
+                    'address_id' => $data->addressId,
+                    'workers_count' => $data->workersCount,
+                    'receipt_date' => $data->receiptDate,
+                    'starting_date' => $data->startingDate,
+                    'deliver_date' => $data->deliverDate,
+                    'reception_status' => $data->receptionStatus,
+                ]);
 
             },
             attempts: 3);
@@ -224,9 +270,9 @@ class WorkSiteController extends Controller
     {
         $workSite = WorkSite::query()->findOrFail($workSiteId);
         Contractor::query()->findOrFail($contractorId);
-        $this->workSiteRepository->update($workSite->id, [
+        $workSite->update([
             'contractor_id' => $contractorId,
-        ], true);
+        ]);
 
         return ApiResponseHelper::sendSuccessResponse();
     }
@@ -236,9 +282,9 @@ class WorkSiteController extends Controller
         $workSite = WorkSite::query()->findOrFail($workSiteId);
         Contractor::query()->findOrFail($contractorId);
 
-        $this->workSiteRepository->update($workSite->id, [
+        $workSite->update([
             'contractor_id' => null,
-        ], true);
+        ]);
 
         return ApiResponseHelper::sendSuccessResponse();
     }

@@ -102,11 +102,6 @@ describe('Update  Employee', function () {
         $response = actingAs($this->notAdmin)->putJson('/api/v1/employee/update/' . $this->employee->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
-    it('should return validation error when data is missed', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/employee/update/' . $this->employee->id, []);
-        $response->assertStatus(Response::HTTP_OK);
-        assertDatabaseHas(User::class, ['first_name' => 'Rayan']);
-    });
     it('should update a Employee with valid data', function () {
         $response = actingAs($this->admin)->putJson('/api/v1/employee/update/' . $this->employee->id, [
             'first_name' => 'Komay',

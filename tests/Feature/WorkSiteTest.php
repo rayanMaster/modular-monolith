@@ -853,7 +853,6 @@ describe('Assign Contractor to WorkSites', function () {
 
     });
 });
-
 describe('Manage resources of the workSite', function () {
     test('As a non-authenticated, I cant manage resource of a workSite', function () {
 

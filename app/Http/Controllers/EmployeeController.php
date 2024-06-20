@@ -10,19 +10,12 @@ use App\Http\Requests\EmployeeCreateRequest;
 use App\Http\Requests\EmployeeUpdateRequest;
 use App\Http\Resources\EmployeeDetailsResource;
 use App\Http\Resources\EmployeeListResource;
-use App\Mapper\EmployeeCreateMapper;
-use App\Mapper\EmployeeUpdateMapper;
 use App\Models\User;
-use App\Repository\WorkerRepository;
 use Illuminate\Http\JsonResponse;
 
 class EmployeeController extends Controller
 {
-    public function __construct(
-        private readonly WorkerRepository $workerRepository
-    ) {
 
-    }
 
     public function list(): JsonResponse
     {
@@ -42,8 +35,13 @@ class EmployeeController extends Controller
          * } $requestedData
          */
         $requestedData = $request->validated();
-        $toSave = EmployeeCreateMapper::fromEloquent(WorkerCreateDTO::fromRequest($requestedData));
-        User::query()->create($toSave);
+        $toSave = WorkerCreateDTO::fromRequest($requestedData);
+        User::query()->create([
+            'first_name' => $toSave->firstName,
+            'last_name' => $toSave->lastName,
+            'phone' => $toSave->phone,
+            'password' => $toSave->password,
+        ]);
 
         return ApiResponseHelper::sendSuccessResponse();
     }
@@ -61,8 +59,11 @@ class EmployeeController extends Controller
          * } $requestedData
          */
         $requestedData = $request->validated();
-        $toUpdate = EmployeeUpdateMapper::fromEloquent(WorkerUpdateDTO::fromRequest($requestedData));
-        $this->workerRepository->update($workerId, $toUpdate);
+        $worker = User::query()->findOrFail($workerId);
+        $toUpdate = WorkerUpdateDTO::fromRequest($requestedData);
+        $worker->update([
+            'first_name' => $toUpdate->firstName,
+        ]);
 
         return ApiResponseHelper::sendSuccessResponse();
     }
