@@ -85,5 +85,8 @@ class PermissionsSeeder extends Seeder
         //Contractor
         $this->addPermission('Contractor', 'contractor', ['list', 'show', 'create', 'update', 'delete']);
 
+        //Warehouse
+        $this->addPermission('Warehouse', 'warehouse', ['list', 'show', 'create', 'update', 'delete']);
+
     }
 }

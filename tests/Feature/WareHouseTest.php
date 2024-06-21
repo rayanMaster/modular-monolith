@@ -5,7 +5,14 @@ use App\Models\User;
 use App\Models\WareHouse;
 use App\Models\WorkSite;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use function Pest\Laravel\{assertSoftDeleted, getJson, postJson, putJson, actingAs, assertDatabaseCount};
+use function Pest\Laravel\{assertSoftDeleted,
+    getJson,
+    postJson,
+    putJson,
+    actingAs,
+    assertDatabaseCount,
+    assertDatabaseHas
+};
 use \Symfony\Component\HttpFoundation\Response;
 
 uses(RefreshDatabase::class);
@@ -37,7 +44,7 @@ describe('Warehouse routes check', function () {
 
     });
 
-})->only();
+});
 describe('Warehouse Create Test', function () {
 
     beforeEach(function () {
@@ -52,16 +59,17 @@ describe('Warehouse Create Test', function () {
     });
 
     it('should create main warehouse in a specific location', function () {
-        actingAs($this->admin)->postJson('/api/warehouse/store', [
+        actingAs($this->admin)->postJson('/api/v1/warehouse/store', [
             'name' => 'Main Warehouse',
             'address_id' => $this->address->id,
-        ])->assertStatus(Response::HTTP_OK)
-            ->assertJsonPath('data', [
-                'name' => 'Main Warehouse',
-                'address' => $this->address->title,
-            ]);
+        ])
+            ->assertStatus(Response::HTTP_OK);
+        assertDatabaseHas(WareHouse::class, [
+            'name' => 'Main Warehouse',
+            'address_id' => $this->address->id,
+        ]);
     });
-})->only();
+});
 describe('Warehouse Update Test', function () {
     beforeEach(function () {
         $this->artisan('storage:link');
@@ -80,16 +88,16 @@ describe('Warehouse Update Test', function () {
             'address_id' => $this->address->id,
         ]);
         $newAddress = Address::factory()->create();
-        actingAs($this->admin)->putJson('/api/warehouse/' . $wareHouse->id . '/update', [
+        actingAs($this->admin)->putJson('/api/v1/warehouse/update/'.$wareHouse->id , [
             'name' => 'Main Warehouse Updated',
-            'address_id' => $this->address->id,
-        ])->assertStatus(Response::HTTP_OK)
-            ->assertJsonPath('data', [
-                'name' => 'Main Warehouse Updated',
-                'address' => $newAddress->title,
-            ]);
+            'address_id' => $newAddress->id,
+        ])->assertStatus(Response::HTTP_OK);
+        assertDatabaseHas(WareHouse::class, [
+            'name' => 'Main Warehouse Updated',
+            'address_id' => $newAddress->id,
+        ]);
     });
-})->only();
+});
 describe('Warehouse List Test', function () {
 
     beforeEach(function () {
@@ -102,29 +110,43 @@ describe('Warehouse List Test', function () {
         $this->address = Address::factory()->create();
         $this->otherAddress = Address::factory()->create();
         $this->firstWarehouse = WareHouse::factory()->create([
-            'title' => 'Main Warehouse',
+            'name' => 'Main Warehouse',
             'address_id' => $this->address->id,
         ]);
         $this->secondWarehouse = WareHouse::factory()->create([
-            'title' => 'Second Warehouse',
+            'name' => 'Second Warehouse',
             'address_id' => $this->otherAddress->id,
         ]);
 
     });
     it('should get a list of warehouses', function () {
-        actingAs($this->admin)->getJson('/api/warehouse/list')
+        actingAs($this->admin)->getJson('/api/v1/warehouse/list')
             ->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment([
                 'name' => 'Main Warehouse',
-                'address' => $this->address->title,
+                'address' => [
+                    'id' => $this->address->id,
+                    'city' => $this->address->city->name,
+                    'state' => $this->address->state,
+                    'street' => $this->address->street,
+                    'zipCode' => $this->address->zipcode,
+                    'title' => $this->address->title,
+                ],
             ])
             ->assertJsonFragment([
                 'name' => 'Second Warehouse',
-                'address' => $this->otherAddress->title,
+                'address' => [
+                    'id' => $this->otherAddress->id,
+                    'city' => $this->otherAddress->city->name,
+                    'state' => $this->otherAddress->state,
+                    'street' => $this->otherAddress->street,
+                    'zipCode' => $this->otherAddress->zipcode,
+                    'title' => $this->otherAddress->title,
+                ],
             ]);
         assertDatabaseCount(WareHouse::class, 2);
     });
-})->only();
+});
 describe('Warehouse Details Test', function () {
 
     beforeEach(function () {
@@ -136,21 +158,33 @@ describe('Warehouse Details Test', function () {
         $this->notAdmin = User::factory()->worker()->create();
         $this->address = Address::factory()->create();
 
+        $this->warehouse = WareHouse::factory()->create([
+            'name' => 'Main Warehouse',
+            'address_id' => $this->address->id,
+        ]);
+
     });
     it('should return not found error if warehouse nof found', function () {
         $unExistedWarehouseId = rand(22, 33);
-        actingAs($this->admin)->getJson('/api/warehouse/show/' . $unExistedWarehouseId)
+        actingAs($this->admin)->getJson('/api/v1/warehouse/show/' . $unExistedWarehouseId)
             ->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should get a warehouse details', function () {
-        actingAs($this->admin)->getJson('/api/warehouse/details/' . $this->workSite->id)
+        actingAs($this->admin)->getJson('/api/v1/warehouse/show/' . $this->warehouse->id)
             ->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment([
                 'name' => 'Main Warehouse',
-                'address' => $this->address->title,
+                'address' => [
+                    'id' => $this->address->id,
+                    'city' => $this->address->city->name,
+                    'state' => $this->address->state,
+                    'street' => $this->address->street,
+                    'zipCode' => $this->address->zipcode,
+                    'title' => $this->address->title,
+                ],
             ]);
     });
-})->only();
+});
 describe('Warehouse Delete Test', function () {
 
     beforeEach(function () {
@@ -166,12 +200,12 @@ describe('Warehouse Delete Test', function () {
     });
     it('should return not found error if warehouse nof found', function () {
         $unExistedWarehouseId = rand(22, 33);
-        actingAs($this->admin)->deleteJson('/api/warehouse/delete/' . $unExistedWarehouseId)
+        actingAs($this->admin)->deleteJson('/api/v1/warehouse/delete/' . $unExistedWarehouseId)
             ->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should delete a warehouse', function () {
-        actingAs($this->admin)->deleteJson('/api/warehouse/delete/' . $this->wareHouse->id)
+        actingAs($this->admin)->deleteJson('/api/v1/warehouse/delete/' . $this->wareHouse->id)
             ->assertStatus(Response::HTTP_OK);
-        assertSoftDeleted('warehouse', ['id' => $this->wareHouse->id]);
+        assertSoftDeleted(WareHouse::class, ['id' => $this->wareHouse->id]);
     });
-})->only();
+});

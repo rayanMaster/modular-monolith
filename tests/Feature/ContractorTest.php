@@ -208,6 +208,7 @@ describe('Details of Contractors Test', function () {
                 'phone' => $this->contractor->phone,
                 'address' => [
                     'id' => $this->address->id,
+                    'title'=>$this->address->title,
                     'city' => $this->address->city?->name,
                     'street' => $this->address->street,
                     'state' => $this->address->state,

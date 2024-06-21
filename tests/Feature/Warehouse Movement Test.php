@@ -12,16 +12,18 @@ uses(RefreshDatabase::class);
 describe('Warehouse Movements', function() {
     beforeEach(function () {
         $this->artisan('storage:link');
+        $this->artisan('db:seed');
+
         $this->workSite = WorkSite::factory()->create();
         $this->admin = User::factory()->admin()->create();
         $this->notAdmin = User::factory()->worker()->create();
         $this->address = Address::factory()->create();
 
     });
-    it('should return error while moving a quantity bigger than already exists in the warehouse', function() {});
-    test('item quantity balance while moving items between warehouses', function() {});
-    it('should be adding items between supplier and warehouse', function() {});
-    it('should be dropping items between warehouse and worksite', function() {});
+//    it('should return error while moving a quantity bigger than already exists in the warehouse', function() {});
+//    test('item quantity balance while moving items between warehouses', function() {});
+//    it('should be adding items between supplier and warehouse', function() {});
+//    it('should be dropping items between warehouse and worksite', function() {});
 
 
 
