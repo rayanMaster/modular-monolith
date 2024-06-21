@@ -7,6 +7,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ItemCategoryController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\WorkSiteCategoryController;
 use App\Http\Controllers\WorkSiteController;
 use App\Http\Controllers\WorkSiteCustomerController;
@@ -251,6 +252,27 @@ Route::prefix('v1')->group(function () {
                     ->name('employee.dailyAttendance.list');
             });
 
+        });
+        Route::group(['prefix'=>'warehouse'],function (){
+            Route::post('/store', [WarehouseController::class, 'store'])
+                ->middleware('can:warehouse-add')
+                ->name('warehouse.create');
+
+            Route::put('/update/{warehouseId}', [WarehouseController::class, 'update'])
+                ->middleware('can:warehouse-update')
+                ->name('warehouse.update');
+
+            Route::get('/list', [WarehouseController::class, 'list'])
+                ->middleware('can:warehouse-list')
+                ->name('warehouse.list');
+
+            Route::get('/show/{warehouseId}', [WarehouseController::class, 'show'])
+                ->middleware('can:warehouse-show')
+                ->name('warehouse.show');
+
+            Route::delete('/delete/{warehouseId}', [WarehouseController::class, 'destroy'])
+                ->middleware('can:warehouse-delete')
+                ->name('warehouse.delete');
         });
         //        Route::group(['prefix' => 'payment'], function () {
         //            Route::get('/list', [PaymentController::class, 'list'])

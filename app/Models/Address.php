@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
+ * @property string|null $title
  * @property string|null $street
  * @property string|null $state
  * @property string|null $zipcode
