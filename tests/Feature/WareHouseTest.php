@@ -2,7 +2,7 @@
 
 use App\Models\Address;
 use App\Models\User;
-use App\Models\WareHouse;
+use App\Models\Warehouse;
 use App\Models\WorkSite;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use function Pest\Laravel\{assertSoftDeleted,
@@ -26,6 +26,7 @@ describe('Warehouse routes check', function () {
             'warehouse.list',
             'warehouse.show',
             'warehouse.delete',
+            'warehouse.item.create'
         ];
 
         // Collect routes and filter based on the prefix
@@ -64,7 +65,7 @@ describe('Warehouse Create Test', function () {
             'address_id' => $this->address->id,
         ])
             ->assertStatus(Response::HTTP_OK);
-        assertDatabaseHas(WareHouse::class, [
+        assertDatabaseHas(Warehouse::class, [
             'name' => 'Main Warehouse',
             'address_id' => $this->address->id,
         ]);
@@ -83,7 +84,7 @@ describe('Warehouse Update Test', function () {
     });
 
     it('should update a warehouse', function () {
-        $wareHouse = WareHouse::factory()->create([
+        $wareHouse = Warehouse::factory()->create([
             'name' => 'Main Warehouse',
             'address_id' => $this->address->id,
         ]);
@@ -92,7 +93,7 @@ describe('Warehouse Update Test', function () {
             'name' => 'Main Warehouse Updated',
             'address_id' => $newAddress->id,
         ])->assertStatus(Response::HTTP_OK);
-        assertDatabaseHas(WareHouse::class, [
+        assertDatabaseHas(Warehouse::class, [
             'name' => 'Main Warehouse Updated',
             'address_id' => $newAddress->id,
         ]);
@@ -109,11 +110,11 @@ describe('Warehouse List Test', function () {
         $this->notAdmin = User::factory()->worker()->create();
         $this->address = Address::factory()->create();
         $this->otherAddress = Address::factory()->create();
-        $this->firstWarehouse = WareHouse::factory()->create([
+        $this->firstWarehouse = Warehouse::factory()->create([
             'name' => 'Main Warehouse',
             'address_id' => $this->address->id,
         ]);
-        $this->secondWarehouse = WareHouse::factory()->create([
+        $this->secondWarehouse = Warehouse::factory()->create([
             'name' => 'Second Warehouse',
             'address_id' => $this->otherAddress->id,
         ]);
@@ -144,7 +145,7 @@ describe('Warehouse List Test', function () {
                     'title' => $this->otherAddress->title,
                 ],
             ]);
-        assertDatabaseCount(WareHouse::class, 2);
+        assertDatabaseCount(Warehouse::class, 2);
     });
 });
 describe('Warehouse Details Test', function () {
@@ -158,7 +159,7 @@ describe('Warehouse Details Test', function () {
         $this->notAdmin = User::factory()->worker()->create();
         $this->address = Address::factory()->create();
 
-        $this->warehouse = WareHouse::factory()->create([
+        $this->warehouse = Warehouse::factory()->create([
             'name' => 'Main Warehouse',
             'address_id' => $this->address->id,
         ]);
@@ -195,7 +196,7 @@ describe('Warehouse Delete Test', function () {
         $this->admin = User::factory()->admin()->create();
         $this->notAdmin = User::factory()->worker()->create();
         $this->address = Address::factory()->create();
-        $this->wareHouse = WareHouse::factory()->create();
+        $this->wareHouse = Warehouse::factory()->create();
 
     });
     it('should return not found error if warehouse nof found', function () {
@@ -206,6 +207,6 @@ describe('Warehouse Delete Test', function () {
     it('should delete a warehouse', function () {
         actingAs($this->admin)->deleteJson('/api/v1/warehouse/delete/' . $this->wareHouse->id)
             ->assertStatus(Response::HTTP_OK);
-        assertSoftDeleted(WareHouse::class, ['id' => $this->wareHouse->id]);
+        assertSoftDeleted(Warehouse::class, ['id' => $this->wareHouse->id]);
     });
 });

@@ -3,15 +3,16 @@
 namespace Database\Factories;
 
 use App\Models\Address;
-use App\Models\Warehouse;
+use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Warehouse>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Supplier>
  */
-class WareHouseFactory extends Factory
+class SupplierFactory extends Factory
 {
-    protected $model = Warehouse::class;
+    protected $model = Supplier::class;
+
     /**
      * Define the model's default state.
      *
@@ -21,7 +22,7 @@ class WareHouseFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'address_id'=>fn()=>Address::query()->first() ? Address::query()->first()->id :
+            'address_id' => fn() => Address::query()->first() ? Address::query()->first()->id :
                 Address::factory()->create()->id,
         ];
     }

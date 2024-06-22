@@ -4,7 +4,7 @@ namespace App\Helpers\ApiResponse;
 
 class ErrorResult extends Result
 {
-    public function __construct(?string $message, bool $isOk = false, int $code = 500)
+    public function __construct(?string $message,int $code = 500 ,  bool $isOk = false)
     {
         parent::__construct();
         $this->isOk = $isOk;

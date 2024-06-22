@@ -20,6 +20,7 @@ describe('Warehouse Movements', function() {
         $this->address = Address::factory()->create();
 
     });
+
 //    it('should return error while moving a quantity bigger than already exists in the warehouse', function() {});
 //    test('item quantity balance while moving items between warehouses', function() {});
 //    it('should be adding items between supplier and warehouse', function() {});

@@ -278,6 +278,10 @@ Route::prefix('v1')->group(function () {
                 Route::post('add', [WarehouseController::class, 'addItems'])
                     ->middleware('can:warehouse-item-add')
                     ->name('warehouse.item.create');
+
+                Route::post('move', [WarehouseController::class, 'moveItems'])
+                    ->middleware('can:warehouse-item-move')
+                    ->name('warehouse.item.move');
             });
         });
         //        Route::group(['prefix' => 'payment'], function () {

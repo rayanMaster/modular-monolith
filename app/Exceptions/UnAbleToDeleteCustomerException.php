@@ -26,8 +26,8 @@ class UnAbleToDeleteCustomerException extends Exception
     {
         return ApiResponseHelper::sendErrorResponse(new ErrorResult(
             message: $this->getMessage(),
-            isOk: false,
-            code: Response::HTTP_CONFLICT
+            code: Response::HTTP_CONFLICT,
+            isOk: false
         ));
     }
 }

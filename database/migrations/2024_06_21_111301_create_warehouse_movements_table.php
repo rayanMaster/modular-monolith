@@ -3,7 +3,7 @@
 use App\Enums\WareHouseMovementsTypeEnum;
 use App\Models\Item;
 use App\Models\User;
-use App\Models\WareHouse;
+use App\Models\Warehouse;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class WarehouseItemsAddRequest extends FormRequest
+class WarehouseItemsMoveItemsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,9 +26,7 @@ class WarehouseItemsAddRequest extends FormRequest
             'items' => ['required', 'array'],
             'items.*.item_id' => ['required', 'exists:items,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
-            'items.*.price' => ['sometimes', 'numeric'],
-            'supplier_id' => ['sometimes', 'exists:suppliers,id'],
-            'date' => ['sometimes', 'date'],
+            'items.*.to_warehouse_id' => ['required', 'exists:warehouses,id'],
         ];
     }
 }
