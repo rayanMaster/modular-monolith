@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
+ * 
+ *
  * @property int $id
  * @property string|null $title
  * @property string|null $street
@@ -20,7 +22,6 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read City|null $city
- *
  * @method static AddressFactory factory($count = null, $state = [])
  * @method static Builder|Address newModelQuery()
  * @method static Builder|Address newQuery()
@@ -33,7 +34,6 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Address whereStreet($value)
  * @method static Builder|Address whereUpdatedAt($value)
  * @method static Builder|Address whereZipcode($value)
- *
  * @mixin \Eloquent
  */
 class Address extends Model

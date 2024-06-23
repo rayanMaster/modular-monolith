@@ -26,7 +26,7 @@ return new class extends Migration
             $table->decimal('price',8,2);
             $table->float('quantity');
             $table->tinyInteger('status')->default(WareHouseItemStatusEnum::IN_STOCK->value);
-            $table->dateTime('date');
+            $table->dateTime('date')->nullable()->useCurrent();
 
             $table->timestamps();
             $table->softDeletes();

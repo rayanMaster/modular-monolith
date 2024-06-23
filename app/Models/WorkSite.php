@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Carbon;
 
 /**
+ * 
+ *
  * @property int $id
  * @property string $title
  * @property string $description
@@ -44,7 +46,6 @@ use Illuminate\Support\Carbon;
  * @property-read int|null $resources_count
  * @property-read Collection<int, WorkSite> $subWorkSites
  * @property-read int|null $sub_work_sites_count
- *
  * @method static WorkSiteFactory factory($count = null, $state = [])
  * @method static Builder|WorkSite newModelQuery()
  * @method static Builder|WorkSite newQuery()
@@ -66,7 +67,8 @@ use Illuminate\Support\Carbon;
  * @method static Builder|WorkSite whereTitle($value)
  * @method static Builder|WorkSite whereUpdatedAt($value)
  * @method static Builder|WorkSite whereWorkersCount($value)
- *
+ * @property-read Collection<int, \App\Models\Item> $items
+ * @property-read int|null $items_count
  * @mixin Eloquent
  */
 class WorkSite extends Model

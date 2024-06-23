@@ -45,7 +45,6 @@ describe('Item Category routes check', function () {
     });
 
 });
-
 describe('Item Category Create', function () {
     uses(RefreshDatabase::class);
 
@@ -80,7 +79,6 @@ describe('Item Category Create', function () {
         $response->assertOk();
     });
 });
-
 describe('Item Category Update', function () {
     uses(RefreshDatabase::class);
 
@@ -128,7 +126,6 @@ describe('Item Category Update', function () {
         $response->assertOk();
     });
 });
-
 describe('Item Category List', function () {
     uses(RefreshDatabase::class);
 
@@ -158,7 +155,6 @@ describe('Item Category List', function () {
             ->assertJsonFragment(['name' => 'item 1']);
     });
 });
-
 describe('Item Category Details', function () {
     uses(RefreshDatabase::class);
 
@@ -196,7 +192,6 @@ describe('Item Category Details', function () {
             );
     });
 });
-
 describe('Item Category Delete', function () {
     uses(RefreshDatabase::class);
 

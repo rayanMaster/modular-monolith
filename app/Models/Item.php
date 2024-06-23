@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
+ * 
+ *
  * @property mixed|null $name
  * @property int $id
  * @property string|null $description
@@ -21,7 +23,6 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  * @property-read ItemCategory|null $category
- *
  * @method static ItemFactory factory($count = null, $state = [])
  * @method static Builder|Item newModelQuery()
  * @method static Builder|Item newQuery()
@@ -37,7 +38,6 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Item whereUpdatedAt($value)
  * @method static Builder|Item withTrashed()
  * @method static Builder|Item withoutTrashed()
- *
  * @mixin Eloquent
  */
 class Item extends Model

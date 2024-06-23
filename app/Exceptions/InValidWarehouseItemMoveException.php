@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class InvalidSubWorkSiteAttendanceException extends Exception
+class InValidWarehouseItemMoveException extends Exception
 {
     /**
      * Report the exception.
@@ -22,7 +22,7 @@ class InvalidSubWorkSiteAttendanceException extends Exception
     /**
      * Render the exception into an HTTP response.
      */
-    public function render(Request $request): JsonResponse
+    public function render(): JsonResponse
     {
         return ApiResponseHelper::sendErrorResponse(new ErrorResult(
             message: $this->getMessage(),

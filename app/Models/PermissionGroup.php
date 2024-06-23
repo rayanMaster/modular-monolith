@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Permission\Models\Permission;
 
 /**
+ * 
+ *
  * @property int $id
  * @property string $name
  * @property string $display_name
@@ -17,7 +19,6 @@ use Spatie\Permission\Models\Permission;
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Permission> $permissions
  * @property-read int|null $permissions_count
- *
  * @method static \Illuminate\Database\Eloquent\Builder|PermissionGroup newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PermissionGroup newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PermissionGroup onlyTrashed()
@@ -30,7 +31,6 @@ use Spatie\Permission\Models\Permission;
  * @method static \Illuminate\Database\Eloquent\Builder|PermissionGroup whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PermissionGroup withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|PermissionGroup withoutTrashed()
- *
  * @mixin \Eloquent
  */
 class PermissionGroup extends Model

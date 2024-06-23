@@ -90,6 +90,8 @@ class PermissionsSeeder extends Seeder
             'list', 'show', 'create', 'update', 'delete',
             'item-add',
             'item-move',
+            'item-update',
+            'item-list',
         ]);
 
     }

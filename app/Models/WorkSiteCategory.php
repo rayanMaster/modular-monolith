@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
+ * 
+ *
  * @property int $id
  * @property string $name
  * @property int $status
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- *
  * @method static \Database\Factories\WorkSiteCategoryFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|WorkSiteCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|WorkSiteCategory newQuery()
@@ -28,7 +29,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|WorkSiteCategory whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|WorkSiteCategory withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|WorkSiteCategory withoutTrashed()
- *
  * @mixin \Eloquent
  */
 class WorkSiteCategory extends Model

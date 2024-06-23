@@ -81,7 +81,7 @@ Route::prefix('v1')->group(function () {
             });
 
             Route::group(['prefix' => '{worksiteId}/item'], function () {
-                Route::post('/{itemId}/add', [WorkSiteItemController::class, 'add'])
+                Route::post('/add', [WorkSiteItemController::class, 'addItems'])
                     ->middleware('can:workSite-item-add')
                     ->name('workSite.item.add');
 
@@ -282,6 +282,14 @@ Route::prefix('v1')->group(function () {
                 Route::post('move', [WarehouseController::class, 'moveItems'])
                     ->middleware('can:warehouse-item-move')
                     ->name('warehouse.item.move');
+
+                Route::post('update', [WarehouseController::class, 'updateItems'])
+                    ->middleware('can:warehouse-item-update')
+                    ->name('warehouse.item.update');
+
+                Route::post('list', [WarehouseController::class, 'listItems'])
+                    ->middleware('can:warehouse-item-list')
+                    ->name('warehouse.item.list');
             });
         });
         //        Route::group(['prefix' => 'payment'], function () {

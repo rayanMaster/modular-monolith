@@ -3,23 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\DTO\WarehouseCreateDTO;
+use App\Exceptions\InValidWarehouseItemMoveException;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\ErrorResult;
 use App\Helpers\ApiResponse\Result;
 use App\Http\Requests\WarehouseCreateRequest;
 use App\Http\Requests\WarehouseItemsAddRequest;
+use App\Http\Requests\WarehouseItemsListRequest;
 use App\Http\Requests\WarehouseItemsMoveItemsRequest;
+use App\Http\Requests\WarehouseItemUpdateItemsRequest;
 use App\Http\Requests\WarehouseUpdateRequest;
 use App\Http\Resources\WarehouseDetailsResource;
+use App\Http\Resources\WarehouseItemsListResource;
 use App\Http\Resources\WarehouseListResource;
 use App\Models\Warehouse;
 use App\Models\WarehouseItem;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
+use function Ramsey\Uuid\v1;
 
 class WarehouseController extends Controller
 {
@@ -83,7 +89,7 @@ class WarehouseController extends Controller
          *     items: array{
          *      item_id:int,
          *      quantity:float,
-         *      price:float
+         *      price:float|null
          *     },
          *     supplier_id:int|null,
          *     date:string|null
@@ -98,7 +104,7 @@ class WarehouseController extends Controller
                 'date' => $requestedData['date'],
                 'item_id' => $item['item_id'],
                 'quantity' => $item['quantity'],
-                'price' => $item['price']
+                'price' => $item['price'] ?? null
             ];
         }, $requestedData['items']);
         try {
@@ -118,7 +124,7 @@ class WarehouseController extends Controller
     /**
      * @throws Throwable
      */
-    public function moveItems(int $fromWarehouseId, WarehouseItemsMoveItemsRequest $request)
+    public function moveItems(int $fromWarehouseId, WarehouseItemsMoveItemsRequest $request): JsonResponse
     {
         /**
          * @var array{
@@ -136,7 +142,7 @@ class WarehouseController extends Controller
          *     from_warehouse_id : int,
          *     to_warehouse_id : int,
          *     item_id:int,
-         *     quantity:int
+         *     quantity:float
          * }> $dataToMove
          */
         $dataToMove = array_map(function ($item) use ($requestedData, $fromWarehouseId) {
@@ -150,8 +156,13 @@ class WarehouseController extends Controller
         DB::transaction(
             callback: function () use ($dataToMove) {
                 foreach ($dataToMove as $item) {
-                    $currentItem = WarehouseItem::query()->findOrFail($item['item_id']);
-                    if($currentItem->q)
+                    $currentItemToMove = WarehouseItem::query()
+                        ->where(column: 'item_id',operator: '=',value: $item['item_id'])
+                        ->where(column:'warehouse_id' ,operator:'=' ,value: $item['to_warehouse_id'])
+                        ->first();
+                    if ($currentItemToMove->quantity < $item['quantity'])
+                        throw new InValidWarehouseItemMoveException("Item quantity out of stock");
+
                     WarehouseItem::query()->where('warehouse_id', $item['from_warehouse_id'])
                         ->where('item_id', $item['item_id'])
                         ->decrement('quantity', $item['quantity']);
@@ -165,6 +176,68 @@ class WarehouseController extends Controller
             attempts: 3);
 
         return ApiResponseHelper::sendSuccessResponse();
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function updateItems(int $warehouseId, WarehouseItemUpdateItemsRequest $request): JsonResponse
+    {
+        /**
+         * @var array{
+         *     items: array{
+         *      item_id:int,
+         *      quantity:int|null,
+         *      price:float|null
+         *     },
+         * } $requestedData
+         */
+        $requestedData = $request->validated();
+
+        $dataToUpdate = array_map(function ($item) use ($requestedData, $warehouseId) {
+            return [
+                'warehouse_id' => $warehouseId,
+                'item_id' => $item['item_id'],
+                'quantity' => $item['quantity'] ?? null,
+                'price' => $item['price'] ?? null,
+            ];
+        }, $requestedData['items']);
+
+        DB::transaction(
+            callback: function () use ($dataToUpdate) {
+                WarehouseItem::query()->upsert(
+                    values: $dataToUpdate,
+                    uniqueBy: ['warehouse_id', 'item_id'],
+                    update: ['quantity', 'price']);
+            },
+            attempts: 3);
+
+        return ApiResponseHelper::sendSuccessResponse();
+    }
+
+    public function listItems(int $warehouseId, WarehouseItemsListRequest $request): JsonResponse
+    {
+        /**
+         * @var array{
+         *   is_low_stock: bool,
+         *   is_out_of_stock:bool
+         * } $requestedData
+         */
+        $requestedData = $request->validated();
+        $results = WarehouseItem::query()
+            ->where(column: 'warehouse_id',operator: '=',value:  $warehouseId)
+            ->with(['item', 'warehouse'])
+            ->when(isset($requestedData['is_low_stock']) && $requestedData['is_low_stock'] == true,function(Builder $query) use ($requestedData){
+                return $query->where(
+                    column: 'quantity',operator: '<',value: 5);
+            })
+            ->when(isset($requestedData['is_out_of_stock']) && $requestedData['is_out_of_stock'] == true,function(Builder $query) use ($requestedData){
+                return $query->where(
+                    column: 'quantity',operator: '=',value: 0);
+            })
+            ->get();
+
+        return ApiResponseHelper::sendSuccessResponse(new Result(WarehouseItemsListResource::collection($results)));
     }
 
 }

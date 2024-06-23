@@ -26,7 +26,10 @@ describe('Warehouse routes check', function () {
             'warehouse.list',
             'warehouse.show',
             'warehouse.delete',
-            'warehouse.item.create'
+            'warehouse.item.create',
+            'warehouse.item.move',
+            'warehouse.item.update',
+            'warehouse.item.list',
         ];
 
         // Collect routes and filter based on the prefix

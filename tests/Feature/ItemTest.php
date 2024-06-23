@@ -50,7 +50,7 @@ describe('Item routes check', function () {
     });
 
 });
-describe(' Item Create', function () {
+describe('Item Create', function () {
     uses(RefreshDatabase::class);
 
     beforeEach(function () {
@@ -85,7 +85,7 @@ describe(' Item Create', function () {
         $response->assertOk();
     });
 });
-describe(' Item Update', function () {
+describe('Item Update', function () {
     uses(RefreshDatabase::class);
 
     beforeEach(function () {
@@ -126,7 +126,7 @@ describe(' Item Update', function () {
         $response->assertOk();
     });
 });
-describe(' Item List', function () {
+describe('Item List', function () {
     uses(RefreshDatabase::class);
 
     beforeEach(function () {
@@ -154,7 +154,7 @@ describe(' Item List', function () {
             ]);
     });
 });
-describe(' Item Details', function () {
+describe('Item Details', function () {
     uses(RefreshDatabase::class);
 
     beforeEach(function () {
@@ -182,7 +182,7 @@ describe(' Item Details', function () {
             ->assertJsonFragment(['name' => 'item 10']);
     });
 });
-describe(' Item Delete', function () {
+describe('Item Delete', function () {
     uses(RefreshDatabase::class);
 
     beforeEach(function () {
