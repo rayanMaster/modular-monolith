@@ -4,12 +4,10 @@ use App\Models\Address;
 use App\Models\User;
 use App\Models\WorkSite;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use function Pest\Laravel\{assertSoftDeleted, getJson, postJson, putJson, actingAs, assertDatabaseCount};
-use \Symfony\Component\HttpFoundation\Response;
 
 uses(RefreshDatabase::class);
 
-describe('Warehouse Movements', function() {
+describe('Warehouse Movements', function () {
     beforeEach(function () {
         $this->artisan('storage:link');
         $this->artisan('db:seed');
@@ -21,16 +19,12 @@ describe('Warehouse Movements', function() {
 
     });
 
-//    it('should return error while moving a quantity bigger than already exists in the warehouse', function() {});
-//    test('item quantity balance while moving items between warehouses', function() {});
-//    it('should be adding items between supplier and warehouse', function() {});
-//    it('should be dropping items between warehouse and worksite', function() {});
-
-
+    //    it('should return error while moving a quantity bigger than already exists in the warehouse', function() {});
+    //    test('item quantity balance while moving items between warehouses', function() {});
+    //    it('should be adding items between supplier and warehouse', function() {});
+    //    it('should be dropping items between warehouse and worksite', function() {});
 
 });
-
-
 
 //    it('should have the option to attach a wareHouse with a workSite or make it as main workHouse
 //    without a workSite', function () {
@@ -51,4 +45,3 @@ describe('Warehouse Movements', function() {
 //    test('if items entered to a worksite are the same the drop off its wareHouse', function () {
 //    });
 //});
-

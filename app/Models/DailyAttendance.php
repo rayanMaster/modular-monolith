@@ -9,13 +9,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
- *
  * @property-read WorkSite|null $workSite
+ *
  * @method static DailyAttendanceFactory factory($count = null, $state = [])
  * @method static Builder|DailyAttendance newModelQuery()
  * @method static Builder|DailyAttendance newQuery()
  * @method static Builder|DailyAttendance query()
+ *
  * @mixin \Eloquent
  */
 class DailyAttendance extends Model

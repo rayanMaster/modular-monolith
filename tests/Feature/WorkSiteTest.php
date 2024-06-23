@@ -421,7 +421,7 @@ describe('List WorkSites', function () {
                 'cost' => number_format($workSite->cost, 2),
                 'address' => [
                     'id' => $address->id,
-                    'title'=>$address->title,
+                    'title' => $address->title,
                     'city' => $address->city?->name,
                     'street' => $address->street,
                     'state' => $address->state,
@@ -475,7 +475,7 @@ describe('List WorkSites', function () {
                 'address' => [
                     'id' => $address->id,
                     'city' => $address->city?->name,
-                    'title'=>$address->title,
+                    'title' => $address->title,
                     'street' => $address->street,
                     'state' => $address->state,
                     'zipCode' => $address->zipcode,
@@ -556,7 +556,7 @@ describe('Show WorkSites Details', function () {
                 'cost' => number_format($this->workSite->cost, 2),
                 'address' => [
                     'id' => $this->workSite->address->id,
-                    'title'=>$this->workSite->address->title,
+                    'title' => $this->workSite->address->title,
                     'city' => $this->workSite->address->city?->name,
                     'street' => $this->workSite->address->street,
                     'state' => $this->workSite->address->state,
@@ -582,7 +582,7 @@ describe('Show WorkSites Details', function () {
                     'cost' => number_format($this->subWorkSite->cost, 2),
                     'address' => [
                         'id' => $this->address->id,
-                        'title'=>$this->address->title,
+                        'title' => $this->address->title,
                         'city' => $this->address->city?->name,
                         'street' => $this->address->street,
                         'state' => $this->address->state,
@@ -656,7 +656,7 @@ describe('Show WorkSites Details', function () {
                 'cost' => number_format($workSite->cost, 2),
                 'address' => [
                     'id' => $workSite->address->id,
-                    'title'=>$this->address->title,
+                    'title' => $this->address->title,
                     'city' => $workSite->address->city?->name,
                     'street' => $workSite->address->street,
                     'state' => $workSite->address->state,

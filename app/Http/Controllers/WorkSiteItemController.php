@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\WorkSiteResourceAddDTO;
 use App\Exceptions\InValidWarehouseItemMoveException;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
@@ -11,7 +10,6 @@ use App\Http\Resources\WorkSiteItemListResource;
 use App\Models\Item;
 use App\Models\WarehouseItem;
 use App\Models\WorkSite;
-use App\Models\WorkSiteItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,12 +45,12 @@ class WorkSiteItemController extends Controller
             callback: function () use ($workSite, $requestedData) {
                 foreach ($requestedData['items'] as $item) {
                     $currentItemQtyInWarehouse = WarehouseItem::query()
-                        ->where('warehouse_id',$requestedData['warehouse_id'])
-                        ->where('item_id',$item['item_id'])
+                        ->where('warehouse_id', $requestedData['warehouse_id'])
+                        ->where('item_id', $item['item_id'])
                         ->first()
                         ?->quantity;
                     if ($currentItemQtyInWarehouse < $item['quantity']) {
-                        throw new InValidWarehouseItemMoveException('Not enough items in warehouse',Response::HTTP_BAD_REQUEST);
+                        throw new InValidWarehouseItemMoveException('Not enough items in warehouse', Response::HTTP_BAD_REQUEST);
                     }
                     $itemsData = [
                         $item['item_id'] => [
@@ -68,7 +66,6 @@ class WorkSiteItemController extends Controller
                 }
             },
             attempts: 3);
-
 
         return ApiResponseHelper::sendSuccessResponse();
     }

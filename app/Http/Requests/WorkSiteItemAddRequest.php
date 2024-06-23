@@ -24,7 +24,7 @@ class WorkSiteItemAddRequest extends FormRequest
     {
         return [
             'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
-            'items'=> ['required', 'array'],
+            'items' => ['required', 'array'],
             'items.*.item_id' => ['required', 'integer', 'exists:items,id'],
             'items.*.quantity' => ['required', 'numeric', 'min:1'],
             'items.*.price' => ['required', 'numeric', 'min:0'],

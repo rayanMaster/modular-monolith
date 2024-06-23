@@ -17,13 +17,13 @@ return new class extends Migration
     {
         Schema::create('warehouse_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Warehouse::class,'warehouse_id');
-            $table->foreignIdFor(Item::class,'item_id');
-            $table->foreignIdFor(Supplier::class,'supplier_id')->nullable();
+            $table->foreignIdFor(Warehouse::class, 'warehouse_id');
+            $table->foreignIdFor(Item::class, 'item_id');
+            $table->foreignIdFor(Supplier::class, 'supplier_id')->nullable();
 
             $table->unique(['warehouse_id', 'item_id']);
 
-            $table->decimal('price',8,2);
+            $table->decimal('price', 8, 2);
             $table->float('quantity');
             $table->tinyInteger('status')->default(WareHouseItemStatusEnum::IN_STOCK->value);
             $table->dateTime('date')->nullable()->useCurrent();

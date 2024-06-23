@@ -16,8 +16,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
- * 
- *
  * @property int $id
  * @property string $first_name
  * @property string|null $last_name
@@ -32,6 +30,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, Payment> $payments
  * @property-read int|null $payments_count
  * @property string $fullName
+ *
  * @method static CustomerFactory factory($count = null, $state = [])
  * @method static Builder|Customer newModelQuery()
  * @method static Builder|Customer newQuery()
@@ -45,10 +44,13 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Customer wherePhone($value)
  * @method static Builder|Customer whereStatus($value)
  * @method static Builder|Customer whereUpdatedAt($value)
+ *
  * @property-read \App\Models\WorkSite|null $workSite
+ *
  * @method static Builder|Customer onlyTrashed()
  * @method static Builder|Customer withTrashed()
  * @method static Builder|Customer withoutTrashed()
+ *
  * @mixin Eloquent
  */
 class Customer extends Model

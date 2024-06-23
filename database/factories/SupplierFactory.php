@@ -22,7 +22,7 @@ class SupplierFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'address_id' => fn() => Address::query()->first() ? Address::query()->first()->id :
+            'address_id' => fn () => Address::query()->first() ? Address::query()->first()->id :
                 Address::factory()->create()->id,
         ];
     }

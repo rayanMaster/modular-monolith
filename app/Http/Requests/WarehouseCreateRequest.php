@@ -23,8 +23,8 @@ class WarehouseCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'=>['required','string','max:255'],
-            'address_id'=>['sometimes','integer','exists:addresses,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'address_id' => ['sometimes', 'integer', 'exists:addresses,id'],
         ];
     }
 }

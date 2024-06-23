@@ -253,7 +253,7 @@ Route::prefix('v1')->group(function () {
             });
 
         });
-        Route::group(['prefix'=>'warehouse'],function (){
+        Route::group(['prefix' => 'warehouse'], function () {
             Route::post('/store', [WarehouseController::class, 'store'])
                 ->middleware('can:warehouse-create')
                 ->name('warehouse.create');
@@ -274,7 +274,7 @@ Route::prefix('v1')->group(function () {
                 ->middleware('can:warehouse-delete')
                 ->name('warehouse.delete');
 
-            Route::group(['prefix'=>'{warehouseId}/items'],function () {
+            Route::group(['prefix' => '{warehouseId}/items'], function () {
                 Route::post('add', [WarehouseController::class, 'addItems'])
                     ->middleware('can:warehouse-item-add')
                     ->name('warehouse.item.create');

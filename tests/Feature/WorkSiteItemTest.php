@@ -61,18 +61,18 @@ describe('WorkSite Item assign', function () {
     });
 
     it('should prevent non auth adding a item to a workSite', function () {
-        $response = postJson('/api/v1/workSite/' . $this->workSite->id . '/item/add');
+        $response = postJson('/api/v1/workSite/'.$this->workSite->id.'/item/add');
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin adding a item to a workSite', function () {
         $response = actingAs($this->notAdmin)
-            ->postJson('/api/v1/workSite/' . $this->workSite->id . '/item/add');
+            ->postJson('/api/v1/workSite/'.$this->workSite->id.'/item/add');
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found error when workSite not found', function () {
         $undefinedWorkSiteId = rand(222, 333);
         $response = actingAs($this->admin)
-            ->postJson('/api/v1/workSite/' . $undefinedWorkSiteId . '/item/add',[
+            ->postJson('/api/v1/workSite/'.$undefinedWorkSiteId.'/item/add', [
                 'warehouse_id' => $this->warehouse->id,
                 'items' => [
                     [
@@ -84,14 +84,14 @@ describe('WorkSite Item assign', function () {
                         'item_id' => $this->item2->id,
                         'quantity' => 20,
                         'price' => 300,
-                    ]
-                ]
+                    ],
+                ],
             ]);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should add valid item to a valid workSite', function () {
         $response = actingAs($this->admin)
-            ->postJson('/api/v1/workSite/' . $this->workSite->id . '/item/add', [
+            ->postJson('/api/v1/workSite/'.$this->workSite->id.'/item/add', [
                 'warehouse_id' => $this->warehouse->id,
                 'items' => [
                     [
@@ -103,8 +103,8 @@ describe('WorkSite Item assign', function () {
                         'item_id' => $this->item2->id,
                         'quantity' => 20,
                         'price' => 300,
-                    ]
-                ]
+                    ],
+                ],
             ]);
         $response->assertOk();
         assertDatabaseHas(WorkSiteItem::class, [
@@ -132,15 +132,15 @@ describe('WorkSite Item assign', function () {
     });
     it('should prevent move quantity of item that not available in warehouse', function () {
         $response = actingAs($this->admin)
-            ->postJson('/api/v1/workSite/' . $this->workSite->id . '/item/add', [
+            ->postJson('/api/v1/workSite/'.$this->workSite->id.'/item/add', [
                 'warehouse_id' => $this->warehouse->id,
                 'items' => [
                     [
                         'item_id' => $this->item3->id,
                         'quantity' => 6,
                         'price' => 300,
-                    ]
-                ]
+                    ],
+                ],
             ]);
         $response->assertStatus(Response::HTTP_BAD_REQUEST);
         assertDatabaseHas(WarehouseItem::class, [
@@ -174,23 +174,23 @@ describe('WorkSite Item list', function () {
     });
 
     it('should prevent non auth show list items of a workSite', function () {
-        $response = getJson('/api/v1/workSite/' . $this->workSite->id . '/item/list');
+        $response = getJson('/api/v1/workSite/'.$this->workSite->id.'/item/list');
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin show list items of a workSite', function () {
         $response = actingAs($this->notAdmin)
-            ->getJson('/api/v1/workSite/' . $this->workSite->id . '/item/list');
+            ->getJson('/api/v1/workSite/'.$this->workSite->id.'/item/list');
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found error when workSite not found', function () {
         $undefinedWorkSiteId = rand(222, 333);
         $response = actingAs($this->admin)
-            ->getJson('/api/v1/workSite/' . $undefinedWorkSiteId . '/item/list');
+            ->getJson('/api/v1/workSite/'.$undefinedWorkSiteId.'/item/list');
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should return list of items of a  valid workSite', function () {
         $response = actingAs($this->admin)
-            ->getJson('/api/v1/workSite/' . $this->workSite->id . '/item/list');
+            ->getJson('/api/v1/workSite/'.$this->workSite->id.'/item/list');
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [

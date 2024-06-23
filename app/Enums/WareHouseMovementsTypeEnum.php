@@ -8,5 +8,4 @@ enum WareHouseMovementsTypeEnum: int
     case DROP_STOCK = 2;
     case ADJUST_STOCK = 3;
 
-
 }

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class WareHouseFactory extends Factory
 {
     protected $model = Warehouse::class;
+
     /**
      * Define the model's default state.
      *
@@ -21,7 +22,7 @@ class WareHouseFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'address_id'=>fn()=>Address::query()->first() ? Address::query()->first()->id :
+            'address_id' => fn () => Address::query()->first() ? Address::query()->first()->id :
                 Address::factory()->create()->id,
         ];
     }

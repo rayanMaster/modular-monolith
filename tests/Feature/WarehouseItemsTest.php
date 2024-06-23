@@ -9,14 +9,10 @@ use App\Models\WarehouseItem;
 use App\Models\WorkSite;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use function Pest\Laravel\{assertSoftDeleted,
-    getJson,
-    postJson,
-    putJson,
-    actingAs,
-    assertDatabaseCount,
-    assertDatabaseHas};
-use \Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
+
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
 
 uses(RefreshDatabase::class);
 
@@ -67,66 +63,65 @@ describe('Warehouse Items', function () {
 
     });
     it('should return error if adding same item twice to a warehouse', function () {
-        actingAs($this->admin)->postJson('/api/v1/warehouse/' . $this->warehouse->id . '/items/add', [
+        actingAs($this->admin)->postJson('/api/v1/warehouse/'.$this->warehouse->id.'/items/add', [
             'items' => [
                 [
                     'item_id' => $this->item1->id,
                     'quantity' => 1,
-                    'price' => 20
+                    'price' => 20,
                 ],
                 [
                     'item_id' => $this->item1->id,
                     'quantity' => 10,
-                    'price' => 30
-                ]
+                    'price' => 30,
+                ],
             ],
             'supplier_id' => $this->supplier->id,
             'date' => Carbon::now()->format('Y-m-d H:i:s'),
         ])
             ->assertStatus(Response::HTTP_CONFLICT)
             ->assertJsonFragment([
-                'message' => 'Item already exists in this warehouse'
+                'message' => 'Item already exists in this warehouse',
             ]);
     });
     test('adding items to warehouse from a supplier', function () {
 
-
         $item1 = Item::factory()->create();
         $item2 = Item::factory()->create();
 
-        actingAs($this->admin)->postJson('/api/v1/warehouse/' . $this->warehouse->id . '/items/add', [
+        actingAs($this->admin)->postJson('/api/v1/warehouse/'.$this->warehouse->id.'/items/add', [
             'items' => [
                 [
                     'item_id' => $item1->id,
                     'quantity' => 1,
-                    'price' => 20
+                    'price' => 20,
                 ],
                 [
                     'item_id' => $item2->id,
                     'quantity' => 10,
-                    'price' => 30
-                ]
+                    'price' => 30,
+                ],
             ],
             'supplier_id' => $this->supplier->id,
             'date' => Carbon::now()->format('Y-m-d H:i:s'),
         ])
-        ->assertStatus(Response::HTTP_OK);
+            ->assertStatus(Response::HTTP_OK);
     });
     it('should prevent adding negative quantity for an item', function () {
-        actingAs($this->admin)->postJson('/api/v1/warehouse/' . $this->warehouse->id . '/items/add', [
+        actingAs($this->admin)->postJson('/api/v1/warehouse/'.$this->warehouse->id.'/items/add', [
             'items' => [
                 [
                     'item_id' => $this->item1->id,
                     'quantity' => -1,
-                    'price' => 20
-                ]
+                    'price' => 20,
+                ],
             ],
             'supplier_id' => $this->supplier->id,
             'date' => Carbon::now()->format('Y-m-d H:i:s'),
         ])->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     });
     test('moving item from one warehouse to other', function () {
-      actingAs($this->admin)->postJson('/api/v1/warehouse/' . $this->warehouse->id . '/items/move', [
+        actingAs($this->admin)->postJson('/api/v1/warehouse/'.$this->warehouse->id.'/items/move', [
             'items' => [
                 [
                     'item_id' => $this->item1->id,
@@ -136,7 +131,7 @@ describe('Warehouse Items', function () {
             ],
 
         ])
-        ->assertStatus(Response::HTTP_OK);
+            ->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(WarehouseItem::class, [
             'item_id' => $this->item1->id,
             'warehouse_id' => $this->otherWarehouse->id,
@@ -149,7 +144,7 @@ describe('Warehouse Items', function () {
         ]);
     });
     it('should prevent moving item if no sufficient items in origin warehouse', function () {
-        actingAs($this->admin)->postJson('/api/v1/warehouse/' . $this->warehouse->id . '/items/move', [
+        actingAs($this->admin)->postJson('/api/v1/warehouse/'.$this->warehouse->id.'/items/move', [
             'items' => [
                 [
                     'item_id' => $this->item1->id,
@@ -171,7 +166,7 @@ describe('Warehouse Items', function () {
         ]);
     });
     test('updating quantity and price for multiple items', function () {
-        actingAs($this->admin)->postJson('/api/v1/warehouse/' . $this->warehouse->id . '/items/update', [
+        actingAs($this->admin)->postJson('/api/v1/warehouse/'.$this->warehouse->id.'/items/update', [
             'items' => [
                 [
                     'item_id' => $this->item1->id,
@@ -198,7 +193,7 @@ describe('Warehouse Items', function () {
             'price' => 249,
         ]);
     });
-    test('getting list of low stock items', function() {
+    test('getting list of low stock items', function () {
         $item = Item::factory()->create();
         $warehouse = Warehouse::factory()->create();
         $warehouseItem = WarehouseItem::factory()->create([
@@ -207,11 +202,11 @@ describe('Warehouse Items', function () {
             'quantity' => 3,
         ]);
 
-        actingAs($this->admin)->postJson('/api/v1/warehouse/' . $warehouse->id . '/items/list',[
+        actingAs($this->admin)->postJson('/api/v1/warehouse/'.$warehouse->id.'/items/list', [
             'is_low_stock' => true,
         ])
             ->assertStatus(Response::HTTP_OK)
-            ->assertJsonPath('data',[
+            ->assertJsonPath('data', [
                 [
                     'item' => [
                         'id' => $item->id,
@@ -234,16 +229,16 @@ describe('Warehouse Items', function () {
                         ],
                     ],
                     'quantity' => $warehouseItem->quantity,
-                    'price' => number_format($warehouseItem->price,2),
+                    'price' => number_format($warehouseItem->price, 2),
                 ],
             ]);
     });
-    test('getting list of out of stock items', function() {
-        actingAs($this->admin)->postJson('/api/v1/warehouse/' . $this->warehouse->id . '/items/list',[
+    test('getting list of out of stock items', function () {
+        actingAs($this->admin)->postJson('/api/v1/warehouse/'.$this->warehouse->id.'/items/list', [
             'is_out_of_stock' => true,
         ])
             ->assertStatus(Response::HTTP_OK)
-            ->assertJsonPath('data',[
+            ->assertJsonPath('data', [
                 [
                     'item' => [
                         'id' => $this->item4->id,
@@ -266,13 +261,11 @@ describe('Warehouse Items', function () {
                         ],
                     ],
                     'quantity' => $this->warehouseItem->quantity,
-                    'price' => number_format($this->warehouseItem->price,2),
+                    'price' => number_format($this->warehouseItem->price, 2),
                 ],
             ]);
     });
 });
-
-
 
 //    it('should have the option to attach a wareHouse with a workSite or make it as main workHouse
 //    without a workSite', function () {
@@ -293,4 +286,3 @@ describe('Warehouse Items', function () {
 //    test('if items entered to a worksite are the same the drop off its wareHouse', function () {
 //    });
 //});
-

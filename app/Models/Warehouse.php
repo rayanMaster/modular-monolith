@@ -9,9 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
- *
  * @property-read \App\Models\Address|null $address
+ *
  * @method static \Database\Factories\WareHouseFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Warehouse newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Warehouse newQuery()
@@ -19,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Warehouse query()
  * @method static \Illuminate\Database\Eloquent\Builder|Warehouse withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Warehouse withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Warehouse extends Model
@@ -26,14 +26,15 @@ class Warehouse extends Model
     use HasFactory,SoftDeletes;
 
     protected $table = 'warehouses';
+
     protected $guarded = [];
 
-
-    public function address(): BelongsTo{
+    public function address(): BelongsTo
+    {
         return $this->belongsTo(Address::class);
     }
 
-    public static function newFactory() : WareHouseFactory
+    public static function newFactory(): WareHouseFactory
     {
         return WareHouseFactory::new();
     }

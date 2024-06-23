@@ -10,13 +10,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
- *
  * @property-read Address|null $address
+ *
  * @method static ContractorFactory factory($count = null, $state = [])
  * @method static Builder|Contractor newModelQuery()
  * @method static Builder|Contractor newQuery()
  * @method static Builder|Contractor query()
+ *
  * @mixin \Eloquent
  */
 class Contractor extends Model

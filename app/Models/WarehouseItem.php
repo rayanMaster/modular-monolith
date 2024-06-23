@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
  * @property int $id
  * @property int $warehouse_id
  * @property int $item_id
@@ -20,6 +19,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property float $quantity
  * @property int $status
  * @property Carbon $date
+ *
  * @method static \Database\Factories\WarehouseItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|WarehouseItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|WarehouseItem newQuery()
@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|WarehouseItem onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|WarehouseItem withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|WarehouseItem withoutTrashed()
+ *
  * @mixin Eloquent
  */
 class WarehouseItem extends Model
@@ -34,6 +35,7 @@ class WarehouseItem extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'warehouse_items';
+
     protected $guarded = [];
 
     public static function newFactory(): WarehouseItemFactory
@@ -41,10 +43,13 @@ class WarehouseItem extends Model
         return WarehouseItemFactory::new();
     }
 
-    public function warehouse(): BelongsTo{
+    public function warehouse(): BelongsTo
+    {
         return $this->belongsTo(Warehouse::class);
     }
-    public function item(): BelongsTo{
+
+    public function item(): BelongsTo
+    {
         return $this->belongsTo(Item::class);
     }
 }

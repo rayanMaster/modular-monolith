@@ -11,8 +11,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
 
 /**
- * 
- *
  * @property int $id
  * @property string $payable_type
  * @property int $payable_id
@@ -23,6 +21,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property string|null $deleted_at
  * @property-read Model|Eloquent $payable
+ *
  * @method static PaymentFactory factory($count = null, $state = [])
  * @method static Builder|Payment newModelQuery()
  * @method static Builder|Payment newQuery()
@@ -36,6 +35,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Payment wherePaymentDate($value)
  * @method static Builder|Payment wherePaymentType($value)
  * @method static Builder|Payment whereUpdatedAt($value)
+ *
  * @mixin Eloquent
  */
 class Payment extends Model

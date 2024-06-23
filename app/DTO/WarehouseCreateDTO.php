@@ -6,16 +6,10 @@ use Spatie\LaravelData\Data;
 
 class WarehouseCreateDTO extends Data
 {
-
-    /**
-     * @param string $name
-     * @param string|null $addressId
-     */
     public function __construct(
         public string $name,
         public ?string $addressId,
-    )
-    {
+    ) {
     }
 
     /**
@@ -23,7 +17,6 @@ class WarehouseCreateDTO extends Data
      *     name:string,
      *     address_id:int|null
      * } $request
-     * @return self
      */
     public static function fromRequest(array $request): self
     {

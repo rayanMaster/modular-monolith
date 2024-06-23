@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\WarehouseCreateDTO;
 use App\Exceptions\InValidWarehouseItemMoveException;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\ErrorResult;
@@ -21,19 +20,16 @@ use App\Models\WarehouseItem;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
-use function Ramsey\Uuid\v1;
 
 class WarehouseController extends Controller
 {
-
-
     public function list(): JsonResponse
     {
         $warehouses = Warehouse::query()->get();
+
         return ApiResponseHelper::sendSuccessResponse(new Result(WarehouseListResource::collection($warehouses)));
     }
 
@@ -47,6 +43,7 @@ class WarehouseController extends Controller
          */
         $requestedData = $request->validated();
         Warehouse::query()->create($requestedData);
+
         return ApiResponseHelper::sendSuccessResponse();
 
     }
@@ -70,12 +67,14 @@ class WarehouseController extends Controller
     public function show(int $warehouseId): JsonResponse
     {
         $warehouse = Warehouse::query()->findOrFail($warehouseId);
+
         return ApiResponseHelper::sendSuccessResponse(new Result(WarehouseDetailsResource::make($warehouse)));
     }
 
     public function destroy(int $warehouseId): JsonResponse
     {
         Warehouse::query()->findOrFail($warehouseId)->delete();
+
         return ApiResponseHelper::sendSuccessResponse();
     }
 
@@ -104,7 +103,7 @@ class WarehouseController extends Controller
                 'date' => $requestedData['date'],
                 'item_id' => $item['item_id'],
                 'quantity' => $item['quantity'],
-                'price' => $item['price'] ?? null
+                'price' => $item['price'] ?? null,
             ];
         }, $requestedData['items']);
         try {
@@ -115,9 +114,10 @@ class WarehouseController extends Controller
                 attempts: 3);
         } catch (QueryException $exception) {
             if ($exception->getCode() == 23000) {
-                return ApiResponseHelper::sendErrorResponse(new ErrorResult("Item already exists in this warehouse", Response::HTTP_CONFLICT));
+                return ApiResponseHelper::sendErrorResponse(new ErrorResult('Item already exists in this warehouse', Response::HTTP_CONFLICT));
             }
         }
+
         return ApiResponseHelper::sendSuccessResponse();
     }
 
@@ -145,7 +145,7 @@ class WarehouseController extends Controller
          *     quantity:float
          * }> $dataToMove
          */
-        $dataToMove = array_map(function ($item) use ($requestedData, $fromWarehouseId) {
+        $dataToMove = array_map(function ($item) use ($fromWarehouseId) {
             return [
                 'from_warehouse_id' => $fromWarehouseId,
                 'to_warehouse_id' => $item['to_warehouse_id'],
@@ -157,11 +157,12 @@ class WarehouseController extends Controller
             callback: function () use ($dataToMove) {
                 foreach ($dataToMove as $item) {
                     $currentItemToMove = WarehouseItem::query()
-                        ->where(column: 'item_id',operator: '=',value: $item['item_id'])
-                        ->where(column:'warehouse_id' ,operator:'=' ,value: $item['to_warehouse_id'])
+                        ->where(column: 'item_id', operator: '=', value: $item['item_id'])
+                        ->where(column: 'warehouse_id', operator: '=', value: $item['to_warehouse_id'])
                         ->first();
-                    if ($currentItemToMove->quantity < $item['quantity'])
-                        throw new InValidWarehouseItemMoveException("Item quantity out of stock");
+                    if ($currentItemToMove->quantity < $item['quantity']) {
+                        throw new InValidWarehouseItemMoveException('Item quantity out of stock');
+                    }
 
                     WarehouseItem::query()->where('warehouse_id', $item['from_warehouse_id'])
                         ->where('item_id', $item['item_id'])
@@ -194,7 +195,7 @@ class WarehouseController extends Controller
          */
         $requestedData = $request->validated();
 
-        $dataToUpdate = array_map(function ($item) use ($requestedData, $warehouseId) {
+        $dataToUpdate = array_map(function ($item) use ($warehouseId) {
             return [
                 'warehouse_id' => $warehouseId,
                 'item_id' => $item['item_id'],
@@ -225,19 +226,18 @@ class WarehouseController extends Controller
          */
         $requestedData = $request->validated();
         $results = WarehouseItem::query()
-            ->where(column: 'warehouse_id',operator: '=',value:  $warehouseId)
+            ->where(column: 'warehouse_id', operator: '=', value: $warehouseId)
             ->with(['item', 'warehouse'])
-            ->when(isset($requestedData['is_low_stock']) && $requestedData['is_low_stock'] == true,function(Builder $query) use ($requestedData){
+            ->when(isset($requestedData['is_low_stock']) && $requestedData['is_low_stock'] == true, function (Builder $query) {
                 return $query->where(
-                    column: 'quantity',operator: '<',value: 5);
+                    column: 'quantity', operator: '<', value: 5);
             })
-            ->when(isset($requestedData['is_out_of_stock']) && $requestedData['is_out_of_stock'] == true,function(Builder $query) use ($requestedData){
+            ->when(isset($requestedData['is_out_of_stock']) && $requestedData['is_out_of_stock'] == true, function (Builder $query) {
                 return $query->where(
-                    column: 'quantity',operator: '=',value: 0);
+                    column: 'quantity', operator: '=', value: 0);
             })
             ->get();
 
         return ApiResponseHelper::sendSuccessResponse(new Result(WarehouseItemsListResource::collection($results)));
     }
-
 }

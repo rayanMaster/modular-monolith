@@ -18,15 +18,15 @@ return new class extends Migration
         Schema::create('warehouse_movements', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Warehouse::class, 'warehouse_id');
-            $table->foreignIdFor(Item::class,'item_id');
+            $table->foreignIdFor(Item::class, 'item_id');
             $table->morphs('movable'); // from supplier or to other wareHouse ...
             $table->unique(['warehouse_id', 'item_id']);
 
-            $table->decimal('price',8,2);
+            $table->decimal('price', 8, 2);
             $table->float('quantity');
             $table->tinyInteger('type')->default(WareHouseMovementsTypeEnum::ADD_STOCK->value);
             $table->dateTime('moved_at')->nullable();
-            $table->foreignIdFor(User::class,'moved_by')->nullable();
+            $table->foreignIdFor(User::class, 'moved_by')->nullable();
 
             $table->timestamps();
             $table->softDeletes();
