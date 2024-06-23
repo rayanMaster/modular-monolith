@@ -33,11 +33,11 @@ class WorkSiteItemController extends Controller
         /**
          * @var array{
          *   warehouse_id:int,
-         *   items:array{
+         *   items:array<string,array{
          *     item_id:int,
          *     quantity:float,
          *     price:float
-         *   }
+         *   }>
          * } $requestedData
          */
         $requestedData = $request->validated();

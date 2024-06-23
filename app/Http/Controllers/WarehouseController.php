@@ -56,8 +56,10 @@ class WarehouseController extends Controller
          *     address_id:int|null
          * } $requestedData
          */
-        $warehouse = Warehouse::query()->findOrFail($warehouseId);
         $requestedData = $request->validated();
+
+        $warehouse = Warehouse::query()->findOrFail($warehouseId);
+
         $warehouse->update($requestedData);
 
         return ApiResponseHelper::sendSuccessResponse();
@@ -85,11 +87,11 @@ class WarehouseController extends Controller
     {
         /**
          * @var array{
-         *     items: array{
+         *     items: array<string,array{
          *      item_id:int,
          *      quantity:float,
          *      price:float|null
-         *     },
+         *     }>,
          *     supplier_id:int|null,
          *     date:string|null
          * } $requestedData
@@ -128,23 +130,14 @@ class WarehouseController extends Controller
     {
         /**
          * @var array{
-         *     items: array{
+         *     items: array<string,array{
          *      item_id:int,
          *      quantity:float,
          *      to_warehouse_id:int
-         *     },
+         *     }>,
          * } $requestedData
          */
         $requestedData = $request->validated();
-
-        /**
-         * @var array<int,array{
-         *     from_warehouse_id : int,
-         *     to_warehouse_id : int,
-         *     item_id:int,
-         *     quantity:float
-         * }> $dataToMove
-         */
         $dataToMove = array_map(function ($item) use ($fromWarehouseId) {
             return [
                 'from_warehouse_id' => $fromWarehouseId,
@@ -160,7 +153,7 @@ class WarehouseController extends Controller
                         ->where(column: 'item_id', operator: '=', value: $item['item_id'])
                         ->where(column: 'warehouse_id', operator: '=', value: $item['to_warehouse_id'])
                         ->first();
-                    if ($currentItemToMove->quantity < $item['quantity']) {
+                    if ($currentItemToMove?->quantity < $item['quantity']) {
                         throw new InValidWarehouseItemMoveException('Item quantity out of stock');
                     }
 
@@ -186,11 +179,11 @@ class WarehouseController extends Controller
     {
         /**
          * @var array{
-         *     items: array{
+         *     items: array<string,array{
          *      item_id:int,
          *      quantity:int|null,
          *      price:float|null
-         *     },
+         *     }>,
          * } $requestedData
          */
         $requestedData = $request->validated();
@@ -220,8 +213,8 @@ class WarehouseController extends Controller
     {
         /**
          * @var array{
-         *   is_low_stock: bool,
-         *   is_out_of_stock:bool
+         *   is_low_stock: bool|null,
+         *   is_out_of_stock:bool|null
          * } $requestedData
          */
         $requestedData = $request->validated();

@@ -26,8 +26,6 @@ use Illuminate\Support\Carbon;
  * @method static Builder|JobTitle whereName($value)
  * @method static Builder|JobTitle whereUpdatedAt($value)
  *
- * @property int $1
- *
  * @mixin \Eloquent
  */
 class JobTitle extends Model

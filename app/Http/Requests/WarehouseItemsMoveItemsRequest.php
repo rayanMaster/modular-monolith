@@ -24,9 +24,9 @@ class WarehouseItemsMoveItemsRequest extends FormRequest
     {
         return [
             'items' => ['required', 'array'],
-            'items.*.item_id' => ['required', 'exists:items,id'],
+            'items.*.item_id' => ['required', 'integer', 'exists:items,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
-            'items.*.to_warehouse_id' => ['required', 'exists:warehouses,id'],
+            'items.*.to_warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
         ];
     }
 }

@@ -29,6 +29,9 @@ class Warehouse extends Model
 
     protected $guarded = [];
 
+    /**
+     * @return BelongsTo<Address,Warehouse>
+     */
     public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);

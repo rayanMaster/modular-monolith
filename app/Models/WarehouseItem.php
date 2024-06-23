@@ -43,11 +43,17 @@ class WarehouseItem extends Model
         return WarehouseItemFactory::new();
     }
 
+    /**
+     * @return BelongsTo<Warehouse,WarehouseItem>
+     */
     public function warehouse(): BelongsTo
     {
         return $this->belongsTo(Warehouse::class);
     }
 
+    /**
+     * @return BelongsTo<Item,WarehouseItem>
+     */
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
