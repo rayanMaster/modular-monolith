@@ -16,7 +16,6 @@ class OrderController extends Controller
 {
     public function store(OrderCreateRequest $request): JsonResponse
     {
-
         /**
          * @var array{
          *     work_site_id: int,
