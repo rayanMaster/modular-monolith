@@ -15,6 +15,7 @@
 <li>Packages configurations</li>
 <li>Laravel Permission by Spatie</li>
 <li>Laravel Data by Spatie</li>
+<li>Laravel Postman API by andreaselia</li>
 </ul>
 <li>What we are building?</li>
 <ul>

@@ -7,6 +7,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ItemCategoryController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\WorkSiteCategoryController;
 use App\Http\Controllers\WorkSiteController;
@@ -18,27 +19,27 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
     Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::group(['prefix' => 'workSite'], function () {
-            Route::post('/create', [WorkSiteController::class, 'store'])
+            Route::post('create', [WorkSiteController::class, 'store'])
                 ->middleware('can:workSite-create')
                 ->name('workSite.create');
 
-            Route::get('/list', [WorkSiteController::class, 'list'])
+            Route::get('list', [WorkSiteController::class, 'list'])
                 ->middleware('can:workSite-list')
                 ->name('workSite.list');
 
-            Route::get('/show/{id}', [WorkSiteController::class, 'show'])
+            Route::get('show/{id}', [WorkSiteController::class, 'show'])
                 ->middleware('can:workSite-show')
                 ->name('workSite.show');
 
-            Route::put('/update/{id}', [WorkSiteController::class, 'update'])
+            Route::put('update/{id}', [WorkSiteController::class, 'update'])
                 ->middleware('can:workSite-update')
                 ->name('workSite.update');
 
-            Route::post('/close/{id}', [WorkSiteController::class, 'close'])
+            Route::post('close/{id}', [WorkSiteController::class, 'close'])
                 ->middleware('can:workSite-close')
                 ->name('workSite.close');
 
-            Route::delete('/delete/{id}', [WorkSiteController::class, 'delete'])
+            Route::delete('delete/{id}', [WorkSiteController::class, 'delete'])
                 ->middleware('can:workSite-delete')
                 ->name('workSite.delete');
 
@@ -140,21 +141,20 @@ Route::prefix('v1')->group(function () {
                     ->name('workSite.customer.assign');
             });
         });
-
         Route::group(['prefix' => 'item'], function () {
-            Route::get('/list', [ItemController::class, 'list'])
+            Route::get('list', [ItemController::class, 'list'])
                 ->middleware('can:item-list')
                 ->name('item.list');
-            Route::get('/show/{id}', [ItemController::class, 'show'])
+            Route::get('show/{id}', [ItemController::class, 'show'])
                 ->middleware('can:item-show')
                 ->name('item.show');
-            Route::post('/create', [ItemController::class, 'store'])
+            Route::post('create', [ItemController::class, 'store'])
                 ->middleware('can:item-create')
                 ->name('item.create');
-            Route::put('/update/{id}', [ItemController::class, 'update'])
+            Route::put('update/{id}', [ItemController::class, 'update'])
                 ->middleware('can:item-update')
                 ->name('item.update');
-            Route::delete('/delete/{id}', [ItemController::class, 'destroy'])
+            Route::delete('delete/{id}', [ItemController::class, 'destroy'])
                 ->middleware('can:item-delete')
                 ->name('item.delete');
 
@@ -292,6 +292,11 @@ Route::prefix('v1')->group(function () {
                     ->name('warehouse.item.list');
             });
         });
+        Route::group(['prefix' => 'order'], function () {
+            Route::post('create', [OrderController::class, 'store'])
+                ->middleware('can:order-create')
+                ->name('order.create');
+        });
         //        Route::group(['prefix' => 'payment'], function () {
         //            Route::get('/list', [PaymentController::class, 'list'])
         //                ->middleware('can:payment-list')
@@ -303,8 +308,7 @@ Route::prefix('v1')->group(function () {
         //
         //        });
     });
-
     Route::group(['prefix' => 'auth'], function () {
-        Route::post('login', LoginController::class);
+        Route::post('login', LoginController::class)->name('login');
     });
 });

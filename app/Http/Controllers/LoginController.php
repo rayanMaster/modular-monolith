@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\LoginDTO;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
 use App\Http\Requests\LoginRequest;
@@ -11,6 +10,7 @@ use App\Models\User;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use stdClass;
 
 class LoginController extends Controller
 {
@@ -24,18 +24,28 @@ class LoginController extends Controller
          * @var array{
          *     user_name : string,
          *     password:string
-         * }$requestedData
+         * } $requestedData
          */
         $requestedData = $request->validated();
-        $data = LoginDTO::fromRequest($requestedData);
-        $user = User::query()->where('phone', $data->phone)->first();
 
-        if (! $user || ! Hash::check($data->password, $user->password)) {
+        /**
+         * @var stdClass{
+         *     user:User,
+         *     token:string
+         * } $result
+         */
+
+        // TODO:consider replace stdClass with DTO
+        $result = new stdClass();
+
+        $user = User::query()->where('phone', $requestedData['user_name'])->first();
+
+        if (! $user || ! Hash::check($requestedData['password'], $user->password)) {
             throw new AuthenticationException();
         }
 
-        $result['user'] = $user;
-        $result['token'] = $user->createToken('token')->plainTextToken;
+        $result->user = $user;
+        $result->token = $user->createToken('token')->plainTextToken;
 
         return ApiResponseHelper::sendSuccessResponse(new Result(LoginResource::make($result)));
 

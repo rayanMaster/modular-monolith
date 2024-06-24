@@ -94,5 +94,7 @@ class PermissionsSeeder extends Seeder
             'item-list',
         ]);
 
+        $this->addPermission('Order', 'order', ['list', 'show', 'create', 'update', 'delete']);
+
     }
 }
