@@ -17,7 +17,7 @@ use function Pest\Laravel\postJson;
 
 describe('Create Payment for a Worksite', function () {
 
-    uses(RefreshDatabase::class);
+
 
     beforeEach(function () {
         $this->artisan('storage:link');
@@ -75,7 +75,7 @@ describe('Create Payment for a Worksite', function () {
 });
 describe('List Payments for a Worksite', function () {
 
-    uses(RefreshDatabase::class);
+
 
     beforeEach(function () {
         $this->artisan('storage:link');

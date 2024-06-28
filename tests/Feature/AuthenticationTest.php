@@ -8,7 +8,7 @@ use function Pest\Laravel\postJson;
 describe('Login', function () {
 
     beforeEach(function () {
-        uses(RefreshDatabase::class);
+
         $this->artisan('migrate:fresh --seed');
     });
     it('should authenticate with valid credentials', function () {

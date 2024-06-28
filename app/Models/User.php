@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -28,6 +29,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property string $fullName
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read Collection<int, Permission> $permissions
@@ -62,7 +64,9 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, HasRoles,Notifiable,SoftDeletes;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable, SoftDeletes;
+
+
 
     /**
      * The attributes that are mass assignable.
@@ -97,5 +101,22 @@ class User extends Authenticatable
     protected static function newFactory(): UserFactory
     {
         return UserFactory::new();
+    }
+
+    /**
+     * @return Attribute<string,string>
+     */
+    public function fullName(): Attribute
+    {
+        return Attribute::make(
+            get: function (mixed $value, mixed $attributes) {
+                if(is_array($attributes)) {
+                    return ($attributes['first_name'] ?? '')
+                        . " " .
+                        ($attributes['last_name'] ?? '');
+                }
+                return '';
+            }
+        );
     }
 }

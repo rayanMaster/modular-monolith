@@ -14,6 +14,7 @@ use App\Http\Controllers\WorkSiteController;
 use App\Http\Controllers\WorkSiteCustomerController;
 use App\Http\Controllers\WorkSiteItemController;
 use App\Http\Controllers\WorkSitePaymentController;
+use App\Http\Middleware\CheckWorkSiteAttendance;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -293,9 +294,17 @@ Route::prefix('v1')->group(function () {
             });
         });
         Route::group(['prefix' => 'order'], function () {
-            Route::post('create', [OrderController::class, 'store'])
-                ->middleware('can:order-create')
+            Route::post('/create', [OrderController::class, 'store'])
+                ->middleware(['can:order-create', CheckWorkSiteAttendance::class])
                 ->name('order.create');
+
+            Route::put('/update/{orderId}', [OrderController::class, 'update'])
+                ->middleware('can:order-update')
+                ->name('order.update');
+
+            Route::get('/list', [OrderController::class, 'list'])
+                ->middleware('can:order-list')
+                ->name('order.list');
         });
         //        Route::group(['prefix' => 'payment'], function () {
         //            Route::get('/list', [PaymentController::class, 'list'])

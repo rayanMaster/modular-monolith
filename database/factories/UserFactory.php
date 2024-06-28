@@ -26,7 +26,7 @@ class UserFactory extends Factory
             'first_name' => fake()->firstName,
             'last_name' => fake()->lastName(),
             'email' => 'admin@admin.com',
-            'phone' => '0945795748',
+            'phone' => fake()->phoneNumber(),
             'password' => 'admin123',
         ])->afterCreating(function (User $user) {
             return $user->assignRole('admin');

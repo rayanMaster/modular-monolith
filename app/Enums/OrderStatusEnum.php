@@ -14,4 +14,9 @@ enum OrderStatusEnum: int
     case SENT_TO_WAREHOUSE = 8;
     case DELIVERED_TO_WAREHOUSE = 9;
 
+    public static function isAllowedToEditByNonAdmin(int $status): bool
+    {
+        return $status >= self::PENDING->value && $status < self::APPROVED->value;
+    }
+
 }
