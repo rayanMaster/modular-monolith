@@ -126,4 +126,12 @@ class OrderController extends Controller
 
         return ApiResponseHelper::sendSuccessResponse(new Result(OrderListResource::collection($orders)));
     }
+
+    public function show(int $orderId): JsonResponse
+    {
+        $order = Order::query()
+            ->with(['orderCreatedBy','orderItems'])
+            ->findOrFail($orderId);
+        return ApiResponseHelper::sendSuccessResponse(new Result(OrderDetailsResource::make($order)));
+    }
 }

@@ -297,14 +297,15 @@ Route::prefix('v1')->group(function () {
             Route::post('/create', [OrderController::class, 'store'])
                 ->middleware(['can:order-create', CheckWorkSiteAttendance::class])
                 ->name('order.create');
-
             Route::put('/update/{orderId}', [OrderController::class, 'update'])
                 ->middleware('can:order-update')
                 ->name('order.update');
-
             Route::get('/list', [OrderController::class, 'list'])
                 ->middleware('can:order-list')
                 ->name('order.list');
+            Route::get('/show/{orderId}', [OrderController::class, 'show'])
+                ->middleware('can:order-show')
+                ->name('order.show');
         });
         //        Route::group(['prefix' => 'payment'], function () {
         //            Route::get('/list', [PaymentController::class, 'list'])

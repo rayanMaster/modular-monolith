@@ -134,7 +134,7 @@ describe('Order Update', function () {
             'item_id' => $this->item1->id,
             'quantity' => 10,
         ]);
-        $response = actingAs($this->siteManager)->putJson('api/v1/order/update/'.$order->id, [
+        $response = actingAs($this->siteManager)->putJson('api/v1/order/update/' . $order->id, [
             'items' => [
                 [
 
@@ -159,7 +159,7 @@ describe('Order Update', function () {
             'item_id' => $this->item1->id,
             'quantity' => 10,
         ]);
-        $response = actingAs($this->siteManager)->putJson('api/v1/order/update/'.$order->id, [
+        $response = actingAs($this->siteManager)->putJson('api/v1/order/update/' . $order->id, [
             'items' => [
                 [
 
@@ -188,7 +188,7 @@ describe('Order Update', function () {
             'item_id' => $this->item1->id,
             'quantity' => 10,
         ]);
-        $response = actingAs($this->admin)->putJson('api/v1/order/update/'.$order->id, [
+        $response = actingAs($this->admin)->putJson('api/v1/order/update/' . $order->id, [
             'items' => [
                 [
 
@@ -288,9 +288,96 @@ describe('Order List', function () {
 });
 
 describe('Order Detail', function () {
+    beforeEach(function () {
+
+        $this->admin = User::factory()->admin()->create();
+        $this->siteManager1 = User::factory()->siteManager()->create();
+        $this->siteManager2 = User::factory()->siteManager()->create();
+        $this->worker = User::factory()->worker()->create();
+        $this->workSite1 = WorkSite::factory()->create();
+        $this->workSite2 = WorkSite::factory()->create();
+        $this->item1 = Item::factory()->create();
+        $this->item2 = Item::factory()->create();
+
+        $this->employeeAttendance = DailyAttendance::factory()->create([
+            'employee_id' => $this->siteManager1->id,
+            'work_site_id' => $this->workSite1->id,
+            'date' => Carbon::today()->toDateString(),
+
+        ]);
+
+    });
     test('As a worksite manager, I can see details of my order', function () {
+        $order = Order::factory()->create([
+            'status' => OrderStatusEnum::PENDING->value,
+            'priority' => OrderPriorityEnum::LOW->value,
+            'work_site_id' => $this->workSite1->id,
+            'created_by' => $this->siteManager1->id,
+        ]);
+        $orderItem = OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'item_id' => $this->item1->id,
+            'quantity' => 10,
+        ]);
+        $response = actingAs($this->siteManager1)->getJson('api/v1/order/show/' . $order->id);
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJsonFragment(
+                [
+                        'id' => $order->id,
+                        'workSite' => $this->workSite1->title,
+                        'order_items' => [
+                            [
+                                'id' => $orderItem->id,
+                                'item' => [
+                                    'id' => $this->item1->id,
+                                    'name' => $this->item1->name,
+                                    'description' => $this->item1->description,
+                                    'item_category' => [
+                                        'id' => $this->item1->category->id,
+                                        'name' => $this->item1->category->name,
+                                    ]
+                                ],
+                                'quantity' => 10,
+                                'price' =>  number_format($orderItem->price,2,'.',''),
+                            ]
+                        ],
+                        'total_amount' => number_format($order->total_amount,2,'.',''),
+                        'status' => 'PENDING',
+                        'priority' => 'LOW',
+                        'created_by' => $this->siteManager1->fullName,
+                ]
+            );
+    });
+    test('As a worksite manager, I cant see details of my order of others', function () {
+        $order = Order::factory()->create([
+            'status' => OrderStatusEnum::PENDING->value,
+            'priority' => OrderPriorityEnum::LOW->value,
+            'work_site_id' => $this->workSite1->id,
+            'created_by' => $this->siteManager2->id,
+        ]);
+        $response = actingAs($this->siteManager1)->getJson('api/v1/order/show/' . $order->id);
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJsonPath('data', []);
     });
     test('As an admin, I can see details of any order in the system', function () {
+        $order = Order::factory()->create([
+            'status' => OrderStatusEnum::PENDING->value,
+            'priority' => OrderPriorityEnum::LOW->value,
+            'work_site_id' => $this->workSite1->id,
+            'created_by' => $this->siteManager1->id,
+        ]);
+        $response = actingAs($this->admin)->getJson('api/v1/order/show/' . $order->id);
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJsonPath('data', [
+                [
+                    'id' => $order->id,
+                    'workSite' => $this->workSite1->title,
+                    'total_amount' => number_format($order->total_amount, 2, '.', ''),
+                    'status' => OrderStatusEnum::from($order->status)->name,
+                    'priority' => OrderPriorityEnum::from($order->priority)->name,
+                    'created_by' => $this->siteManager1->fullName,
+                ],
+            ]);
     });
 });
 

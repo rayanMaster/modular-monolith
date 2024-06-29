@@ -5,6 +5,9 @@ namespace App\Models;
 use Database\Factories\OrderItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -35,5 +38,13 @@ class OrderItem extends Model
     protected static function newFactory(): OrderItemFactory
     {
         return OrderItemFactory::new();
+    }
+
+    /**
+     * @return HasOne<Item>
+     */
+    public function itemDetails(): HasOne
+    {
+        return $this->hasOne(Item::class, 'id', 'item_id');
     }
 }
