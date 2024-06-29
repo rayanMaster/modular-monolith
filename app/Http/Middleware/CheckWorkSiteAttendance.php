@@ -10,7 +10,6 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,7 +18,8 @@ class CheckWorkSiteAttendance
     /**
      * Handle an incoming request.
      *
-     * @param Closure(Request): (Response) $next
+     * @param  Closure(Request): (Response)  $next
+     *
      * @throws UserAttendanceException
      */
     public function handle(Request $request, Closure $next): Response
@@ -35,28 +35,30 @@ class CheckWorkSiteAttendance
 
         if ($validator->fails()) {
             // Handle validation failure
-            return ApiResponseHelper::sendErrorResponse(new ErrorResult('invalid_parameters',Response::HTTP_UNPROCESSABLE_ENTITY));
+            return ApiResponseHelper::sendErrorResponse(new ErrorResult('invalid_parameters', Response::HTTP_UNPROCESSABLE_ENTITY));
         }
 
-        if ($authUser && $authUser->hasRole('admin'))
+        if ($authUser && $authUser->hasRole('admin')) {
             return $next($request);
+        }
 
         // Ensure $date is a valid date string
         $dateInput = $request->input('date');
         $date = null;
-        if(is_string($dateInput)) {
+        if (is_string($dateInput)) {
             $date = Carbon::parse($dateInput)->toDateString();
         }
 
         $doesUserPresentAtWorkSite = DailyAttendance::query()
             ->where('employee_id', $authUser?->id)
             ->where('work_site_id', $request->input('work_site_id'))
-            ->whereDate('date',  $date)
+            ->whereDate('date', $date)
             ->exists();
 
-        if (!$doesUserPresentAtWorkSite) {
-            throw new UserAttendanceException("Employee attendance does not present at work site");
+        if (! $doesUserPresentAtWorkSite) {
+            throw new UserAttendanceException('Employee attendance does not present at work site');
         }
+
         return $next($request);
     }
 }

@@ -3,8 +3,6 @@
 use App\Models\Customer;
 use App\Models\User;
 use App\Models\WorkSite;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
@@ -12,13 +10,9 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\postJson;
 
 describe('WorkSite Customer assign', function () {
-    uses(RefreshDatabase::class);
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
+
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 

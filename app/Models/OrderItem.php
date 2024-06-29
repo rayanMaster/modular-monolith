@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem query()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class OrderItem extends Model

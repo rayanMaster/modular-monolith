@@ -5,25 +5,16 @@ use App\Models\Payment;
 use App\Models\User;
 use App\Models\WorkSite;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
 describe('Create Payment for a Worksite', function () {
 
-
-
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        assertDatabaseCount(Role::class, 4);
 
         $this->workSite = WorkSite::factory()->create();
 
@@ -75,13 +66,7 @@ describe('Create Payment for a Worksite', function () {
 });
 describe('List Payments for a Worksite', function () {
 
-
-
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        assertDatabaseCount(Role::class, 4);
 
         $this->workSite = WorkSite::factory()->create();
 

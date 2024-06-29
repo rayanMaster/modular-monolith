@@ -8,17 +8,14 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\User;
 use App\Models\WorkSite;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 
-
 describe('Order Create', function () {
     beforeEach(function () {
-        $this->artisan('db:seed');
         $this->admin = User::factory()->admin()->create();
         $this->siteManager = User::factory()->siteManager()->create();
         $this->worker = User::factory()->worker()->create();
@@ -26,8 +23,6 @@ describe('Order Create', function () {
         $this->workSite2 = WorkSite::factory()->create();
         $this->item1 = Item::factory()->create();
         $this->item2 = Item::factory()->create();
-
-
 
     });
     test('As an admin , I can create an order for a worksite or general one', function () {
@@ -44,6 +39,7 @@ describe('Order Create', function () {
                 ],
             ],
             'priority' => OrderPriorityEnum::NORMAL->value,
+            'date' => Carbon::today()->toDateString(),
         ])->assertStatus(Response::HTTP_OK);
         $orderId = json_decode($response->content())->data->id;
         assertDatabaseHas('orders', [
@@ -114,7 +110,6 @@ describe('Order Create', function () {
 });
 describe('Order Update', function () {
     beforeEach(function () {
-        $this->artisan('db:seed');
 
         $this->admin = User::factory()->admin()->create();
         $this->siteManager = User::factory()->siteManager()->create();
@@ -139,14 +134,14 @@ describe('Order Update', function () {
             'item_id' => $this->item1->id,
             'quantity' => 10,
         ]);
-        $response = actingAs($this->siteManager)->putJson('api/v1/order/update/' . $order->id, [
+        $response = actingAs($this->siteManager)->putJson('api/v1/order/update/'.$order->id, [
             'items' => [
                 [
 
                     'item_id' => $orderItem->item_id,
                     'quantity' => 20,
-                ]
-            ]
+                ],
+            ],
         ]);
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(OrderItem::class, [
@@ -164,14 +159,14 @@ describe('Order Update', function () {
             'item_id' => $this->item1->id,
             'quantity' => 10,
         ]);
-        $response = actingAs($this->siteManager)->putJson('api/v1/order/update/' . $order->id, [
+        $response = actingAs($this->siteManager)->putJson('api/v1/order/update/'.$order->id, [
             'items' => [
                 [
 
                     'item_id' => $orderItem->item_id,
                     'quantity' => 20,
-                ]
-            ]
+                ],
+            ],
         ]);
         $response->assertStatus(Response::HTTP_FORBIDDEN)
             ->assertJsonFragment([
@@ -193,14 +188,14 @@ describe('Order Update', function () {
             'item_id' => $this->item1->id,
             'quantity' => 10,
         ]);
-        $response = actingAs($this->admin)->putJson('api/v1/order/update/' . $order->id, [
+        $response = actingAs($this->admin)->putJson('api/v1/order/update/'.$order->id, [
             'items' => [
                 [
 
                     'item_id' => $orderItem->item_id,
                     'quantity' => 20,
-                ]
-            ]
+                ],
+            ],
         ]);
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(OrderItem::class, [
@@ -213,7 +208,7 @@ describe('Order Update', function () {
 });
 describe('Order List', function () {
     beforeEach(function () {
-        $this->artisan('db:seed');
+
         $this->admin = User::factory()->admin()->create();
         $this->siteManager1 = User::factory()->siteManager()->create();
         $this->siteManager2 = User::factory()->siteManager()->create();
@@ -253,7 +248,7 @@ describe('Order List', function () {
                     'status' => OrderStatusEnum::from($order1->status)->name,
                     'priority' => OrderPriorityEnum::from($order1->priority)->name,
                     'created_by' => $this->siteManager1->fullName,
-                ]
+                ],
             ]);
     });
     test('As an admin, I can see list of all orders in the system', function () {
@@ -287,11 +282,10 @@ describe('Order List', function () {
                     'status' => OrderStatusEnum::from($order2->status)->name,
                     'priority' => OrderPriorityEnum::from($order2->priority)->name,
                     'created_by' => $this->siteManager2->fullName,
-                ]
+                ],
             ]);
     });
 });
-
 
 describe('Order Detail', function () {
     test('As a worksite manager, I can see details of my order', function () {

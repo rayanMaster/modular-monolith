@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\User;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\postJson;
@@ -8,19 +8,23 @@ use function Pest\Laravel\postJson;
 describe('Login', function () {
 
     beforeEach(function () {
-
-        $this->artisan('migrate:fresh --seed');
+        $this->user = User::factory()->admin()->create(
+            [
+                'phone' => '+6281234567890',
+                'password' => 'password',
+            ]
+        );
     });
     it('should authenticate with valid credentials', function () {
         $response = postJson('/api/v1/auth/login', [
-            'user_name' => '0945795748',
-            'password' => 'admin123',
+            'user_name' => $this->user->phone,
+            'password' => 'password',
         ]);
         $response->assertStatus(Response::HTTP_OK);
     });
     it('should not authenticate with incorrect credentials', function () {
         $response = postJson('/api/v1/auth/login', [
-            'user_name' => '0945795748',
+            'user_name' => $this->user->phone,
             'password' => 'admin12',
         ]);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);

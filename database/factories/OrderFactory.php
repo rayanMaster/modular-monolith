@@ -28,7 +28,7 @@ class OrderFactory extends Factory
             'total_amount' => fake()->numberBetween(1000, 99999),
             'status' => fake()->randomElement(OrderStatusEnum::cases()),
             'priority' => fake()->randomElement(OrderPriorityEnum::cases()),
-            'created_by' => User::factory()->siteManager()->create()->id
+            'created_by' => User::factory()->siteManager()->create()->id,
         ];
     }
 }

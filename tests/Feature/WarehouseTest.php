@@ -4,7 +4,6 @@ use App\Models\Address;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Models\WorkSite;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
@@ -12,7 +11,6 @@ use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertSoftDeleted;
 
-uses(RefreshDatabase::class);
 describe('Warehouse routes check', function () {
     it('should have all routes for /warehouse', function () {
         $this->artisan('optimize:clear');
@@ -49,8 +47,6 @@ describe('Warehouse routes check', function () {
 describe('Warehouse Create Test', function () {
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->artisan('db:seed');
 
         $this->workSite = WorkSite::factory()->create();
         $this->admin = User::factory()->admin()->create();
@@ -73,8 +69,6 @@ describe('Warehouse Create Test', function () {
 });
 describe('Warehouse Update Test', function () {
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->artisan('db:seed');
 
         $this->workSite = WorkSite::factory()->create();
         $this->admin = User::factory()->admin()->create();
@@ -102,8 +96,6 @@ describe('Warehouse Update Test', function () {
 describe('Warehouse List Test', function () {
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->artisan('db:seed');
 
         $this->workSite = WorkSite::factory()->create();
         $this->admin = User::factory()->admin()->create();
@@ -151,8 +143,6 @@ describe('Warehouse List Test', function () {
 describe('Warehouse Details Test', function () {
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->artisan('db:seed');
 
         $this->workSite = WorkSite::factory()->create();
         $this->admin = User::factory()->admin()->create();
@@ -189,8 +179,6 @@ describe('Warehouse Details Test', function () {
 describe('Warehouse Delete Test', function () {
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->artisan('db:seed');
 
         $this->workSite = WorkSite::factory()->create();
         $this->admin = User::factory()->admin()->create();

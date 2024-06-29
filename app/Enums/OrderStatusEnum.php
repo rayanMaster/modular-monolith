@@ -18,5 +18,4 @@ enum OrderStatusEnum: int
     {
         return $status >= self::PENDING->value && $status < self::APPROVED->value;
     }
-
 }

@@ -54,7 +54,6 @@ class OrderController extends Controller
             OrderItem::query()->insert($orderItemsData);
         }, attempts: 3);
 
-
         return ApiResponseHelper::sendSuccessResponse(new Result(OrderDetailsResource::make($order)));
 
     }
@@ -66,9 +65,9 @@ class OrderController extends Controller
     {
         $order = Order::query()->findOrFail($orderId);
         $authUser = Auth::user();
-        if ($authUser && !$authUser->hasRole('admin') &&
-            $order->status && !OrderStatusEnum::isAllowedToEditByNonAdmin($order->status)) {
-            throw new OrderEditException("You cannot update an order not in pending approval");
+        if ($authUser && ! $authUser->hasRole('admin') &&
+            $order->status && ! OrderStatusEnum::isAllowedToEditByNonAdmin($order->status)) {
+            throw new OrderEditException('You cannot update an order not in pending approval');
         }
         DB::transaction(callback: function () use ($request, $order) {
 
@@ -90,10 +89,10 @@ class OrderController extends Controller
                 'priority' => $requestedData['priority'] ?? null,
                 'total_amount' => $requestedData['total_amount'] ?? null,
                 'status' => $requestedData['status'] ?? null,
-            ], fn($item) => $item != null);
+            ], fn ($item) => $item != null);
 
             $order->update($dataToUpdate);
-            if (is_array($requestedData['items']) && sizeof($requestedData['items']) > 0) {
+            if (is_array($requestedData['items']) && count($requestedData['items']) > 0) {
                 $orderItemsToUpdateData = array_map(function ($item) use ($order) {
                     return [
                         'order_id' => $order->id,
@@ -111,6 +110,7 @@ class OrderController extends Controller
         }, attempts: 3);
 
         $updatedOrder = $order->refresh();
+
         return ApiResponseHelper::sendSuccessResponse(new Result(OrderDetailsResource::make($updatedOrder)));
     }
 
@@ -118,11 +118,12 @@ class OrderController extends Controller
     {
         $user = Auth::user();
         $orders = Order::query()
-            ->when(value: $user && !$user->hasRole('admin'), callback: function (Builder $query) {
+            ->when(value: $user && ! $user->hasRole('admin'), callback: function (Builder $query) {
                 return $query->where(column: 'created_by',
                     operator: '=', value: Auth::id());
             })
             ->with(['orderCreatedBy'])->get();
+
         return ApiResponseHelper::sendSuccessResponse(new Result(OrderListResource::collection($orders)));
     }
 }

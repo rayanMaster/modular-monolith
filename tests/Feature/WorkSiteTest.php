@@ -12,10 +12,8 @@ use App\Models\User;
 use App\Models\WorkSite;
 use App\Models\WorkSiteCategory;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
@@ -132,13 +130,7 @@ describe('WorkSite routes check', function () {
 });
 describe('Create WorkSite', function () {
 
-    uses(RefreshDatabase::class);
-
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
 
     });
 
@@ -312,13 +304,7 @@ describe('Create WorkSite', function () {
 });
 describe('Update WorkSite', function () {
 
-    uses(RefreshDatabase::class);
-
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
 
         $this->admin = User::factory()->admin()->create();
         $this->workSite = WorkSite::factory()->create();
@@ -362,13 +348,7 @@ describe('Update WorkSite', function () {
 });
 describe('List WorkSites', function () {
 
-    uses(RefreshDatabase::class);
-
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
 
         $this->admin = User::factory()->admin()->create();
         $this->notAdmin = User::factory()->siteManager()->create();
@@ -495,13 +475,7 @@ describe('List WorkSites', function () {
 });
 describe('Show WorkSites Details', function () {
 
-    uses(RefreshDatabase::class);
-
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
 
         $this->admin = User::factory()->admin()->create();
         $this->notAdmin = User::factory()->siteManager()->create();
@@ -699,13 +673,7 @@ describe('Show WorkSites Details', function () {
 });
 describe('Close WorkSites', function () {
 
-    uses(RefreshDatabase::class);
-
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
 
         $this->admin = User::factory()->admin()->create();
         $this->notAdmin = User::factory()->siteManager()->create();
@@ -786,13 +754,7 @@ describe('Close WorkSites', function () {
 });
 describe('Assign Contractor to WorkSites', function () {
 
-    uses(RefreshDatabase::class);
-
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
 
         $this->admin = User::factory()->admin()->create();
         $this->notAdmin = User::factory()->siteManager()->create();

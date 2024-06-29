@@ -3,14 +3,9 @@
 use App\Models\Address;
 use App\Models\User;
 use App\Models\WorkSite;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 describe('Warehouse Movements', function () {
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->artisan('db:seed');
 
         $this->workSite = WorkSite::factory()->create();
         $this->admin = User::factory()->admin()->create();

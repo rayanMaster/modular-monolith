@@ -6,8 +6,6 @@ use App\Models\Warehouse;
 use App\Models\WarehouseItem;
 use App\Models\WorkSite;
 use App\Models\WorkSiteItem;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
@@ -16,13 +14,9 @@ use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
 describe('WorkSite Item assign', function () {
-    uses(RefreshDatabase::class);
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
+
         $this->notAdmin = User::factory()->worker()->create();
         $this->admin = User::factory()->admin()->create();
 
@@ -151,13 +145,9 @@ describe('WorkSite Item assign', function () {
     });
 });
 describe('WorkSite Item list', function () {
-    uses(RefreshDatabase::class);
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
+
         $this->notAdmin = User::factory()->worker()->create();
         $this->admin = User::factory()->admin()->create();
 

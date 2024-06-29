@@ -3,8 +3,6 @@
 use App\Models\Item;
 use App\Models\ItemCategory;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
@@ -46,13 +44,9 @@ describe('Item Category routes check', function () {
 
 });
 describe('Item Category Create', function () {
-    uses(RefreshDatabase::class);
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
+
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
         $this->item = Item::factory()->create();
@@ -80,13 +74,9 @@ describe('Item Category Create', function () {
     });
 });
 describe('Item Category Update', function () {
-    uses(RefreshDatabase::class);
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
+
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -127,13 +117,9 @@ describe('Item Category Update', function () {
     });
 });
 describe('Item Category List', function () {
-    uses(RefreshDatabase::class);
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
+
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -156,13 +142,9 @@ describe('Item Category List', function () {
     });
 });
 describe('Item Category Details', function () {
-    uses(RefreshDatabase::class);
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
+
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -193,13 +175,9 @@ describe('Item Category Details', function () {
     });
 });
 describe('Item Category Delete', function () {
-    uses(RefreshDatabase::class);
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
+
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 

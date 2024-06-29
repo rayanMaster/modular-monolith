@@ -66,8 +66,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, HasRoles, Notifiable, SoftDeletes;
 
-
-
     /**
      * The attributes that are mass assignable.
      *
@@ -110,11 +108,12 @@ class User extends Authenticatable
     {
         return Attribute::make(
             get: function (mixed $value, mixed $attributes) {
-                if(is_array($attributes)) {
+                if (is_array($attributes)) {
                     return ($attributes['first_name'] ?? '')
-                        . " " .
+                        .' '.
                         ($attributes['last_name'] ?? '');
                 }
+
                 return '';
             }
         );

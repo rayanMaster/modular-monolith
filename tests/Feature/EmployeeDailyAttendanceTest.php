@@ -4,16 +4,12 @@ use App\Models\DailyAttendance;
 use App\Models\User;
 use App\Models\WorkSite;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
-
-uses(RefreshDatabase::class);
 
 describe('DailyAttendance routes check', function () {
     it('should have all routes for /daily_attendance', function () {
@@ -45,10 +41,6 @@ describe('DailyAttendance routes check', function () {
 describe('EmployeeDailyAttendance Create', function () {
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
 
         $this->worker = User::factory()->worker()->create();
         $this->admin = User::factory()->admin()->create();
@@ -165,10 +157,6 @@ describe('EmployeeDailyAttendance Create', function () {
 });
 describe('EmployeeDailyAttendance List', function () {
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
 
         $this->worker = User::factory()->worker()->create();
         $this->admin = User::factory()->admin()->create();

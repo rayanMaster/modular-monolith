@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
@@ -45,13 +43,9 @@ describe('Employee routes check', function () {
 });
 
 describe('Create  Employee', function () {
-    uses(RefreshDatabase::class);
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
+
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
     });
@@ -79,13 +73,9 @@ describe('Create  Employee', function () {
     });
 });
 describe('Update  Employee', function () {
-    uses(RefreshDatabase::class);
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
+
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -110,13 +100,9 @@ describe('Update  Employee', function () {
     });
 });
 describe('Show  Employees list', function () {
-    uses(RefreshDatabase::class);
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
+
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
@@ -145,13 +131,9 @@ describe('Show  Employees list', function () {
     });
 });
 describe('Show  Employee details', function () {
-    uses(RefreshDatabase::class);
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
+
         $this->notAdmin = User::factory()->worker()->create();
         $this->admin = User::factory()->admin()->create();
 
@@ -177,13 +159,9 @@ describe('Show  Employee details', function () {
     });
 });
 describe('Delete Employee', function () {
-    uses(RefreshDatabase::class);
 
     beforeEach(function () {
-        $this->artisan('storage:link');
-        $this->assertDatabaseCount(Role::class, 0);
-        $this->artisan('db:seed');
-        $this->assertDatabaseCount(Role::class, 4);
+
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 

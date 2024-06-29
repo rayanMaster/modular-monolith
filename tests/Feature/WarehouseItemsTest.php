@@ -8,19 +8,13 @@ use App\Models\Warehouse;
 use App\Models\WarehouseItem;
 use App\Models\WorkSite;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 
-uses(RefreshDatabase::class);
-
 describe('Warehouse Items', function () {
     beforeEach(function () {
-
-        $this->artisan('storage:link');
-        $this->artisan('db:seed');
 
         $this->workSite = WorkSite::factory()->create();
         $this->admin = User::factory()->admin()->create();
