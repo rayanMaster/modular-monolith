@@ -39,7 +39,6 @@ describe('Contractor routes check', function () {
     });
 
 });
-
 describe('Create Contractor of workSite Test', function () {
 
     beforeEach(function () {

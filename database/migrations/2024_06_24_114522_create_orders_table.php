@@ -19,7 +19,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(WorkSite::class)->nullable();
             $table->decimal('total_amount', 10, 2)->nullable();
-            $table->tinyInteger('status')->default(OrderStatusEnum::PENDING);
+            $table->tinyInteger('status')->default(OrderStatusEnum::PENDING->value);
             $table->integer('priority')->nullable()->default(OrderPriorityEnum::NORMAL->value);
             $table->foreignIdFor(User::class, 'created_by');
 

@@ -303,7 +303,6 @@ describe('Order Detail', function () {
             'employee_id' => $this->siteManager1->id,
             'work_site_id' => $this->workSite1->id,
             'date' => Carbon::today()->toDateString(),
-
         ]);
 
     });
@@ -348,7 +347,7 @@ describe('Order Detail', function () {
                 ]
             );
     });
-    test('As a worksite manager, I cant see details of my order of others', function () {
+    test('As a worksite manager, I cant see details of order of others', function () {
         $order = Order::factory()->create([
             'status' => OrderStatusEnum::PENDING->value,
             'priority' => OrderPriorityEnum::LOW->value,
@@ -356,8 +355,8 @@ describe('Order Detail', function () {
             'created_by' => $this->siteManager2->id,
         ]);
         $response = actingAs($this->siteManager1)->getJson('api/v1/order/show/' . $order->id);
-        $response->assertStatus(Response::HTTP_OK)
-            ->assertJsonPath('data', []);
+        $response->assertStatus(Response::HTTP_NOT_FOUND)
+            ->assertJsonPath('data', null);
     });
     test('As an admin, I can see details of any order in the system', function () {
         $order = Order::factory()->create([
@@ -366,34 +365,114 @@ describe('Order Detail', function () {
             'work_site_id' => $this->workSite1->id,
             'created_by' => $this->siteManager1->id,
         ]);
+        $orderItem = OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'item_id' => $this->item1->id,
+            'quantity' => 10,
+        ]);
         $response = actingAs($this->admin)->getJson('api/v1/order/show/' . $order->id);
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonPath('data', [
-                [
-                    'id' => $order->id,
-                    'workSite' => $this->workSite1->title,
-                    'total_amount' => number_format($order->total_amount, 2, '.', ''),
-                    'status' => OrderStatusEnum::from($order->status)->name,
-                    'priority' => OrderPriorityEnum::from($order->priority)->name,
-                    'created_by' => $this->siteManager1->fullName,
+                'id' => $order->id,
+                'workSite' => $this->workSite1->title,
+                'order_items' => [
+                    [
+                        'id' => $orderItem->id,
+                        'item' => [
+                            'id' => $this->item1->id,
+                            'name' => $this->item1->name,
+                            'description' => $this->item1->description,
+                            'item_category' => [
+                                'id' => $this->item1->category->id,
+                                'name' => $this->item1->category->name,
+                            ]
+                        ],
+                        'quantity' => 10,
+                        'price' =>  number_format($orderItem->price,2,'.',''),
+                    ]
                 ],
+                'total_amount' => number_format($order->total_amount,2,'.',''),
+                'status' => 'PENDING',
+                'priority' => 'LOW',
+                'created_by' => $this->siteManager1->fullName,
             ]);
     });
 });
 
 describe('Order Status', function () {
-    test('As a worksite manager, I can see the status of the order', function () {
+    beforeEach(function () {
+
+        $this->admin = User::factory()->admin()->create();
+        $this->siteManager1 = User::factory()->siteManager()->create();
+        $this->siteManager2 = User::factory()->siteManager()->create();
+        $this->worker = User::factory()->worker()->create();
+        $this->workSite1 = WorkSite::factory()->create();
+        $this->workSite2 = WorkSite::factory()->create();
+        $this->item1 = Item::factory()->create();
+        $this->item2 = Item::factory()->create();
+
+        $this->storeKeeper = User::factory()->storeKeeper()->create();
+
+        $this->employeeAttendance = DailyAttendance::factory()->create([
+            'employee_id' => $this->siteManager1->id,
+            'work_site_id' => $this->workSite1->id,
+            'date' => Carbon::today()->toDateString(),
+        ]);
+        $this->order = Order::factory()->create([
+            'status' => OrderStatusEnum::PENDING->value,
+        ]);
+
     });
-    test('As a worksite manager, I can update the status of the order to Delivered only', function () {
+    test('As a worksite manager, I can update the status of the order to received to worksite', function () {
+        actingAs($this->siteManager1)->putJson('api/v1/order/update/' . $this->order->id, [
+            'status' => OrderStatusEnum::RECEIVED_TO_WORKSITE->value,
+        ])->assertStatus(Response::HTTP_OK);
     });
-    test('As a store keeper, I can update the status of the order to Received only', function () {
+    test('As a worksite manager, I cant update the status of the order to other than received to worksite only', function () {
+        actingAs($this->siteManager1)->putJson('api/v1/order/update/' . $this->order->id, [
+            'status' => OrderStatusEnum::DELIVERED_TO_WAREHOUSE->value,
+        ])->assertStatus(Response::HTTP_FORBIDDEN);
+    });
+    test('As a store keeper, I can update the status of the order to Delivered to warehouse only', function () {
+        actingAs($this->storeKeeper)->putJson('api/v1/order/update/' . $this->order->id, [
+            'status' => OrderStatusEnum::DELIVERED_TO_WAREHOUSE->value,
+        ])->assertStatus(Response::HTTP_OK);
+    });
+    test('As a store keeper, I cant update the status of the order to other than Delivered to warehouse', function () {
+        actingAs($this->storeKeeper)->putJson('api/v1/order/update/' . $this->order->id, [
+            'status' => OrderStatusEnum::RECEIVED_TO_WORKSITE->value,
+        ])->assertStatus(Response::HTTP_FORBIDDEN);
     });
     test('As an admin, I can update the status of the order to any status', function () {
-    });
-    test('As an admin, I can see the status of the order in the system', function () {
-    });
-    test('As an admin, I should receive notifications with all order statuses in the system', function () {
-    });
-    test('As an worksite manager, I should received notification with my orders status', function () {
+        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+            'status' => OrderStatusEnum::RECEIVED_TO_WORKSITE->value,
+        ])->assertStatus(Response::HTTP_OK);
+        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+            'status' => OrderStatusEnum::PENDING->value,
+        ])->assertStatus(Response::HTTP_OK);
+        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+            'status' => OrderStatusEnum::REJECTED->value,
+        ])->assertStatus(Response::HTTP_OK);
+        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+            'status' => OrderStatusEnum::CANCELLED->value,
+        ])->assertStatus(Response::HTTP_OK);
+        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+            'status' => OrderStatusEnum::ORDERED_FROM_SUPPLIER->value,
+        ])->assertStatus(Response::HTTP_OK);
+        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+            'status' => OrderStatusEnum::CANCELLED_FROM_SUPPLIER->value,
+        ])->assertStatus(Response::HTTP_OK);
+        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+            'status' => OrderStatusEnum::DELIVERED_FROM_SUPPLIER->value,
+        ])->assertStatus(Response::HTTP_OK);
+        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+            'status' => OrderStatusEnum::RECEIVED_TO_WORKSITE->value,
+        ])->assertStatus(Response::HTTP_OK);
+        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+            'status' => OrderStatusEnum::SENT_TO_WAREHOUSE->value,
+        ])->assertStatus(Response::HTTP_OK);
+        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+            'status' => OrderStatusEnum::DELIVERED_TO_WAREHOUSE->value,
+        ])->assertStatus(Response::HTTP_OK);
     });
 });

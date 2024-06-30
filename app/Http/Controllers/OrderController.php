@@ -17,6 +17,7 @@ use Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class OrderController extends Controller
@@ -33,7 +34,8 @@ class OrderController extends Controller
          *     item_id:int,
          *     quantity:int
          *     }>,
-         *     priority:int|null
+         *     priority:int|null,
+         *     status:int|null,
          * } $requestedData
          */
         $requestedData = $request->validated();
@@ -41,6 +43,7 @@ class OrderController extends Controller
             $order = Order::query()->create([
                 'work_site_id' => $requestedData['work_site_id'],
                 'priority' => $requestedData['priority'] ?? OrderPriorityEnum::NORMAL->value,
+                'status' => $requestedData['status'] ?? OrderStatusEnum::PENDING->value,
                 'created_by' => Auth::id(),
             ]);
             $orderItemsData = array_map(function ($item) use ($order) {
@@ -65,11 +68,13 @@ class OrderController extends Controller
     {
         $order = Order::query()->findOrFail($orderId);
         $authUser = Auth::user();
-        if ($authUser && ! $authUser->hasRole('admin') &&
-            $order->status && ! OrderStatusEnum::isAllowedToEditByNonAdmin($order->status)) {
+        if ($authUser && !$authUser->hasRole('admin') &&
+            $order->status && !OrderStatusEnum::isAllowedToEditByNonAdmin($order->status)) {
             throw new OrderEditException('You cannot update an order not in pending approval');
         }
-        DB::transaction(callback: function () use ($request, $order) {
+
+
+        DB::transaction(callback: function () use ($request, $order,$authUser) {
 
             /**
              * @var array{
@@ -85,14 +90,25 @@ class OrderController extends Controller
              */
             $requestedData = $request->validated();
 
+            if ($authUser && $authUser->hasRole('site_manager')
+                && array_key_exists('status', $requestedData)
+                && !OrderStatusEnum::isAllowedToEditBySiteManager($requestedData['status'])) {
+                throw new OrderEditException('You are not allowed to update order status', Response::HTTP_FORBIDDEN);
+            }
+            if ($authUser && $authUser->hasRole('store_keeper')
+                && array_key_exists('status', $requestedData)
+                && !OrderStatusEnum::isAllowedToEditByStoreKeeper($requestedData['status'])) {
+                throw new OrderEditException('You are not allowed to update order status', Response::HTTP_FORBIDDEN);
+            }
+
             $dataToUpdate = array_filter([
                 'priority' => $requestedData['priority'] ?? null,
                 'total_amount' => $requestedData['total_amount'] ?? null,
                 'status' => $requestedData['status'] ?? null,
-            ], fn ($item) => $item != null);
+            ], fn($item) => $item != null);
 
             $order->update($dataToUpdate);
-            if (is_array($requestedData['items']) && count($requestedData['items']) > 0) {
+            if (isset($requestedData['items']) && is_array($requestedData['items']) && count($requestedData['items']) > 0) {
                 $orderItemsToUpdateData = array_map(function ($item) use ($order) {
                     return [
                         'order_id' => $order->id,
@@ -118,7 +134,7 @@ class OrderController extends Controller
     {
         $user = Auth::user();
         $orders = Order::query()
-            ->when(value: $user && ! $user->hasRole('admin'), callback: function (Builder $query) {
+            ->when(value: $user && !$user->hasRole('admin'), callback: function (Builder $query) {
                 return $query->where(column: 'created_by',
                     operator: '=', value: Auth::id());
             })
@@ -129,8 +145,13 @@ class OrderController extends Controller
 
     public function show(int $orderId): JsonResponse
     {
+        $user = Auth::user();
         $order = Order::query()
-            ->with(['orderCreatedBy','orderItems'])
+            ->when(value: $user && !$user->hasRole('admin'), callback: function (Builder $query) {
+                return $query->where(column: 'created_by',
+                    operator: '=', value: Auth::id());
+            })
+            ->with(['orderCreatedBy', 'orderItems.itemDetails'])
             ->findOrFail($orderId);
         return ApiResponseHelper::sendSuccessResponse(new Result(OrderDetailsResource::make($order)));
     }

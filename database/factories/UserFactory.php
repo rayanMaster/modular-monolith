@@ -52,6 +52,12 @@ class UserFactory extends Factory
             return $user->assignRole('site_manager');
         });
     }
+    public function storeKeeper(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            return $user->assignRole('store_keeper');
+        });
+    }
 
     public function worker(): static
     {

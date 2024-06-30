@@ -148,7 +148,7 @@ describe('Show  Employee details', function () {
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return error if employee not existed', function () {
-        $nonExistedWorker = rand(100, 200);
+        $nonExistedWorker = rand(1000, 2000);
         $response = actingAs($this->admin)->getJson('/api/v1/employee/show/'.$nonExistedWorker);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });

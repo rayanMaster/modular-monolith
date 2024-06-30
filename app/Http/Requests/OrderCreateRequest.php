@@ -28,6 +28,7 @@ class OrderCreateRequest extends FormRequest
             'items.*.item_id' => ['required', 'exists:items,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'priority' => ['sometimes', 'integer'],
+            'status' => ['sometimes', 'integer'],
         ];
     }
 }
