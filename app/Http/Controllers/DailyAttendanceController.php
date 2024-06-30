@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\DailyAttendanceCreateDTO;
-use App\DTO\DailyAttendanceListDTO;
 use App\Exceptions\InvalidSubWorkSiteAttendanceException;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
@@ -15,6 +13,7 @@ use App\Models\User;
 use App\Models\WorkSite;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
+use Symfony\Component\HttpFoundation\Response;
 
 class DailyAttendanceController extends Controller
 {
@@ -25,7 +24,6 @@ class DailyAttendanceController extends Controller
     {
 
         /** @var array{
-         *     employee_id : int | null,
          *     work_site_id : int,
          *     date_from : string | null,
          *     date_to : string | null
@@ -34,15 +32,14 @@ class DailyAttendanceController extends Controller
         $requestedData = $request->validated();
         User::query()->findOrFail($employeeId);
 
-        $dataFromRequest = DailyAttendanceCreateDTO::fromRequest($requestedData, $employeeId);
-        $dateFrom = $dataFromRequest->dateFrom ?? Carbon::today();
-        $dateTo = $dataFromRequest->dateTo ?? Carbon::today();
+        $dateFrom = $requestedData['date_from'] ?? Carbon::today();
+        $dateTo = $requestedData['date_to'] ?? Carbon::today();
 
         $alreadyHasDailyAttendance = DailyAttendance::query()
             ->where(
                 column: 'employee_id',
                 operator: '=',
-                value: $dataFromRequest->employeeId)
+                value: $employeeId)
             ->whereDate(column: 'date',
                 operator: '>=',
                 value: $dateFrom)
@@ -51,20 +48,22 @@ class DailyAttendanceController extends Controller
                 value: $dateTo)
             ->exists();
         if ($alreadyHasDailyAttendance) {
-            throw new InvalidSubWorkSiteAttendanceException('You already have a daily attendance for a work site');
+            throw new InvalidSubWorkSiteAttendanceException('You already have a daily attendance for a work site', Response::HTTP_FORBIDDEN);
         }
-        $workSite = WorkSite::query()->findOrFail($dataFromRequest->workSiteId);
+        $workSite = WorkSite::query()->findOrFail($requestedData['work_site_id']);
+
         // test if work site is a sub-worksite
         if ($workSite->parent_work_site_id != null) {
-            throw new InvalidSubWorkSiteAttendanceException('Cant Assign employee to work site');
+            throw new InvalidSubWorkSiteAttendanceException('Cant Assign employee to work site', Response::HTTP_FORBIDDEN);
         }
 
         $dates = $this->getDates($dateFrom, $dateTo);
         $dataToSave = [];
+
         foreach ($dates as $date) {
             $dataToSave[] = [
-                'employee_id' => $dataFromRequest->employeeId,
-                'work_site_id' => $dataFromRequest->workSiteId,
+                'employee_id' => $employeeId,
+                'work_site_id' => $requestedData['work_site_id'],
                 'date' => $date,
             ];
         }
@@ -86,14 +85,14 @@ class DailyAttendanceController extends Controller
 
         User::query()->findOrFail($employeeId);
 
-        $dataFromRequest = DailyAttendanceListDTO::fromRequest($requestedData, $employeeId);
-        $dateFrom = $dataFromRequest->dateFrom ?? Carbon::today();
-        $dateTo = $dataFromRequest->dateTo ?? Carbon::today();
+        $dateFrom = $requestedData['date_from'] ?? Carbon::today();
+        $dateTo = $requestedData['date_to'] ?? Carbon::today();
+
         $result = DailyAttendance::query()
             ->where(
                 column: 'employee_id',
                 operator: '=',
-                value: $dataFromRequest->employeeId)
+                value: $requestedData['employee_id'] ?? $employeeId)
             ->whereDate(column: 'date',
                 operator: '>=',
                 value: $dateFrom)

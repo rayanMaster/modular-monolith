@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\PaymentCreateDTO;
-use App\DTO\PaymentListDTO;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
 use App\Http\Requests\PaymentCreateRequest;
@@ -28,7 +26,6 @@ class WorkSitePaymentController extends Controller
          */
         $requestedData = $request->validated();
 
-        $filteredData = PaymentListDTO::fromRequest($requestedData);
         $payments = Payment::query()->where(
             column: 'payable_id',
             operator: '=',
@@ -40,17 +37,18 @@ class WorkSitePaymentController extends Controller
                 value: WorkSite::class
             )
             ->when(
-                value: $filteredData->dateFrom && $filteredData->dateTo,
-                callback: function (Builder $builder) use ($filteredData) {
+                value: $requestedData['date_from'] &&
+                $requestedData['date_to'],
+                callback: function (Builder $builder) use ($requestedData) {
                     $builder->whereDate(
                         column: 'payment_date',
                         operator: '>=',
-                        value: $filteredData->dateFrom
+                        value: $requestedData['date_from'] ?? null
                     )
                         ->whereDate(
                             column: 'payment_date',
                             operator: '<=',
-                            value: $filteredData->dateTo);
+                            value: $requestedData['date_to'] ?? null);
                 })
             ->get();
 
@@ -69,12 +67,12 @@ class WorkSitePaymentController extends Controller
          *  payable_id : int|null,
          *  payable_type :string|null,
          *  payment_date :string,
-         *  payment_amount :int,
+         *  amount :float,
          *  payment_type :int|null,
          * } $requestedData
          */
         $requestedData = $request->validated();
-        $workSite->payments()->create(PaymentCreateDTO::fromRequest($requestedData)->toArray());
+        $workSite->payments()->create($requestedData);
 
         return ApiResponseHelper::sendSuccessResponse();
     }

@@ -36,7 +36,7 @@ describe('Create Payment for a Worksite', function () {
     test('As an administrator, I want to make payment to workSite', function () {
 
         $response = actingAs($this->admin)->postJson('/api/v1/workSite/'.$this->workSite->id.'/payment/create', [
-            'payment_amount' => 3000,
+            'amount' => 3000,
             'payment_type' => PaymentTypesEnum::CASH->value,
             'payment_date' => '2024-04-12 10:34',
             'payable_id' => $this->workSite->id,

@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\WorkSiteCreateDTO;
-use App\DTO\WorkSiteUpdateDTO;
 use App\Enums\PaymentTypesEnum;
 use App\Enums\WorkSiteCompletionStatusEnum;
 use App\Exceptions\UnAbleToCloseWorkSiteException;
@@ -21,6 +19,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Drivers\Gd\Driver;
+use Throwable;
 
 class WorkSiteController extends Controller
 {
@@ -34,7 +33,7 @@ class WorkSiteController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function store(WorkSiteCreateRequest $request): JsonResponse
     {
@@ -71,31 +70,30 @@ class WorkSiteController extends Controller
                  *  } $requestedData
                  */
                 $requestedData = $request->validated();
-                $data = WorkSiteCreateDTO::fromRequest($requestedData);
+                $dataToSave = array_filter([
+                    'title' => $requestedData['title'],
+                    'description' => $requestedData['description'],
+                    'customer_id' => $requestedData['customer_id'] ?? null,
+                    'category_id' => $requestedData['category_id'] ?? null,
+                    'contractor_id' => $requestedData['contractor_id'] ?? null,
+                    'parent_work_site_id' => $requestedData['parent_work_site_id'] ?? null,
+                    'starting_budget' => $requestedData['starting_budget'] ?? null,
+                    'cost' => $requestedData['cost'] ?? null,
+                    'address_id' => $requestedData['address_id'] ?? null,
+                    'workers_count' => $requestedData['workers_count'] ?? null,
+                    'receipt_date' => $requestedData['receipt_date'] ?? null,
+                    'starting_date' => $requestedData['starting_date'] ?? null,
+                    'deliver_date' => $requestedData['deliver_date'] ?? null,
+                    'reception_status' => $requestedData['reception_status'] ?? null,
+                    'completion_status' => $requestedData['completion_status'] ?? null,
+                ], fn ($value) => $value != null);
 
-                $workSiteData = [
-                    'title' => $data->title,
-                    'description' => $data->description,
-                    'customer_id' => $data->customerId,
-                    'category_id' => $data->categoryId,
-                    'contractor_id' => $data->contractorId,
-                    'parent_work_site_id' => $data->parentWorksiteId,
-                    'starting_budget' => $data->startingBudget,
-                    'cost' => $data->cost,
-                    'address_id' => $data->addressId,
-                    'workers_count' => $data->workersCount,
-                    'receipt_date' => $data->receiptDate,
-                    'starting_date' => $data->startingDate,
-                    'deliver_date' => $data->deliverDate,
-                    'reception_status' => $data->receptionStatus,
-                    'completion_status' => $data->completionStatus,
-                ];
-
-                $workSite = WorkSite::query()->create($workSiteData);
+                $workSite = WorkSite::query()->create($dataToSave);
 
                 $resourcesData = [];
-                if (is_array($data->workSiteItems) && count($data->workSiteItems) > 0) {
-                    foreach ($data->workSiteItems as $resource) {
+                if (array_key_exists('items', $requestedData) &&
+                    is_array($requestedData['items']) && count($requestedData['items']) > 0) {
+                    foreach ($requestedData['items'] as $resource) {
                         if (is_array($resource)) {
                             $item = [
                                 'quantity' => $resource['quantity'],
@@ -107,8 +105,9 @@ class WorkSiteController extends Controller
                 }
                 $workSite->items()->syncWithoutDetaching($resourcesData);
                 $paymentData = [];
-                if (is_array($data->payments) && count($data->payments) > 0) {
-                    foreach ($data->payments as $payment) {
+                if (array_key_exists('payments', $requestedData) &&
+                    is_array($requestedData['payments']) && count($requestedData['payments']) > 0) {
+                    foreach ($requestedData['payments'] as $payment) {
                         if (is_array($payment)) {
                             $item = [
                                 'amount' => $payment['payment_amount'],
@@ -166,7 +165,7 @@ class WorkSiteController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function update(WorkSiteUpdateRequest $request, int $id): JsonResponse
     {
@@ -205,23 +204,25 @@ class WorkSiteController extends Controller
                 $requestedData = $request->validated();
                 $workSite = WorkSite::query()->findOrFail($id);
 
-                $data = WorkSiteUpdateDTO::fromRequest($requestedData);
+                $dataToSave = array_filter([
+                    'title' => $requestedData['title'] ?? null,
+                    'description' => $requestedData['description'] ?? null,
+                    'customer_id' => $requestedData['customer_id'] ?? null,
+                    'category_id' => $requestedData['category_id'] ?? null,
+                    'contractor_id' => $requestedData['contractor_id'] ?? null,
+                    'parent_work_site_id' => $requestedData['parent_work_site_id'] ?? null,
+                    'starting_budget' => $requestedData['starting_budget'] ?? null,
+                    'cost' => $requestedData['cost'] ?? null,
+                    'address_id' => $requestedData['address_id'] ?? null,
+                    'workers_count' => $requestedData['workers_count'] ?? null,
+                    'receipt_date' => $requestedData['receipt_date'] ?? null,
+                    'starting_date' => $requestedData['starting_date'] ?? null,
+                    'deliver_date' => $requestedData['deliver_date'] ?? null,
+                    'reception_status' => $requestedData['reception_status'] ?? null,
+                    'completion_status' => $requestedData['completion_status'] ?? null,
+                ], fn ($value) => $value != null);
 
-                $workSite->update([
-                    'title' => $data->title,
-                    'description' => $data->description,
-                    'customer_id' => $data->customerId,
-                    'category_id' => $data->categoryId,
-                    'parent_work_site_id' => $data->parentWorkSiteId,
-                    'starting_budget' => $data->startingBudget,
-                    'cost' => $data->cost,
-                    'address_id' => $data->addressId,
-                    'workers_count' => $data->workersCount,
-                    'receipt_date' => $data->receiptDate,
-                    'starting_date' => $data->startingDate,
-                    'deliver_date' => $data->deliverDate,
-                    'reception_status' => $data->receptionStatus,
-                ]);
+                $workSite->update($dataToSave);
 
             },
             attempts: 3);
@@ -262,7 +263,7 @@ class WorkSiteController extends Controller
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function assignContractor(int $workSiteId, int $contractorId): JsonResponse
     {

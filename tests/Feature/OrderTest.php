@@ -134,7 +134,7 @@ describe('Order Update', function () {
             'item_id' => $this->item1->id,
             'quantity' => 10,
         ]);
-        $response = actingAs($this->siteManager)->putJson('api/v1/order/update/' . $order->id, [
+        $response = actingAs($this->siteManager)->putJson('api/v1/order/update/'.$order->id, [
             'items' => [
                 [
 
@@ -159,7 +159,7 @@ describe('Order Update', function () {
             'item_id' => $this->item1->id,
             'quantity' => 10,
         ]);
-        $response = actingAs($this->siteManager)->putJson('api/v1/order/update/' . $order->id, [
+        $response = actingAs($this->siteManager)->putJson('api/v1/order/update/'.$order->id, [
             'items' => [
                 [
 
@@ -188,7 +188,7 @@ describe('Order Update', function () {
             'item_id' => $this->item1->id,
             'quantity' => 10,
         ]);
-        $response = actingAs($this->admin)->putJson('api/v1/order/update/' . $order->id, [
+        $response = actingAs($this->admin)->putJson('api/v1/order/update/'.$order->id, [
             'items' => [
                 [
 
@@ -318,32 +318,32 @@ describe('Order Detail', function () {
             'item_id' => $this->item1->id,
             'quantity' => 10,
         ]);
-        $response = actingAs($this->siteManager1)->getJson('api/v1/order/show/' . $order->id);
+        $response = actingAs($this->siteManager1)->getJson('api/v1/order/show/'.$order->id);
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment(
                 [
-                        'id' => $order->id,
-                        'workSite' => $this->workSite1->title,
-                        'order_items' => [
-                            [
-                                'id' => $orderItem->id,
-                                'item' => [
-                                    'id' => $this->item1->id,
-                                    'name' => $this->item1->name,
-                                    'description' => $this->item1->description,
-                                    'item_category' => [
-                                        'id' => $this->item1->category->id,
-                                        'name' => $this->item1->category->name,
-                                    ]
+                    'id' => $order->id,
+                    'workSite' => $this->workSite1->title,
+                    'order_items' => [
+                        [
+                            'id' => $orderItem->id,
+                            'item' => [
+                                'id' => $this->item1->id,
+                                'name' => $this->item1->name,
+                                'description' => $this->item1->description,
+                                'item_category' => [
+                                    'id' => $this->item1->category->id,
+                                    'name' => $this->item1->category->name,
                                 ],
-                                'quantity' => 10,
-                                'price' =>  number_format($orderItem->price,2,'.',''),
-                            ]
+                            ],
+                            'quantity' => 10,
+                            'price' => number_format($orderItem->price, 2, '.', ''),
                         ],
-                        'total_amount' => number_format($order->total_amount,2,'.',''),
-                        'status' => 'PENDING',
-                        'priority' => 'LOW',
-                        'created_by' => $this->siteManager1->fullName,
+                    ],
+                    'total_amount' => number_format($order->total_amount, 2, '.', ''),
+                    'status' => 'PENDING',
+                    'priority' => 'LOW',
+                    'created_by' => $this->siteManager1->fullName,
                 ]
             );
     });
@@ -354,7 +354,7 @@ describe('Order Detail', function () {
             'work_site_id' => $this->workSite1->id,
             'created_by' => $this->siteManager2->id,
         ]);
-        $response = actingAs($this->siteManager1)->getJson('api/v1/order/show/' . $order->id);
+        $response = actingAs($this->siteManager1)->getJson('api/v1/order/show/'.$order->id);
         $response->assertStatus(Response::HTTP_NOT_FOUND)
             ->assertJsonPath('data', null);
     });
@@ -370,7 +370,7 @@ describe('Order Detail', function () {
             'item_id' => $this->item1->id,
             'quantity' => 10,
         ]);
-        $response = actingAs($this->admin)->getJson('api/v1/order/show/' . $order->id);
+        $response = actingAs($this->admin)->getJson('api/v1/order/show/'.$order->id);
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonPath('data', [
                 'id' => $order->id,
@@ -385,13 +385,13 @@ describe('Order Detail', function () {
                             'item_category' => [
                                 'id' => $this->item1->category->id,
                                 'name' => $this->item1->category->name,
-                            ]
+                            ],
                         ],
                         'quantity' => 10,
-                        'price' =>  number_format($orderItem->price,2,'.',''),
-                    ]
+                        'price' => number_format($orderItem->price, 2, '.', ''),
+                    ],
                 ],
-                'total_amount' => number_format($order->total_amount,2,'.',''),
+                'total_amount' => number_format($order->total_amount, 2, '.', ''),
                 'status' => 'PENDING',
                 'priority' => 'LOW',
                 'created_by' => $this->siteManager1->fullName,
@@ -424,54 +424,54 @@ describe('Order Status', function () {
 
     });
     test('As a worksite manager, I can update the status of the order to received to worksite', function () {
-        actingAs($this->siteManager1)->putJson('api/v1/order/update/' . $this->order->id, [
+        actingAs($this->siteManager1)->putJson('api/v1/order/update/'.$this->order->id, [
             'status' => OrderStatusEnum::RECEIVED_TO_WORKSITE->value,
         ])->assertStatus(Response::HTTP_OK);
     });
     test('As a worksite manager, I cant update the status of the order to other than received to worksite only', function () {
-        actingAs($this->siteManager1)->putJson('api/v1/order/update/' . $this->order->id, [
+        actingAs($this->siteManager1)->putJson('api/v1/order/update/'.$this->order->id, [
             'status' => OrderStatusEnum::DELIVERED_TO_WAREHOUSE->value,
         ])->assertStatus(Response::HTTP_FORBIDDEN);
     });
     test('As a store keeper, I can update the status of the order to Delivered to warehouse only', function () {
-        actingAs($this->storeKeeper)->putJson('api/v1/order/update/' . $this->order->id, [
+        actingAs($this->storeKeeper)->putJson('api/v1/order/update/'.$this->order->id, [
             'status' => OrderStatusEnum::DELIVERED_TO_WAREHOUSE->value,
         ])->assertStatus(Response::HTTP_OK);
     });
     test('As a store keeper, I cant update the status of the order to other than Delivered to warehouse', function () {
-        actingAs($this->storeKeeper)->putJson('api/v1/order/update/' . $this->order->id, [
+        actingAs($this->storeKeeper)->putJson('api/v1/order/update/'.$this->order->id, [
             'status' => OrderStatusEnum::RECEIVED_TO_WORKSITE->value,
         ])->assertStatus(Response::HTTP_FORBIDDEN);
     });
     test('As an admin, I can update the status of the order to any status', function () {
-        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+        actingAs($this->admin)->putJson('api/v1/order/update/'.$this->order->id, [
             'status' => OrderStatusEnum::RECEIVED_TO_WORKSITE->value,
         ])->assertStatus(Response::HTTP_OK);
-        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+        actingAs($this->admin)->putJson('api/v1/order/update/'.$this->order->id, [
             'status' => OrderStatusEnum::PENDING->value,
         ])->assertStatus(Response::HTTP_OK);
-        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+        actingAs($this->admin)->putJson('api/v1/order/update/'.$this->order->id, [
             'status' => OrderStatusEnum::REJECTED->value,
         ])->assertStatus(Response::HTTP_OK);
-        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+        actingAs($this->admin)->putJson('api/v1/order/update/'.$this->order->id, [
             'status' => OrderStatusEnum::CANCELLED->value,
         ])->assertStatus(Response::HTTP_OK);
-        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+        actingAs($this->admin)->putJson('api/v1/order/update/'.$this->order->id, [
             'status' => OrderStatusEnum::ORDERED_FROM_SUPPLIER->value,
         ])->assertStatus(Response::HTTP_OK);
-        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+        actingAs($this->admin)->putJson('api/v1/order/update/'.$this->order->id, [
             'status' => OrderStatusEnum::CANCELLED_FROM_SUPPLIER->value,
         ])->assertStatus(Response::HTTP_OK);
-        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+        actingAs($this->admin)->putJson('api/v1/order/update/'.$this->order->id, [
             'status' => OrderStatusEnum::DELIVERED_FROM_SUPPLIER->value,
         ])->assertStatus(Response::HTTP_OK);
-        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+        actingAs($this->admin)->putJson('api/v1/order/update/'.$this->order->id, [
             'status' => OrderStatusEnum::RECEIVED_TO_WORKSITE->value,
         ])->assertStatus(Response::HTTP_OK);
-        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+        actingAs($this->admin)->putJson('api/v1/order/update/'.$this->order->id, [
             'status' => OrderStatusEnum::SENT_TO_WAREHOUSE->value,
         ])->assertStatus(Response::HTTP_OK);
-        actingAs($this->admin)->putJson('api/v1/order/update/' . $this->order->id, [
+        actingAs($this->admin)->putJson('api/v1/order/update/'.$this->order->id, [
             'status' => OrderStatusEnum::DELIVERED_TO_WAREHOUSE->value,
         ])->assertStatus(Response::HTTP_OK);
     });

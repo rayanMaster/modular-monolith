@@ -22,13 +22,19 @@ enum OrderStatusEnum: int
 
     public static function isAllowedToEditBySiteManager(int $updateStatus): bool
     {
-        if ($updateStatus == self::RECEIVED_TO_WORKSITE->value) return true;
+        if ($updateStatus == self::RECEIVED_TO_WORKSITE->value) {
+            return true;
+        }
+
         return false;
     }
 
     public static function isAllowedToEditByStoreKeeper(int $updateStatus): bool
     {
-        if ($updateStatus == self::DELIVERED_TO_WAREHOUSE->value) return true;
+        if ($updateStatus == self::DELIVERED_TO_WAREHOUSE->value) {
+            return true;
+        }
+
         return false;
     }
 }

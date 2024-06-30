@@ -49,7 +49,6 @@ class CustomerController extends Controller
     public function destroy(int $id): void
     {
 
-        \DB::enableQueryLog();
         $customer = Customer::query()->findOrFail($id);
 
         $relatedWorkSite = $customer->whereHas('workSite', function ($query) {

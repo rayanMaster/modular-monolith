@@ -68,13 +68,12 @@ class OrderController extends Controller
     {
         $order = Order::query()->findOrFail($orderId);
         $authUser = Auth::user();
-        if ($authUser && !$authUser->hasRole('admin') &&
-            $order->status && !OrderStatusEnum::isAllowedToEditByNonAdmin($order->status)) {
+        if ($authUser && ! $authUser->hasRole('admin') &&
+            $order->status && ! OrderStatusEnum::isAllowedToEditByNonAdmin($order->status)) {
             throw new OrderEditException('You cannot update an order not in pending approval');
         }
 
-
-        DB::transaction(callback: function () use ($request, $order,$authUser) {
+        DB::transaction(callback: function () use ($request, $order, $authUser) {
 
             /**
              * @var array{
@@ -92,12 +91,14 @@ class OrderController extends Controller
 
             if ($authUser && $authUser->hasRole('site_manager')
                 && array_key_exists('status', $requestedData)
-                && !OrderStatusEnum::isAllowedToEditBySiteManager($requestedData['status'])) {
+                && $requestedData['status']
+                && ! OrderStatusEnum::isAllowedToEditBySiteManager($requestedData['status'])) {
                 throw new OrderEditException('You are not allowed to update order status', Response::HTTP_FORBIDDEN);
             }
             if ($authUser && $authUser->hasRole('store_keeper')
                 && array_key_exists('status', $requestedData)
-                && !OrderStatusEnum::isAllowedToEditByStoreKeeper($requestedData['status'])) {
+                && $requestedData['status']
+                && ! OrderStatusEnum::isAllowedToEditByStoreKeeper($requestedData['status'])) {
                 throw new OrderEditException('You are not allowed to update order status', Response::HTTP_FORBIDDEN);
             }
 
@@ -105,10 +106,11 @@ class OrderController extends Controller
                 'priority' => $requestedData['priority'] ?? null,
                 'total_amount' => $requestedData['total_amount'] ?? null,
                 'status' => $requestedData['status'] ?? null,
-            ], fn($item) => $item != null);
+            ], fn ($item) => $item != null);
 
             $order->update($dataToUpdate);
-            if (isset($requestedData['items']) && is_array($requestedData['items']) && count($requestedData['items']) > 0) {
+            if (isset($requestedData['items']) &&
+                count($requestedData['items']) > 0) {
                 $orderItemsToUpdateData = array_map(function ($item) use ($order) {
                     return [
                         'order_id' => $order->id,
@@ -134,7 +136,7 @@ class OrderController extends Controller
     {
         $user = Auth::user();
         $orders = Order::query()
-            ->when(value: $user && !$user->hasRole('admin'), callback: function (Builder $query) {
+            ->when(value: $user && ! $user->hasRole('admin'), callback: function (Builder $query) {
                 return $query->where(column: 'created_by',
                     operator: '=', value: Auth::id());
             })
@@ -147,12 +149,13 @@ class OrderController extends Controller
     {
         $user = Auth::user();
         $order = Order::query()
-            ->when(value: $user && !$user->hasRole('admin'), callback: function (Builder $query) {
+            ->when(value: $user && ! $user->hasRole('admin'), callback: function (Builder $query) {
                 return $query->where(column: 'created_by',
                     operator: '=', value: Auth::id());
             })
             ->with(['orderCreatedBy', 'orderItems.itemDetails'])
             ->findOrFail($orderId);
+
         return ApiResponseHelper::sendSuccessResponse(new Result(OrderDetailsResource::make($order)));
     }
 }

@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\WorkerCreateDTO;
-use App\DTO\WorkerUpdateDTO;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
 use App\Http\Requests\EmployeeCreateRequest;
@@ -12,6 +10,7 @@ use App\Http\Resources\EmployeeDetailsResource;
 use App\Http\Resources\EmployeeListResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Throwable;
 
 class EmployeeController extends Controller
 {
@@ -29,23 +28,24 @@ class EmployeeController extends Controller
          *     first_name:string,
          *     last_name:string|null,
          *     phone:string,
-         *     password:string,
+         *     password:string|null,
          * } $requestedData
          */
         $requestedData = $request->validated();
-        $toSave = WorkerCreateDTO::fromRequest($requestedData);
-        User::query()->create([
-            'first_name' => $toSave->firstName,
-            'last_name' => $toSave->lastName,
-            'phone' => $toSave->phone,
-            'password' => $toSave->password,
-        ]);
+        $dataToSave = array_filter([
+            'first_name' => $requestedData['first_name'],
+            'last_name' => $requestedData['last_name'] ?? null,
+            'phone' => $requestedData['phone'],
+            'password' => $requestedData['password'] ?? '123456',
+        ], fn ($value) => $value != null);
+
+        User::query()->create($dataToSave);
 
         return ApiResponseHelper::sendSuccessResponse();
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function update(EmployeeUpdateRequest $request, int $workerId): JsonResponse
     {
@@ -58,10 +58,14 @@ class EmployeeController extends Controller
          */
         $requestedData = $request->validated();
         $worker = User::query()->findOrFail($workerId);
-        $toUpdate = WorkerUpdateDTO::fromRequest($requestedData);
-        $worker->update([
-            'first_name' => $toUpdate->firstName,
-        ]);
+
+        $dataToSave = array_filter([
+            'first_name' => $requestedData['first_name'] ?? null,
+            'last_name' => $requestedData['last_name'] ?? null,
+            'phone' => $requestedData['phone'] ?? null,
+        ], fn ($value) => $value != null);
+
+        $worker->update($dataToSave);
 
         return ApiResponseHelper::sendSuccessResponse();
     }
