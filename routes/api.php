@@ -246,8 +246,11 @@ Route::prefix('v1')->group(function () {
                 Route::post('create', [DailyAttendanceController::class, 'store'])
                     ->middleware('can:employee-attendance-add')
                     ->name('employee.dailyAttendance.add');
-            });
-            Route::group(['prefix' => '{employeeId}/daily_attendance'], function () {
+
+                Route::put('update/{dailyAttendanceId}', [DailyAttendanceController::class, 'update'])
+                    ->middleware('can:employee-attendance-update')
+                    ->name('employee.dailyAttendance.update');
+
                 Route::get('list', [DailyAttendanceController::class, 'list'])
                     ->middleware('can:employee-attendance-list')
                     ->name('employee.dailyAttendance.list');

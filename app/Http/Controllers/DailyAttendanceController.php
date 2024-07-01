@@ -7,6 +7,7 @@ use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
 use App\Http\Requests\DailyAttendanceCreateRequest;
 use App\Http\Requests\DailyAttendanceListRequest;
+use App\Http\Requests\DailyAttendanceUpdateRequest;
 use App\Http\Resources\DailyAttendanceListResource;
 use App\Models\DailyAttendance;
 use App\Models\User;
@@ -69,6 +70,74 @@ class DailyAttendanceController extends Controller
         }
 
         DailyAttendance::query()->insert($dataToSave);
+
+        return ApiResponseHelper::sendSuccessResponse();
+    }
+
+    /**
+     * @throws InvalidSubWorkSiteAttendanceException
+     */
+    public function update(int $employeeId, DailyAttendanceUpdateRequest $request): JsonResponse
+    {
+
+        /** @var array{
+         *     work_site_id : int|null,
+         *     date_from : string,
+         *     date_to : string
+         * } $requestedData
+         */
+        $requestedData = $request->validated();
+        User::query()->findOrFail($employeeId);
+
+        $dateFrom = $requestedData['date_from'];
+        $dateTo = $requestedData['date_to'];
+
+        $alreadyHasDailyAttendance = DailyAttendance::query()
+            ->where(
+                column: 'employee_id',
+                operator: '=',
+                value: $employeeId)
+            ->whereDate(column: 'date',
+                operator: '>=',
+                value: $dateFrom)
+            ->whereDate(column: 'date',
+                operator: '<=',
+                value: $dateTo)
+            ->exists();
+        if ($alreadyHasDailyAttendance) {
+            throw new InvalidSubWorkSiteAttendanceException('You already have a daily attendance for a work site', Response::HTTP_FORBIDDEN);
+        }
+
+        $dates = $this->getDates($dateFrom, $dateTo);
+        if (!isset($requestedData['work_site_id'])) {
+            foreach ($dates as $date) {
+                DailyAttendance::query()
+                    ->where(column: 'employee_id', operator: '=', value: $employeeId)
+                    ->whereDate(column: 'date', operator: '=', value: $date)
+                    ->delete();
+            }
+        } else {
+
+            $dataToSave = [];
+            foreach ($dates as $date) {
+                $dataToSave[] = [
+                    'employee_id' => $employeeId,
+                    'work_site_id' => $requestedData['work_site_id'] ?? null,
+                    'date' => $date,
+                ];
+            }
+            $workSite = WorkSite::query()->findOrFail($requestedData['work_site_id']);
+
+            // test if work site is a sub-worksite
+            if ($workSite->parent_work_site_id != null) {
+                throw new InvalidSubWorkSiteAttendanceException('Cant Assign employee to work site', Response::HTTP_FORBIDDEN);
+            }
+
+            DailyAttendance::query()->upsert(
+                values: $dataToSave,
+                uniqueBy: ['employee_id', 'work_site_id'],
+                update: ['date', 'work_site_id']);
+        }
 
         return ApiResponseHelper::sendSuccessResponse();
     }

@@ -79,6 +79,7 @@ class PermissionsSeeder extends Seeder
                 'update',
                 'delete',
                 'attendance-add',
+                'attendance-update',
                 'attendance-list',
             ]);
 

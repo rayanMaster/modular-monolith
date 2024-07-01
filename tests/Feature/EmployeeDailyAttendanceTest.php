@@ -162,32 +162,49 @@ describe('EmployeeDailyAttendance Update', function () {
 
         $this->worker = User::factory()->worker()->create();
         $this->admin = User::factory()->admin()->create();
-        $this->workSite = WorkSite::factory()->create();
+        $this->workSite1 = WorkSite::factory()->create();
+        $this->workSite2 = WorkSite::factory()->create();
         $this->subWorkSite = WorkSite::factory()->create([
-            'parent_work_site_id' => $this->workSite->id,
+            'parent_work_site_id' => $this->workSite1->id,
         ]);
         $this->employeeAttendance = DailyAttendance::factory()->create([
-            'work_site_id' => $this->workSite->id,
+            'work_site_id' => $this->workSite1->id,
             'employee_id' => $this->worker->id,
-            'date' => Carbon::today()->format('Y-m-d'),
+            'date' => '2024-08-01',
         ]);
     });
 
     it('should update attendance for an employee', function () {
         $response = actingAs($this->admin)
-            ->postJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/update/'.$this->employeeAttendance->id, [
-                'work_site_id' => $this->workSite->id,
-                'date' => '2024-08-01',
+            ->putJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/update/'.$this->employeeAttendance->id, [
+                'work_site_id' => $this->workSite2->id,
+                'date_from' => '2024-08-02',
+                'date_to' => '2024-08-02',
             ]);
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(DailyAttendance::class,
             [
                 'employee_id' => $this->worker->id,
-                'date' => '2024-08-01',
-                'work_site_id' => $this->workSite->id,
+                'date' => '2024-08-02',
+                'work_site_id' => $this->workSite2->id,
             ],
         );
     });
+    it('should remove attendance to any worksite for this employee in date range', function () {
+        $response = actingAs($this->admin)
+            ->putJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/update/'.$this->employeeAttendance->id, [
+                'date_from' => '2024-08-02',
+                'date_to' => '2024-08-02',
+            ]);
+        $response->assertStatus(Response::HTTP_OK);
+        assertDatabaseMissing(DailyAttendance::class,
+            [
+                'employee_id' => $this->worker->id,
+                'date' => '2024-08-02',
+                'work_site_id' => $this->workSite1->id,
+            ],
+        );
+    })->only();
     it('should prevent assigning an employee to same or multiple workSites in a same day', function () {
         $otherWorkSite = WorkSite::factory()->create();
 
@@ -247,7 +264,7 @@ describe('EmployeeDailyAttendance Update', function () {
             'work_site_id' => $otherWorkSite->id,
         ]);
     });
-})->skip();
+});
 describe('EmployeeDailyAttendance List', function () {
     beforeEach(function () {
 

@@ -156,7 +156,7 @@ describe('Warehouse Details Test', function () {
 
     });
     it('should return not found error if warehouse nof found', function () {
-        $unExistedWarehouseId = rand(22, 33);
+        $unExistedWarehouseId = rand(2222, 3333);
         actingAs($this->admin)->getJson('/api/v1/warehouse/show/'.$unExistedWarehouseId)
             ->assertStatus(Response::HTTP_NOT_FOUND);
     });
