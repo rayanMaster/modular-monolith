@@ -18,6 +18,7 @@ describe('DailyAttendance routes check', function () {
         $expectedRouteNames = [
             'employee.dailyAttendance.add',
             'employee.dailyAttendance.list',
+            'employee.dailyAttendance.update',
         ];
 
         // Collect routes and filter based on the prefix

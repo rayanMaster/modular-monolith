@@ -109,7 +109,7 @@ class DailyAttendanceController extends Controller
         }
 
         $dates = $this->getDates($dateFrom, $dateTo);
-        if (!isset($requestedData['work_site_id'])) {
+        if (! isset($requestedData['work_site_id'])) {
             foreach ($dates as $date) {
                 DailyAttendance::query()
                     ->where(column: 'employee_id', operator: '=', value: $employeeId)
@@ -122,7 +122,7 @@ class DailyAttendanceController extends Controller
             foreach ($dates as $date) {
                 $dataToSave[] = [
                     'employee_id' => $employeeId,
-                    'work_site_id' => $requestedData['work_site_id'] ?? null,
+                    'work_site_id' => $requestedData['work_site_id'],
                     'date' => $date,
                 ];
             }
