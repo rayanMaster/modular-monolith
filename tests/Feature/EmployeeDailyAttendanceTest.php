@@ -38,7 +38,6 @@ describe('DailyAttendance routes check', function () {
     });
 
 });
-
 describe('EmployeeDailyAttendance Create', function () {
 
     beforeEach(function () {

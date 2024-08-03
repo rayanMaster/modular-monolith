@@ -39,7 +39,7 @@ describe('Contractor routes check', function () {
     });
 
 });
-describe('Create Contractor of workSite Test', function () {
+describe('Create Contractor of workSite', function () {
 
     beforeEach(function () {
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
@@ -73,7 +73,7 @@ describe('Create Contractor of workSite Test', function () {
     });
 
 });
-describe('Update Contractor of workSite Test', function () {
+describe('Update Contractor of workSite', function () {
 
     beforeEach(function () {
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);

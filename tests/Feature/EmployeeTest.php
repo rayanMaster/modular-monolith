@@ -43,7 +43,7 @@ describe('Employee routes check', function () {
 
 });
 
-describe('Create  Employee', function () {
+describe('Create Employee', function () {
 
     beforeEach(function () {
 
@@ -73,7 +73,7 @@ describe('Create  Employee', function () {
         assertDatabaseHas(User::class, ['first_name' => 'Rayan']);
     });
 });
-describe('Update  Employee', function () {
+describe('Update Employee', function () {
 
     beforeEach(function () {
 
@@ -100,7 +100,7 @@ describe('Update  Employee', function () {
         assertDatabaseHas(User::class, ['first_name' => 'Komay']);
     });
 });
-describe('Show  Employees list', function () {
+describe('Show Employees list', function () {
 
     beforeEach(function () {
 
@@ -131,7 +131,7 @@ describe('Show  Employees list', function () {
             ->assertJsonFragment(['first_name' => 'Rayan']);
     });
 });
-describe('Show  Employee details', function () {
+describe('Show Employee details', function () {
 
     beforeEach(function () {
 
