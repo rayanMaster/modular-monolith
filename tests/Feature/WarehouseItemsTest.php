@@ -6,7 +6,7 @@ use App\Models\Supplier;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Models\WarehouseItem;
-use App\Models\WorkSite;
+use App\Models\Worksite;
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,7 +16,7 @@ use function Pest\Laravel\assertDatabaseHas;
 describe('Warehouse Items', function () {
     beforeEach(function () {
 
-        $this->workSite = WorkSite::factory()->create();
+        $this->worksite = Worksite::factory()->create();
         $this->admin = User::factory()->admin()->create();
         $this->notAdmin = User::factory()->worker()->create();
         $this->address = Address::factory()->create();
@@ -261,8 +261,8 @@ describe('Warehouse Items', function () {
     });
 });
 
-//    it('should have the option to attach a wareHouse with a workSite or make it as main workHouse
-//    without a workSite', function () {
+//    it('should have the option to attach a wareHouse with a worksite or make it as main workHouse
+//    without a worksite', function () {
 //    });
 //    it('should assign store keeper to a wareHouse, and at least one for each', function () {
 //    });
@@ -272,7 +272,7 @@ describe('Warehouse Items', function () {
 //    });
 //    it('should track all movements between warehouses', function () {
 //    });
-//    it('should move items to a workSite from its own warehouse only', function () {
+//    it('should move items to a worksite from its own warehouse only', function () {
 //    });
 //    it('should track all items movements between worksite and its warehouse', function () {
 //    });

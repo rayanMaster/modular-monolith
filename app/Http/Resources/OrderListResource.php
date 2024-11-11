@@ -5,13 +5,13 @@ namespace App\Http\Resources;
 use App\Enums\OrderPriorityEnum;
 use App\Enums\OrderStatusEnum;
 use App\Models\User;
-use App\Models\WorkSite;
+use App\Models\Worksite;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @property int $id
- * @property WorkSite $workSite
+ * @property Worksite $workSite
  * @property float $total_amount
  * @property string $status
  * @property string $priority
@@ -28,7 +28,7 @@ class OrderListResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'workSite' => $this->workSite->title,
+            'worksite' => $this->worksite->title,
             'total_amount' => $this->total_amount,
             'status' => OrderStatusEnum::from($this->status)->name,
             'priority' => OrderPriorityEnum::from($this->priority)->name,

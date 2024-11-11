@@ -29,7 +29,7 @@ class CheckWorkSiteAttendance
 
         // Validate the request inputs
         $validator = Validator::make($request->all(), [
-            'work_site_id' => 'required|integer',
+            'worksite_id' => 'required|integer',
             'date' => 'required|date',
         ]);
 
@@ -51,7 +51,7 @@ class CheckWorkSiteAttendance
 
         $doesUserPresentAtWorkSite = DailyAttendance::query()
             ->where('employee_id', $authUser?->id)
-            ->where('work_site_id', $request->input('work_site_id'))
+            ->where('worksite_id', $request->input('worksite_id'))
             ->whereDate('date', $date)
             ->exists();
 

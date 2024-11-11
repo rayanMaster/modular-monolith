@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('work_site_categories', function (Blueprint $table) {
+        Schema::create('worksite_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->tinyInteger('status')->default(StatusEnum::Active->value);
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('work_site_categories');
+        Schema::dropIfExists('worksite_categories');
     }
 };

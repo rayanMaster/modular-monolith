@@ -14,6 +14,7 @@ return new class extends Migration
     {
         Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
+            $table->uuid();
             $table->string('name');
             $table->foreignIdFor(Address::class)->nullable();
             $table->timestamps();

@@ -39,7 +39,7 @@ describe('Contractor routes check', function () {
     });
 
 });
-describe('Create Contractor of workSite', function () {
+describe('Create Contractor of worksite', function () {
 
     beforeEach(function () {
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
@@ -60,6 +60,7 @@ describe('Create Contractor of workSite', function () {
     it('should create new Contractor with valid data', function () {
         $address = Address::factory()->create();
         $response = actingAs($this->admin)->postJson('/api/v1/contractor/create', [
+            'uuid' => Str::uuid()->toString(),
             'first_name' => 'Rayan',
             'last_name' => 'Azzam',
             'address_id' => $address->id,
@@ -73,7 +74,7 @@ describe('Create Contractor of workSite', function () {
     });
 
 });
-describe('Update Contractor of workSite', function () {
+describe('Update Contractor of worksite', function () {
 
     beforeEach(function () {
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);

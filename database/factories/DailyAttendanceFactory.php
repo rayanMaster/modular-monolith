@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\DailyAttendance;
 use App\Models\User;
-use App\Models\WorkSite;
+use App\Models\Worksite;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,7 +23,7 @@ class DailyAttendanceFactory extends Factory
     {
         return [
             'employee_id' => User::factory()->create()->id,
-            'work_site_id' => Worksite::factory()->create()->id,
+            'worksite_id' => Worksite::factory()->create()->id,
             'date' => $this->faker->date(),
         ];
     }

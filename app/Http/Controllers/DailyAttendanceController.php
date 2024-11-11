@@ -11,7 +11,7 @@ use App\Http\Requests\DailyAttendanceUpdateRequest;
 use App\Http\Resources\DailyAttendanceListResource;
 use App\Models\DailyAttendance;
 use App\Models\User;
-use App\Models\WorkSite;
+use App\Models\Worksite;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +25,7 @@ class DailyAttendanceController extends Controller
     {
 
         /** @var array{
-         *     work_site_id : int,
+         *     worksite_id : int,
          *     date_from : string | null,
          *     date_to : string | null
          * } $requestedData
@@ -51,10 +51,10 @@ class DailyAttendanceController extends Controller
         if ($alreadyHasDailyAttendance) {
             throw new InvalidSubWorkSiteAttendanceException('You already have a daily attendance for a work site', Response::HTTP_FORBIDDEN);
         }
-        $workSite = WorkSite::query()->findOrFail($requestedData['work_site_id']);
+        $workSite = Worksite::query()->findOrFail($requestedData['worksite_id']);
 
         // test if work site is a sub-worksite
-        if ($workSite->parent_work_site_id != null) {
+        if ($workSite->parent_worksite_id != null) {
             throw new InvalidSubWorkSiteAttendanceException('Cant Assign employee to work site', Response::HTTP_FORBIDDEN);
         }
 
@@ -64,7 +64,7 @@ class DailyAttendanceController extends Controller
         foreach ($dates as $date) {
             $dataToSave[] = [
                 'employee_id' => $employeeId,
-                'work_site_id' => $requestedData['work_site_id'],
+                'worksite_id' => $requestedData['worksite_id'],
                 'date' => $date,
             ];
         }
@@ -81,7 +81,7 @@ class DailyAttendanceController extends Controller
     {
 
         /** @var array{
-         *     work_site_id : int|null,
+         *     worksite_id : int|null,
          *     date_from : string,
          *     date_to : string
          * } $requestedData
@@ -109,7 +109,7 @@ class DailyAttendanceController extends Controller
         }
 
         $dates = $this->getDates($dateFrom, $dateTo);
-        if (! isset($requestedData['work_site_id'])) {
+        if (! isset($requestedData['worksite_id'])) {
             foreach ($dates as $date) {
                 DailyAttendance::query()
                     ->where(column: 'employee_id', operator: '=', value: $employeeId)
@@ -122,21 +122,21 @@ class DailyAttendanceController extends Controller
             foreach ($dates as $date) {
                 $dataToSave[] = [
                     'employee_id' => $employeeId,
-                    'work_site_id' => $requestedData['work_site_id'],
+                    'worksite_id' => $requestedData['worksite_id'],
                     'date' => $date,
                 ];
             }
-            $workSite = WorkSite::query()->findOrFail($requestedData['work_site_id']);
+            $workSite = Worksite::query()->findOrFail($requestedData['worksite_id']);
 
             // test if work site is a sub-worksite
-            if ($workSite->parent_work_site_id != null) {
+            if ($workSite->parent_worksite_id != null) {
                 throw new InvalidSubWorkSiteAttendanceException('Cant Assign employee to work site', Response::HTTP_FORBIDDEN);
             }
 
             DailyAttendance::query()->upsert(
                 values: $dataToSave,
-                uniqueBy: ['employee_id', 'work_site_id'],
-                update: ['date', 'work_site_id']);
+                uniqueBy: ['employee_id', 'worksite_id'],
+                update: ['date', 'worksite_id']);
         }
 
         return ApiResponseHelper::sendSuccessResponse();

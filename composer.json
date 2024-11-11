@@ -13,6 +13,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "nwidart/laravel-modules": "^11.0",
+        "saloonphp/laravel-plugin": "^3.0",
         "spatie/laravel-data": "^4.5",
         "spatie/laravel-permission": "^6.7"
     },
@@ -21,13 +22,14 @@
         "fakerphp/faker": "^1.23",
         "larastan/larastan": "^2.0",
         "laravel/pint": "^1.13",
-        "laravel/sail": "^1.26",
+        "laravel/sail": "^1.37",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.0",
-        "pestphp/pest": "^2.34",
-        "pestphp/pest-plugin-laravel": "^2.4.0",
-        "phpunit/phpunit": "^10.5.17",
-        "pestphp/pest-plugin-watch": "^2.1",
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "pestphp/pest-plugin-type-coverage": "^3.0",
+        "pestphp/pest-plugin-watch": "^3.0",
+        "phpunit/phpunit": "^11",
         "spatie/laravel-ignition": "^2.4"
     },
     "autoload": {
@@ -55,8 +57,11 @@
         "stan": [
             "./vendor/bin/phpstan analyse --memory-limit=1G"
         ],
-        "pest": [
+        "test": [
             "./vendor/bin/pest"
+        ],
+        "mutate": [
+            "./vendor/bin/pest --mutate --parallel"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

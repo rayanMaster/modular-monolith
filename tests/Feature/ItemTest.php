@@ -147,7 +147,7 @@ describe('Item Details', function () {
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
-        $this->item = Item::factory()->create(['id' => 10, 'name' => 'item 10']);
+        $this->item = Item::factory()->create(['name' => 'item 10']);
 
     });
     it('should prevent non auth show item', function () {
@@ -155,7 +155,9 @@ describe('Item Details', function () {
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should return not found for un-existed item', function () {
-        $response = actingAs($this->admin)->getJson('/api/v1/item/show/2');
+        $lastItemId = Item::query()->latest('id')->value('id');
+        $unExistedId = $lastItemId + 1;
+        $response = actingAs($this->admin)->getJson('/api/v1/item/show/'.$unExistedId);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should return data', function () {
@@ -171,7 +173,7 @@ describe('Item Delete', function () {
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
 
-        $this->item = Item::factory()->create(['id' => 10, 'name' => 'item 10']);
+        $this->item = Item::factory()->create(['name' => 'item 10']);
 
     });
     it('should prevent non auth delete item', function () {
@@ -183,11 +185,14 @@ describe('Item Delete', function () {
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found for un-existed item', function () {
-        $response = actingAs($this->admin)->deleteJson('/api/v1/item/delete/2');
+        $lastItemId = Item::query()->latest('id')->value('id');
+        $unExistedItem = $lastItemId ? $lastItemId + 1 : 1;
+        $response = actingAs($this->admin)->deleteJson('/api/v1/item/delete/'.$unExistedItem);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should delete item from database', function () {
-        assertDatabaseCount(Item::class, 1);
+        $itemsBeforeDeleteCount = Item::query()->get()->count();
+        assertDatabaseCount(Item::class, $itemsBeforeDeleteCount);
         actingAs($this->admin)->deleteJson('/api/v1/item/delete/'.$this->item->id);
         assertSoftDeleted('items', ['id' => $this->item->id]);
     });

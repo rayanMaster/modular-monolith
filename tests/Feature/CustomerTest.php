@@ -2,11 +2,18 @@
 
 use App\Enums\PaymentTypesEnum;
 use App\Enums\WorkSiteCompletionStatusEnum;
+use App\Http\Integrations\Accounting\Connector\AccountingConnector;
+use App\Http\Integrations\Accounting\Requests\CustomerSync\CustomerSyncDTO;
+use App\Http\Integrations\Accounting\Requests\CustomerSync\CustomerSyncRequest;
 use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\User;
-use App\Models\WorkSite;
+use App\Models\Worksite;
 use Carbon\Carbon;
+use Saloon\Exceptions\Request\FatalRequestException;
+use Saloon\Exceptions\Request\RequestException;
+use Saloon\Http\Faking\MockClient;
+use Saloon\Http\Faking\MockResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
@@ -19,6 +26,8 @@ use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
 
 describe('Customer routes check', function () {
+
+
     it('should have all routes for /customer', function () {
         $this->artisan('optimize:clear');
         // Define the expected route names
@@ -49,8 +58,18 @@ describe('Customer routes check', function () {
 });
 describe('Customer Create', function () {
 
-    beforeEach(function () {
 
+    beforeEach(function () {
+        $this->uuid = Str::uuid()->toString();
+
+        $this->mockClient = new MockClient([
+            CustomerSyncRequest::class => MockResponse::make(
+                body: [
+                    'uuid' => $this->uuid, // Assert the uuid matches
+                    'name' => 'Rayan Azzam' // Adjust the expected name to match the full name
+                ],
+                status: 200)
+        ]);
         $this->notAdmin = User::factory()->worker()->create(['email' => 'not_admin@admin.com']);
         $this->admin = User::factory()->admin()->create(['email' => 'admin@admin.com']);
     });
@@ -75,7 +94,27 @@ describe('Customer Create', function () {
         ]);
         $response->assertOk();
     });
-});
+
+    it('should call sync method with accounting system', function () {
+
+
+        $connector = new AccountingConnector();
+        $connector->withMockClient($this->mockClient);
+
+        actingAs($this->admin)->postJson('/api/v1/customer/create', [
+            'first_name' => 'Rayan',
+            'last_name' => 'Azzam',
+        ]);
+        $this->mockClient->assertSent(function ($request) {
+            return $request->body()->all() === [
+                    'uuid' => $this->uuid, // Assert the uuid matches
+                    'name' => 'Rayan Azzam' // Adjust the expected name to match the full name
+                ];
+        });
+        $this->mockClient->assertSentCount(1);
+
+    });
+})->only();
 describe('Customer Update', function () {
 
     beforeEach(function () {
@@ -87,24 +126,24 @@ describe('Customer Update', function () {
     });
 
     it('should prevent non auth updating a Customer', function () {
-        $response = putJson('/api/v1/customer/update/'.$this->customer->id);
+        $response = putJson('/api/v1/customer/update/' . $this->customer->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin updating a Customer', function () {
-        $response = actingAs($this->notAdmin)->putJson('/api/v1/customer/update/'.$this->customer->id);
+        $response = actingAs($this->notAdmin)->putJson('/api/v1/customer/update/' . $this->customer->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should not return validation error when data is missed', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/customer/update/'.$this->customer->id, []);
+        $response = actingAs($this->admin)->putJson('/api/v1/customer/update/' . $this->customer->id, []);
         $response->assertStatus(Response::HTTP_OK);
     });
     it('should not touch a field if not updated', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/customer/update/'.$this->customer->id, []);
+        $response = actingAs($this->admin)->putJson('/api/v1/customer/update/' . $this->customer->id, []);
         assertDatabaseHas('customers', ['first_name' => 'Rayan']);
         $response->assertStatus(Response::HTTP_OK);
     });
     it('should create new Customer with valid data', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/customer/update/'.$this->customer->id, [
+        $response = actingAs($this->admin)->putJson('/api/v1/customer/update/' . $this->customer->id, [
             'first_name' => 'John',
         ]);
         assertDatabaseHas('customers', ['first_name' => 'John']);
@@ -156,11 +195,11 @@ describe('Customer Details', function () {
     });
 
     it('should prevent non auth show details of a Customer', function () {
-        $response = getJson('/api/v1/customer/show/'.$this->customer->id);
+        $response = getJson('/api/v1/customer/show/' . $this->customer->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin show details of a Customer', function () {
-        $response = actingAs($this->notAdmin)->getJson('/api/v1/customer/show/'.$this->customer->id);
+        $response = actingAs($this->notAdmin)->getJson('/api/v1/customer/show/' . $this->customer->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should show details of a Customer', function () {
@@ -171,7 +210,7 @@ describe('Customer Details', function () {
             'payment_date' => Carbon::now(),
             'payment_type' => PaymentTypesEnum::CASH->value,
         ]);
-        actingAs($this->admin)->getJson('/api/v1/customer/show/'.$this->customer->id)
+        actingAs($this->admin)->getJson('/api/v1/customer/show/' . $this->customer->id)
             ->assertOk()
             ->assertJsonStructure([
                 'data' => [
@@ -211,11 +250,11 @@ describe('Customer Delete', function () {
     });
 
     it('should prevent non auth delete a Customer', function () {
-        $response = deleteJson('/api/v1/customer/delete/'.$this->customer->id);
+        $response = deleteJson('/api/v1/customer/delete/' . $this->customer->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin delete a Customer', function () {
-        $response = actingAs($this->notAdmin)->deleteJson('/api/v1/customer/delete/'.$this->customer->id);
+        $response = actingAs($this->notAdmin)->deleteJson('/api/v1/customer/delete/' . $this->customer->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should prevent delete a Customer related to un closed worksite', function () {
@@ -223,14 +262,14 @@ describe('Customer Delete', function () {
             'customer_id' => $this->customer->id,
             'completion_status' => WorkSiteCompletionStatusEnum::STARTED->value,
         ]);
-        $response = actingAs($this->admin)->deleteJson('/api/v1/customer/delete/'.$this->customer->id);
+        $response = actingAs($this->admin)->deleteJson('/api/v1/customer/delete/' . $this->customer->id);
         $response->assertStatus(Response::HTTP_CONFLICT)
             ->assertJsonFragment([
                 'message' => 'Unable to delete customer with a not closed work site',
             ]);
     });
     it('should delete a Customer', function () {
-        actingAs($this->admin)->deleteJson('/api/v1/customer/delete/'.$this->customer->id)
+        actingAs($this->admin)->deleteJson('/api/v1/customer/delete/' . $this->customer->id)
             ->assertOk();
         assertSoftDeleted(Customer::class, ['id' => $this->customer->id]);
     });

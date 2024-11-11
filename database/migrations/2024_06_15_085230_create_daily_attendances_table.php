@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Models\WorkSite;
+use App\Models\Worksite;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('daily_attendances', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class, 'employee_id');
-            $table->foreignIdFor(WorkSite::class, 'work_site_id');
+            $table->foreignIdFor(Worksite::class, 'worksite_id');
             $table->date('date');
 
             $table->timestamps();

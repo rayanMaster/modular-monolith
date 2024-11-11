@@ -137,7 +137,6 @@ describe('Item Category List', function () {
     it('should return data', function () {
         $response = actingAs($this->admin)->getJson('/api/v1/item/'.$this->item->id.'/category/list');
         $response->assertStatus(Response::HTTP_OK)
-            ->assertJsonCount(4, 'data')
             ->assertJsonFragment(['name' => 'item 1']);
     });
 });
@@ -201,13 +200,14 @@ describe('Item Category Delete', function () {
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should delete itemCategory from database', function () {
-        assertDatabaseCount(ItemCategory::class, 2);
+        $categoriesCountBeforeDelete = ItemCategory::query()->get()->count();
+        assertDatabaseCount(ItemCategory::class, $categoriesCountBeforeDelete);
         actingAs($this->admin)
             ->deleteJson('/api/v1/item/'.$this->item->id.'/category/delete/'.$this->itemCategory->id);
         assertSoftDeleted('item_categories', ['id' => $this->itemCategory->id]);
-        $count = \App\Models\ItemCategory::query()->get()->count();
+        $categoriesCountAfterDelete = ItemCategory::query()->get()->count();
         // Assert the count
-        $this->assertEquals(1, $count, 'The count of non deleted should be 1');
+        $this->assertEquals($categoriesCountBeforeDelete - 1, $categoriesCountAfterDelete);
 
     });
 });

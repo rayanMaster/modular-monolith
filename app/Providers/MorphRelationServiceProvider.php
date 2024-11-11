@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Customer;
-use App\Models\WorkSite;
+use App\Models\Worksite;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,7 +23,7 @@ class MorphRelationServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Relation::morphMap([
-            'workSite' => Worksite::class,
+            'worksite' => Worksite::class,
             'customer' => Customer::class,
         ]);
     }

@@ -21,6 +21,7 @@ class ContractorFactory extends Factory
     public function definition(): array
     {
         return [
+            'uuid' => fake()->uuid,
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
             'address_id' => fn () => Address::query()->first() ?

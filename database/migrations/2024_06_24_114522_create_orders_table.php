@@ -3,7 +3,7 @@
 use App\Enums\OrderPriorityEnum;
 use App\Enums\OrderStatusEnum;
 use App\Models\User;
-use App\Models\WorkSite;
+use App\Models\Worksite;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,7 +17,7 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(WorkSite::class)->nullable();
+            $table->foreignIdFor(Worksite::class)->nullable();
             $table->decimal('total_amount', 10, 2)->nullable();
             $table->tinyInteger('status')->default(OrderStatusEnum::PENDING->value);
             $table->integer('priority')->nullable()->default(OrderPriorityEnum::NORMAL->value);

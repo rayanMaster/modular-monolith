@@ -7,15 +7,16 @@ use App\Enums\WorkSiteReceptionStatusEnum;
 use App\Models\Address;
 use App\Models\Contractor;
 use App\Models\Customer;
-use App\Models\WorkSite;
-use App\Models\WorkSiteCategory;
+use App\Models\User;
+use App\Models\Worksite;
+use App\Models\WorksiteCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class WorkSiteFactory extends Factory
 {
-    protected $model = WorkSite::class;
+    protected $model = Worksite::class;
 
     public function definition(): array
     {
@@ -23,18 +24,21 @@ class WorkSiteFactory extends Factory
 
         $file = UploadedFile::fake()->image('test.jpg');
 
-        $wsCategory = WorkSiteCategory::factory()->create();
+        $wsCategory = WorksiteCategory::factory()->create();
 
         $customer = Customer::factory()->create();
         $contractor = Contractor::factory()->create();
+        $manager = User::factory()->siteManager()->create();
 
         return [
-            'title' => 'workSite A',
-            'description' => 'this workSite is for freeTown',
+            'uuid' => fake()->uuid,
+            'title' => 'worksite A',
+            'description' => 'this worksite is for freeTown',
+            'manager_id' => $manager->id,
             'customer_id' => $customer->id,
             'category_id' => $wsCategory->id, // construction
             'contractor_id' => $contractor->id,
-            'parent_work_site_id' => null, // this is main worksite == top level worksite
+            'parent_worksite_id' => null, // this is main worksite == top level worksite
             'starting_budget' => 15,
             'cost' => 20,
             'address_id' => fn () => Address::query()->first() != null ?

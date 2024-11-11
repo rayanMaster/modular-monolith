@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property int $id
- * @property int|null $work_site_id
+ * @property int|null $worksite_id
  * @property int|null $total_amount
  * @property int|null $status
  * @property int|null $priority
@@ -42,11 +42,11 @@ class Order extends Model
     }
 
     /**
-     * @return BelongsTo<WorkSite,Order>
+     * @return BelongsTo<Worksite,Order>
      */
-    public function workSite(): BelongsTo
+    public function worksite(): BelongsTo
     {
-        return $this->belongsTo(WorkSite::class);
+        return $this->belongsTo(Worksite::class);
     }
 
     /**

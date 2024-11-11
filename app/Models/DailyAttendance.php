@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property-read WorkSite|null $workSite
+ * @property-read Worksite|null $workSite
  *
  * @method static DailyAttendanceFactory factory($count = null, $state = [])
  * @method static Builder|DailyAttendance newModelQuery()
@@ -31,10 +31,10 @@ class DailyAttendance extends Model
     }
 
     /**
-     * @return BelongsTo<WorkSite,DailyAttendance>
+     * @return BelongsTo<Worksite,DailyAttendance>
      */
-    public function workSite(): BelongsTo
+    public function worksite(): BelongsTo
     {
-        return $this->belongsTo(WorkSite::class);
+        return $this->belongsTo(Worksite::class);
     }
 }

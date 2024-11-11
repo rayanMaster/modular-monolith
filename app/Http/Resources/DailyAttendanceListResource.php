@@ -2,12 +2,12 @@
 
 namespace App\Http\Resources;
 
-use App\Models\WorkSite;
+use App\Models\Worksite;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property WorkSite $workSite
+ * @property Worksite $workSite
  * @property mixed $date
  */
 class DailyAttendanceListResource extends JsonResource
@@ -20,7 +20,7 @@ class DailyAttendanceListResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'workSite' => $this->workSite->title,
+            'worksite' => $this->worksite->title,
             'date' => $this->date,
         ];
     }

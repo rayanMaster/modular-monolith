@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\RolesEnum;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class EmployeeCreateRequest extends FormRequest
 {
@@ -25,8 +27,9 @@ class EmployeeCreateRequest extends FormRequest
         return [
             'first_name' => ['required', 'string'],
             'last_name' => ['nullable', 'string'],
-            'phone' => ['required', 'string'],
+            'phone' => ['required', 'string', 'unique:users,phone'],
             'password' => ['sometimes', 'string'],
+            'role' => ['sometimes', Rule::in(RolesEnum::cases())],
         ];
     }
 }

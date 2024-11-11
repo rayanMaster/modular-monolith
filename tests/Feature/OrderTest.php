@@ -7,7 +7,7 @@ use App\Models\Item;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\User;
-use App\Models\WorkSite;
+use App\Models\Worksite;
 use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,15 +19,15 @@ describe('Order Create', function () {
         $this->admin = User::factory()->admin()->create();
         $this->siteManager = User::factory()->siteManager()->create();
         $this->worker = User::factory()->worker()->create();
-        $this->workSite1 = WorkSite::factory()->create();
-        $this->workSite2 = WorkSite::factory()->create();
+        $this->workSite1 = Worksite::factory()->create();
+        $this->workSite2 = Worksite::factory()->create();
         $this->item1 = Item::factory()->create();
         $this->item2 = Item::factory()->create();
 
     });
     test('As an admin , I can create an order for a worksite or general one', function () {
         $response = actingAs($this->admin)->postJson('api/v1/order/create', [
-            'work_site_id' => $this->workSite1->id,
+            'worksite_id' => $this->workSite1->id,
             'items' => [
                 [
                     'item_id' => $this->item1->id,
@@ -45,7 +45,7 @@ describe('Order Create', function () {
         assertDatabaseHas('orders', [
             'id' => $orderId,
             'created_by' => $this->admin->id,
-            'work_site_id' => $this->workSite1->id,
+            'worksite_id' => $this->workSite1->id,
             'priority' => OrderPriorityEnum::NORMAL->value,
         ]);
         assertDatabaseHas(OrderItem::class, [
@@ -61,12 +61,12 @@ describe('Order Create', function () {
     });
     test('As a worksite manager, I cant create an order for a worksite,if i am not in this worksite at this time', function () {
         DailyAttendance::factory()->create([
-            'work_site_id' => $this->workSite1->id,
+            'worksite_id' => $this->workSite1->id,
             'employee_id' => $this->siteManager->id,
             'date' => Carbon::now()->addDays(-1),
         ]);
         actingAs($this->siteManager)->postJson('api/v1/order/create', [
-            'work_site_id' => $this->workSite1->id,
+            'worksite_id' => $this->workSite1->id,
             'items' => [
                 [
                     'item_id' => $this->item1->id,
@@ -83,12 +83,12 @@ describe('Order Create', function () {
     });
     test('As a worksite manager, I can create an order for a worksite, if i am in this worksite at this time', function () {
         DailyAttendance::factory()->create([
-            'work_site_id' => $this->workSite1->id,
+            'worksite_id' => $this->workSite1->id,
             'employee_id' => $this->siteManager->id,
             'date' => Carbon::now()->toDateString(),
         ]);
         actingAs($this->siteManager)->postJson('api/v1/order/create', [
-            'work_site_id' => $this->workSite1->id,
+            'worksite_id' => $this->workSite1->id,
             'items' => [
                 [
                     'item_id' => $this->item1->id,
@@ -114,18 +114,18 @@ describe('Order Update', function () {
         $this->admin = User::factory()->admin()->create();
         $this->siteManager = User::factory()->siteManager()->create();
         $this->worker = User::factory()->worker()->create();
-        $this->workSite = WorkSite::factory()->create();
+        $this->worksite = Worksite::factory()->create();
         $this->item1 = Item::factory()->create();
         $this->item2 = Item::factory()->create();
     });
     test('As a worksite manager, I can update an order items, while its pending', function () {
         $order = Order::factory()->create([
-            'work_site_id' => $this->workSite->id,
+            'worksite_id' => $this->worksite->id,
             'status' => OrderStatusEnum::PENDING->value,
             'created_by' => $this->siteManager->id,
         ]);
         DailyAttendance::factory()->create([
-            'work_site_id' => $this->workSite->id,
+            'worksite_id' => $this->worksite->id,
             'employee_id' => $this->siteManager->id,
             'date' => Carbon::now()->toDateString(),
         ]);
@@ -213,14 +213,14 @@ describe('Order List', function () {
         $this->siteManager1 = User::factory()->siteManager()->create();
         $this->siteManager2 = User::factory()->siteManager()->create();
         $this->worker = User::factory()->worker()->create();
-        $this->workSite1 = WorkSite::factory()->create();
-        $this->workSite2 = WorkSite::factory()->create();
+        $this->workSite1 = Worksite::factory()->create();
+        $this->workSite2 = Worksite::factory()->create();
         $this->item1 = Item::factory()->create();
         $this->item2 = Item::factory()->create();
 
         $this->employeeAttendance = DailyAttendance::factory()->create([
             'employee_id' => $this->siteManager1->id,
-            'work_site_id' => $this->workSite1->id,
+            'worksite_id' => $this->workSite1->id,
             'date' => Carbon::today()->toDateString(),
 
         ]);
@@ -231,11 +231,11 @@ describe('Order List', function () {
         $order1 = Order::factory()->create([
             'status' => OrderStatusEnum::PENDING->value,
             'priority' => OrderPriorityEnum::LOW->value,
-            'work_site_id' => $this->workSite1->id,
+            'worksite_id' => $this->workSite1->id,
             'created_by' => $this->siteManager1->id,
         ]);
         Order::factory()->create([
-            'work_site_id' => $this->workSite2->id,
+            'worksite_id' => $this->workSite2->id,
             'created_by' => $this->siteManager2->id,
         ]);
         $response = actingAs($this->siteManager1)->getJson('api/v1/order/list');
@@ -243,7 +243,7 @@ describe('Order List', function () {
             ->assertJsonPath('data', [
                 [
                     'id' => $order1->id,
-                    'workSite' => $this->workSite1->title,
+                    'worksite' => $this->workSite1->title,
                     'total_amount' => number_format($order1->total_amount, 2, '.', ''),
                     'status' => OrderStatusEnum::from($order1->status)->name,
                     'priority' => OrderPriorityEnum::from($order1->priority)->name,
@@ -255,13 +255,13 @@ describe('Order List', function () {
         $order1 = Order::factory()->create([
             'status' => OrderStatusEnum::PENDING->value,
             'priority' => OrderPriorityEnum::LOW->value,
-            'work_site_id' => $this->workSite1->id,
+            'worksite_id' => $this->workSite1->id,
             'created_by' => $this->siteManager1->id,
         ]);
         $order2 = Order::factory()->create([
             'status' => OrderStatusEnum::PENDING->value,
             'priority' => OrderPriorityEnum::LOW->value,
-            'work_site_id' => $this->workSite2->id,
+            'worksite_id' => $this->workSite2->id,
             'created_by' => $this->siteManager2->id,
         ]);
         $response = actingAs($this->admin)->getJson('api/v1/order/list');
@@ -269,7 +269,7 @@ describe('Order List', function () {
             ->assertJsonPath('data', [
                 [
                     'id' => $order1->id,
-                    'workSite' => $this->workSite1->title,
+                    'worksite' => $this->workSite1->title,
                     'total_amount' => number_format($order1->total_amount, 2, '.', ''),
                     'status' => OrderStatusEnum::from($order1->status)->name,
                     'priority' => OrderPriorityEnum::from($order1->priority)->name,
@@ -277,7 +277,7 @@ describe('Order List', function () {
                 ],
                 [
                     'id' => $order2->id,
-                    'workSite' => $this->workSite2->title,
+                    'worksite' => $this->workSite2->title,
                     'total_amount' => number_format($order2->total_amount, 2, '.', ''),
                     'status' => OrderStatusEnum::from($order2->status)->name,
                     'priority' => OrderPriorityEnum::from($order2->priority)->name,
@@ -294,14 +294,14 @@ describe('Order Detail', function () {
         $this->siteManager1 = User::factory()->siteManager()->create();
         $this->siteManager2 = User::factory()->siteManager()->create();
         $this->worker = User::factory()->worker()->create();
-        $this->workSite1 = WorkSite::factory()->create();
-        $this->workSite2 = WorkSite::factory()->create();
+        $this->workSite1 = Worksite::factory()->create();
+        $this->workSite2 = Worksite::factory()->create();
         $this->item1 = Item::factory()->create();
         $this->item2 = Item::factory()->create();
 
         $this->employeeAttendance = DailyAttendance::factory()->create([
             'employee_id' => $this->siteManager1->id,
-            'work_site_id' => $this->workSite1->id,
+            'worksite_id' => $this->workSite1->id,
             'date' => Carbon::today()->toDateString(),
         ]);
 
@@ -310,7 +310,7 @@ describe('Order Detail', function () {
         $order = Order::factory()->create([
             'status' => OrderStatusEnum::PENDING->value,
             'priority' => OrderPriorityEnum::LOW->value,
-            'work_site_id' => $this->workSite1->id,
+            'worksite_id' => $this->workSite1->id,
             'created_by' => $this->siteManager1->id,
         ]);
         $orderItem = OrderItem::factory()->create([
@@ -323,7 +323,7 @@ describe('Order Detail', function () {
             ->assertJsonFragment(
                 [
                     'id' => $order->id,
-                    'workSite' => $this->workSite1->title,
+                    'worksite' => $this->workSite1->title,
                     'order_items' => [
                         [
                             'id' => $orderItem->id,
@@ -351,7 +351,7 @@ describe('Order Detail', function () {
         $order = Order::factory()->create([
             'status' => OrderStatusEnum::PENDING->value,
             'priority' => OrderPriorityEnum::LOW->value,
-            'work_site_id' => $this->workSite1->id,
+            'worksite_id' => $this->workSite1->id,
             'created_by' => $this->siteManager2->id,
         ]);
         $response = actingAs($this->siteManager1)->getJson('api/v1/order/show/'.$order->id);
@@ -362,7 +362,7 @@ describe('Order Detail', function () {
         $order = Order::factory()->create([
             'status' => OrderStatusEnum::PENDING->value,
             'priority' => OrderPriorityEnum::LOW->value,
-            'work_site_id' => $this->workSite1->id,
+            'worksite_id' => $this->workSite1->id,
             'created_by' => $this->siteManager1->id,
         ]);
         $orderItem = OrderItem::factory()->create([
@@ -374,7 +374,7 @@ describe('Order Detail', function () {
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonPath('data', [
                 'id' => $order->id,
-                'workSite' => $this->workSite1->title,
+                'worksite' => $this->workSite1->title,
                 'order_items' => [
                     [
                         'id' => $orderItem->id,
@@ -406,8 +406,8 @@ describe('Order Status', function () {
         $this->siteManager1 = User::factory()->siteManager()->create();
         $this->siteManager2 = User::factory()->siteManager()->create();
         $this->worker = User::factory()->worker()->create();
-        $this->workSite1 = WorkSite::factory()->create();
-        $this->workSite2 = WorkSite::factory()->create();
+        $this->workSite1 = Worksite::factory()->create();
+        $this->workSite2 = Worksite::factory()->create();
         $this->item1 = Item::factory()->create();
         $this->item2 = Item::factory()->create();
 
@@ -415,7 +415,7 @@ describe('Order Status', function () {
 
         $this->employeeAttendance = DailyAttendance::factory()->create([
             'employee_id' => $this->siteManager1->id,
-            'work_site_id' => $this->workSite1->id,
+            'worksite_id' => $this->workSite1->id,
             'date' => Carbon::today()->toDateString(),
         ]);
         $this->order = Order::factory()->create([

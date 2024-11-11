@@ -23,7 +23,7 @@ class DailyAttendanceCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'work_site_id' => ['required', 'exists:work_sites,id'],
+            'worksite_id' => ['required', 'exists:worksites,id'],
             'date_from' => ['sometimes', 'date_format:Y-m-d'],
             'date_to' => ['sometimes', 'date_format:Y-m-d', 'after_or_equal:date_from'],
         ];

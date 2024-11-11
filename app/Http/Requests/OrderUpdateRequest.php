@@ -25,7 +25,7 @@ class OrderUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'work_site_id' => ['sometimes', 'exists:work_sites,id'],
+            'worksite_id' => ['sometimes', 'exists:worksites,id'],
             'total_amount' => ['sometimes', 'numeric'],
             'status' => ['sometimes', Rule::in(OrderStatusEnum::cases())],
             'items' => ['sometimes', 'array'],

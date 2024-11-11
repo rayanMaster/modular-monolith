@@ -10,6 +10,7 @@ use App\Http\Resources\ContractorDetailsResource;
 use App\Http\Resources\ContractorListResource;
 use App\Models\Contractor;
 use Illuminate\Http\JsonResponse;
+use Str;
 use Throwable;
 
 class ContractorController extends Controller
@@ -35,6 +36,7 @@ class ContractorController extends Controller
          */
         $requestData = $request->validated();
         $filteredData = array_filter([
+            'uuid' => Str::uuid()->toString(),
             'first_name' => $requestData['first_name'],
             'last_name' => $requestData['last_name'] ?? null,
             'phone' => $requestData['phone'] ?? null,

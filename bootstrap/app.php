@@ -2,6 +2,7 @@
 
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -33,7 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return back(Response::HTTP_UNPROCESSABLE_ENTITY);
         });
 
-        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $exception, Request $request) {
+        $exceptions->render(function (AuthenticationException $exception, Request $request) {
             if ($request->expectsJson()) {
                 return ApiResponseHelper::sendResponse(new Result(null,
                     null, 'UnAuthenticated', false, Response::HTTP_UNAUTHORIZED));

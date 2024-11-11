@@ -21,6 +21,7 @@ class SupplierFactory extends Factory
     public function definition(): array
     {
         return [
+            'uuid' => fake()->uuid,
             'name' => $this->faker->name(),
             'address_id' => fn () => Address::query()->first() ? Address::query()->first()->id :
                 Address::factory()->create()->id,

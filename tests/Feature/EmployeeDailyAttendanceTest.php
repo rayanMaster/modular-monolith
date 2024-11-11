@@ -2,7 +2,7 @@
 
 use App\Models\DailyAttendance;
 use App\Models\User;
-use App\Models\WorkSite;
+use App\Models\Worksite;
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -44,15 +44,15 @@ describe('EmployeeDailyAttendance Create', function () {
 
         $this->worker = User::factory()->worker()->create();
         $this->admin = User::factory()->admin()->create();
-        $this->workSite = WorkSite::factory()->create();
-        $this->subWorkSite = WorkSite::factory()->create([
-            'parent_work_site_id' => $this->workSite->id,
+        $this->worksite = Worksite::factory()->create();
+        $this->subWorkSite = Worksite::factory()->create([
+            'parent_worksite_id' => $this->worksite->id,
         ]);
     });
 
-    it('should prevent adding attendance for an employee for a sub-workSite', function () {
+    it('should prevent adding attendance for an employee for a sub-worksite', function () {
         $response = actingAs($this->admin)->postJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/create', [
-            'work_site_id' => $this->subWorkSite->id,
+            'worksite_id' => $this->subWorkSite->id,
         ]);
         $response->assertStatus(Response::HTTP_FORBIDDEN)
             ->assertJsonFragment([
@@ -63,7 +63,7 @@ describe('EmployeeDailyAttendance Create', function () {
     });
     it('should add attendance for an employee for today if no date added', function () {
         $response = actingAs($this->admin)->postJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/create', [
-            'work_site_id' => $this->workSite->id,
+            'worksite_id' => $this->worksite->id,
         ]);
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseCount(DailyAttendance::class, 1);
@@ -71,7 +71,7 @@ describe('EmployeeDailyAttendance Create', function () {
             [
                 'employee_id' => $this->worker->id,
                 'date' => Carbon::today()->format('Y-m-d'),
-                'work_site_id' => $this->workSite->id,
+                'worksite_id' => $this->worksite->id,
             ],
         );
     });
@@ -79,7 +79,7 @@ describe('EmployeeDailyAttendance Create', function () {
         $response = actingAs($this->admin)->postJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/create', [
             'date_from' => '2024-01-01',
             'date_to' => '2024-01-02',
-            'work_site_id' => $this->workSite->id,
+            'worksite_id' => $this->worksite->id,
         ]);
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseCount(DailyAttendance::class, 2);
@@ -87,7 +87,7 @@ describe('EmployeeDailyAttendance Create', function () {
             [
                 'employee_id' => $this->worker->id,
                 'date' => '2024-01-01',
-                'work_site_id' => $this->workSite->id,
+                'worksite_id' => $this->worksite->id,
 
             ],
         );
@@ -95,23 +95,23 @@ describe('EmployeeDailyAttendance Create', function () {
             [
                 'employee_id' => $this->worker->id,
                 'date' => '2024-01-02',
-                'work_site_id' => $this->workSite->id,
+                'worksite_id' => $this->worksite->id,
             ],
         );
     });
     it('should prevent assigning an employee to same or multiple workSites in a same day', function () {
-        $otherWorkSite = WorkSite::factory()->create();
+        $otherWorkSite = Worksite::factory()->create();
 
         actingAs($this->admin)->postJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/create', [
-            'work_site_id' => $this->workSite->id,
+            'worksite_id' => $this->worksite->id,
         ])->assertStatus(Response::HTTP_OK);
 
         actingAs($this->admin)->postJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/create', [
-            'work_site_id' => $this->workSite->id,
+            'worksite_id' => $this->worksite->id,
         ])->assertStatus(Response::HTTP_FORBIDDEN);
 
         actingAs($this->admin)->postJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/create', [
-            'work_site_id' => $otherWorkSite->id,
+            'worksite_id' => $otherWorkSite->id,
         ])->assertStatus(Response::HTTP_FORBIDDEN);
 
         assertDatabaseCount(DailyAttendance::class, 1);
@@ -119,24 +119,24 @@ describe('EmployeeDailyAttendance Create', function () {
             [
                 'employee_id' => $this->worker->id,
                 'date' => Carbon::today()->format('Y-m-d'),
-                'work_site_id' => $this->workSite->id,
+                'worksite_id' => $this->worksite->id,
             ],
         );
         assertDatabaseMissing(DailyAttendance::class, [
             'employee_id' => $this->worker->id,
             'date' => Carbon::today()->format('Y-m-d'),
-            'work_site_id' => $otherWorkSite->id,
+            'worksite_id' => $otherWorkSite->id,
         ]);
     });
     it('should prevent assigning an employee to same or multiple workSites in for date range', function () {
-        $otherWorkSite = WorkSite::factory()->create();
+        $otherWorkSite = Worksite::factory()->create();
 
         actingAs($this->admin)->postJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/create', [
-            'work_site_id' => $this->workSite->id,
+            'worksite_id' => $this->worksite->id,
         ])->assertStatus(Response::HTTP_OK);
 
         actingAs($this->admin)->postJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/create', [
-            'work_site_id' => $otherWorkSite->id,
+            'worksite_id' => $otherWorkSite->id,
             'date_from' => Carbon::today()->subDay(2)->format('Y-m-d'),
             'date_to' => Carbon::today()->addDays(2)->format('Y-m-d'),
         ])->assertStatus(Response::HTTP_FORBIDDEN);
@@ -146,13 +146,13 @@ describe('EmployeeDailyAttendance Create', function () {
             [
                 'employee_id' => $this->worker->id,
                 'date' => Carbon::today()->format('Y-m-d'),
-                'work_site_id' => $this->workSite->id,
+                'worksite_id' => $this->worksite->id,
             ],
         );
         assertDatabaseMissing(DailyAttendance::class, [
             'employee_id' => $this->worker->id,
             'date' => Carbon::today()->format('Y-m-d'),
-            'work_site_id' => $otherWorkSite->id,
+            'worksite_id' => $otherWorkSite->id,
         ]);
     });
 });
@@ -162,13 +162,13 @@ describe('EmployeeDailyAttendance Update', function () {
 
         $this->worker = User::factory()->worker()->create();
         $this->admin = User::factory()->admin()->create();
-        $this->workSite1 = WorkSite::factory()->create();
-        $this->workSite2 = WorkSite::factory()->create();
-        $this->subWorkSite = WorkSite::factory()->create([
-            'parent_work_site_id' => $this->workSite1->id,
+        $this->workSite1 = Worksite::factory()->create();
+        $this->workSite2 = Worksite::factory()->create();
+        $this->subWorkSite = Worksite::factory()->create([
+            'parent_worksite_id' => $this->workSite1->id,
         ]);
         $this->employeeAttendance = DailyAttendance::factory()->create([
-            'work_site_id' => $this->workSite1->id,
+            'worksite_id' => $this->workSite1->id,
             'employee_id' => $this->worker->id,
             'date' => '2024-08-01',
         ]);
@@ -177,7 +177,7 @@ describe('EmployeeDailyAttendance Update', function () {
     it('should update attendance for an employee', function () {
         $response = actingAs($this->admin)
             ->putJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/update/'.$this->employeeAttendance->id, [
-                'work_site_id' => $this->workSite2->id,
+                'worksite_id' => $this->workSite2->id,
                 'date_from' => '2024-08-02',
                 'date_to' => '2024-08-02',
             ]);
@@ -186,7 +186,7 @@ describe('EmployeeDailyAttendance Update', function () {
             [
                 'employee_id' => $this->worker->id,
                 'date' => '2024-08-02',
-                'work_site_id' => $this->workSite2->id,
+                'worksite_id' => $this->workSite2->id,
             ],
         );
     });
@@ -201,7 +201,7 @@ describe('EmployeeDailyAttendance Update', function () {
             [
                 'employee_id' => $this->worker->id,
                 'date' => '2024-08-02',
-                'work_site_id' => $this->workSite1->id,
+                'worksite_id' => $this->workSite1->id,
             ],
         );
     });
@@ -211,19 +211,19 @@ describe('EmployeeDailyAttendance List', function () {
 
         $this->worker = User::factory()->worker()->create();
         $this->admin = User::factory()->admin()->create();
-        $this->workSite = WorkSite::factory()->create();
+        $this->worksite = Worksite::factory()->create();
         DailyAttendance::factory()->create([
-            'work_site_id' => $this->workSite->id,
+            'worksite_id' => $this->worksite->id,
             'employee_id' => $this->worker->id,
             'date' => Carbon::today()->format('Y-m-d'),
         ]);
         DailyAttendance::factory()->create([
-            'work_site_id' => $this->workSite->id,
+            'worksite_id' => $this->worksite->id,
             'employee_id' => $this->worker->id,
             'date' => Carbon::today()->addDay()->format('Y-m-d'),
         ]);
         DailyAttendance::factory()->create([
-            'work_site_id' => $this->workSite->id,
+            'worksite_id' => $this->worksite->id,
             'employee_id' => $this->worker->id,
             'date' => Carbon::today()->addDays(2)->format('Y-m-d'),
         ]);
@@ -236,11 +236,11 @@ describe('EmployeeDailyAttendance List', function () {
             ->assertStatus(Response::HTTP_OK)
             ->assertJsonPath('data', [
                 [
-                    'workSite' => $this->workSite->title,
+                    'worksite' => $this->worksite->title,
                     'date' => Carbon::today()->format('Y-m-d'),
                 ],
                 [
-                    'workSite' => $this->workSite->title,
+                    'worksite' => $this->worksite->title,
                     'date' => Carbon::today()->addDay()->format('Y-m-d'),
                 ],
             ]);

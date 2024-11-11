@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Helpers\Data\AddressFormat;
 use Database\Factories\AddressFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read City|null $city
+ * @property-read string $rawAddress
  *
  * @method static AddressFactory factory($count = null, $state = [])
  * @method static Builder|Address newModelQuery()
@@ -53,5 +56,25 @@ class Address extends Model
     public function city(): BelongsTo
     {
         return $this->belongsTo(City::class);
+    }
+
+    public function rawAddress(): Attribute
+    {
+        return Attribute::make(
+            get: function (mixed $value, mixed $attributes) {
+                return AddressFormat::format($this->addressMapper($this));
+            }
+        );
+    }
+
+    private function addressMapper(Address $address): array
+    {
+        $addressValue['title'] = $address->title;
+        $addressValue['state'] = $address->state;
+        $addressValue['city'] = $address->city?->name;
+        $addressValue['street'] = $address->street;
+        $addressValue['zipcode'] = $address->zipcode;
+
+        return $addressValue;
     }
 }

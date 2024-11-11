@@ -18,7 +18,6 @@ class ItemFactory extends Factory
             'item_category_id' => ItemCategory::query()->first() ?
                 ItemCategory::query()->first()->id :
                 ItemCategory::factory()->create()->id,
-
         ];
     }
 }

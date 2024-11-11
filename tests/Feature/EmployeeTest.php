@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\RolesEnum;
 use App\Models\User;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -72,6 +73,28 @@ describe('Create Employee', function () {
         $response->assertOk();
         assertDatabaseHas(User::class, ['first_name' => 'Rayan']);
     });
+    it('should create return validation error when phone duplicated', function () {
+        User::factory()->create([
+            'phone' => '0945795748',
+        ]);
+        $response = actingAs($this->admin)->postJson('/api/v1/employee/create', [
+            'first_name' => 'Rayan',
+            'phone' => '0945795748',
+        ]);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    });
+    it('should create new Employee with role', function () {
+        $phone = '0945795748';
+        $response = actingAs($this->admin)->postJson('/api/v1/employee/create', [
+            'first_name' => 'Rayan',
+            'phone' => $phone,
+            'role' => RolesEnum::SITE_MANAGER->value,
+        ]);
+        $response->assertOk();
+        $user = User::query()->where('phone', $phone)->with(['roles'])->first();
+        expect($user->hasRole(RolesEnum::SITE_MANAGER->value))->toBeTrue();
+        assertDatabaseHas(User::class, ['first_name' => 'Rayan']);
+    });
 });
 describe('Update Employee', function () {
 
@@ -109,26 +132,40 @@ describe('Show Employees list', function () {
 
     });
     it('should prevent non auth show list of Employees', function () {
-        $response = $this->getJson('/api/v1/employee/list');
+        $response = $this->postJson('/api/v1/employee/list');
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     it('should prevent non admin show list of Employees', function () {
-        $response = actingAs($this->notAdmin)->getJson('/api/v1/employee/list');
+        $response = actingAs($this->notAdmin)->postJson('/api/v1/employee/list');
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return right number of Employees in database', function () {
         $alreadyExistsUsers = User::count();
         User::factory(10)->create(['first_name' => 'Rayan']);
 
-        $response = actingAs($this->admin)->getJson('/api/v1/employee/list');
+        $response = actingAs($this->admin)->postJson('/api/v1/employee/list');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseCount(User::class, $alreadyExistsUsers + 10);
     });
     it('should return list of employees', function () {
-        User::factory()->create(['first_name' => 'Rayan']);
-        $response = actingAs($this->admin)->getJson('/api/v1/employee/list');
+        User::factory()->create(['first_name' => 'Rayan', 'last_name' => 'Azzam']);
+        $response = actingAs($this->admin)->postJson('/api/v1/employee/list');
         $response->assertStatus(Response::HTTP_OK)
-            ->assertJsonFragment(['first_name' => 'Rayan']);
+            ->assertJsonFragment(['name' => 'Rayan Azzam']);
+    });
+    it('should return only managers when we request them', function () {
+        User::factory()->admin()->create(['first_name' => 'Komay', 'last_name' => 'Azzam']);
+        $siteManager = User::factory()->siteManager()->create(['first_name' => 'Rayan', 'last_name' => 'Azzam']);
+        $response = actingAs($this->admin)->postJson('/api/v1/employee/list',
+            [
+                'is_manager' => true,
+            ]);
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJsonFragment([
+                'id' => $siteManager->id,
+                'name' => 'Rayan Azzam',
+            ])
+            ->assertJsonMissingExact(['name' => 'Komay Azzam']);
     });
 });
 describe('Show Employee details', function () {

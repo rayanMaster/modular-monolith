@@ -3,7 +3,7 @@
 use App\Models\Address;
 use App\Models\User;
 use App\Models\Warehouse;
-use App\Models\WorkSite;
+use App\Models\Worksite;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
@@ -48,7 +48,7 @@ describe('Warehouse Create Test', function () {
 
     beforeEach(function () {
 
-        $this->workSite = WorkSite::factory()->create();
+        $this->worksite = Worksite::factory()->create();
         $this->admin = User::factory()->admin()->create();
         $this->notAdmin = User::factory()->worker()->create();
         $this->address = Address::factory()->create();
@@ -70,7 +70,7 @@ describe('Warehouse Create Test', function () {
 describe('Warehouse Update Test', function () {
     beforeEach(function () {
 
-        $this->workSite = WorkSite::factory()->create();
+        $this->worksite = Worksite::factory()->create();
         $this->admin = User::factory()->admin()->create();
         $this->notAdmin = User::factory()->worker()->create();
         $this->address = Address::factory()->create();
@@ -97,7 +97,7 @@ describe('Warehouse List Test', function () {
 
     beforeEach(function () {
 
-        $this->workSite = WorkSite::factory()->create();
+        $this->worksite = Worksite::factory()->create();
         $this->admin = User::factory()->admin()->create();
         $this->notAdmin = User::factory()->worker()->create();
         $this->address = Address::factory()->create();
@@ -144,7 +144,7 @@ describe('Warehouse Details Test', function () {
 
     beforeEach(function () {
 
-        $this->workSite = WorkSite::factory()->create();
+        $this->worksite = Worksite::factory()->create();
         $this->admin = User::factory()->admin()->create();
         $this->notAdmin = User::factory()->worker()->create();
         $this->address = Address::factory()->create();
@@ -180,7 +180,7 @@ describe('Warehouse Delete Test', function () {
 
     beforeEach(function () {
 
-        $this->workSite = WorkSite::factory()->create();
+        $this->worksite = Worksite::factory()->create();
         $this->admin = User::factory()->admin()->create();
         $this->notAdmin = User::factory()->worker()->create();
         $this->address = Address::factory()->create();
@@ -188,7 +188,7 @@ describe('Warehouse Delete Test', function () {
 
     });
     it('should return not found error if warehouse nof found', function () {
-        $unExistedWarehouseId = rand(22, 33);
+        $unExistedWarehouseId = rand(220, 330);
         actingAs($this->admin)->deleteJson('/api/v1/warehouse/delete/'.$unExistedWarehouseId)
             ->assertStatus(Response::HTTP_NOT_FOUND);
     });

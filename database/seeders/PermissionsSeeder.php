@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\ModelHasRole;
 use App\Models\PermissionGroup;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class PermissionsSeeder extends Seeder
 {
@@ -40,8 +42,12 @@ class PermissionsSeeder extends Seeder
         | Dashboard
         |--------------------------------------------------------------------------
         */
-        // WorkSite
-        $this->addPermission('Work Site', 'workSite', [
+        // Worksite
+        //        Role::query()->truncate();
+        //        ModelHasRole::query()->truncate();
+        //
+        //        Permission::query()->truncate();
+        $this->addPermission('Work Site', 'worksite', [
             'list',
             'show',
             'create',
@@ -55,8 +61,8 @@ class PermissionsSeeder extends Seeder
             'item-list',
         ]);
 
-        // WorkSite Category
-        $this->addPermission('Work Site Category', 'workSite-category', ['list', 'show', 'create', 'update', 'delete']);
+        // Worksite Category
+        $this->addPermission('Work Site Category', 'worksite-category', ['list', 'show', 'create', 'update', 'delete']);
 
         // Item
         $this->addPermission('Item', 'item', ['list', 'show', 'create', 'update', 'delete']);
@@ -69,6 +75,9 @@ class PermissionsSeeder extends Seeder
 
         // Customer
         $this->addPermission('Payment', 'payment', ['list', 'show', 'create']);
+
+        //City
+        $this->addPermission('City', 'city', ['list', 'show', 'create', 'update', 'delete']);
 
         //Employee
         $this->addPermission('Employee', 'employee',

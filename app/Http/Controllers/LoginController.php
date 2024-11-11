@@ -36,12 +36,12 @@ class LoginController extends Controller
          */
 
         // TODO:consider replace stdClass with DTO
-        $result = new stdClass();
+        $result = new stdClass;
 
         $user = User::query()->where('phone', $requestedData['user_name'])->first();
 
         if (! $user || ! Hash::check($requestedData['password'], $user->password)) {
-            throw new AuthenticationException();
+            throw new AuthenticationException;
         }
 
         $result->user = $user;

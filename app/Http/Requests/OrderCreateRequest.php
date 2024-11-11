@@ -23,7 +23,7 @@ class OrderCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'work_site_id' => ['required', 'exists:work_sites,id'],
+            'worksite_id' => ['required', 'exists:worksites,id'],
             'items' => ['required', 'array'],
             'items.*.item_id' => ['required', 'exists:items,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],

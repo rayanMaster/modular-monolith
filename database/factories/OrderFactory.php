@@ -6,7 +6,7 @@ use App\Enums\OrderPriorityEnum;
 use App\Enums\OrderStatusEnum;
 use App\Models\Order;
 use App\Models\User;
-use App\Models\WorkSite;
+use App\Models\Worksite;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,7 +24,7 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'work_site_id' => WorkSite::factory()->create()->id,
+            'worksite_id' => Worksite::factory()->create()->id,
             'total_amount' => fake()->numberBetween(1000, 99999),
             'status' => fake()->randomElement(OrderStatusEnum::cases()),
             'priority' => fake()->randomElement(OrderPriorityEnum::cases()),

@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\WorkSiteCategory;
+use App\Models\WorksiteCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class WorkSiteCategoryFactory extends Factory
@@ -10,7 +10,7 @@ class WorkSiteCategoryFactory extends Factory
     /**
      * The name of the factory's corresponding model.
      */
-    protected $model = WorkSiteCategory::class;
+    protected $model = WorksiteCategory::class;
 
     /**
      * Define the model's default state.
@@ -20,7 +20,7 @@ class WorkSiteCategoryFactory extends Factory
         return [
             'id' => null,
             'name' => fake()->name,
-            'status' => rand(0, 1),
+            'status' => fake()->randomElement([0, 1]),
         ];
     }
 }

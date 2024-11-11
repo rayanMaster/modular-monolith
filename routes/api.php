@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CityController;
 use App\Http\Controllers\ContractorController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DailyAttendanceController;
@@ -10,136 +11,136 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\WorkSiteCategoryController;
-use App\Http\Controllers\WorkSiteController;
-use App\Http\Controllers\WorkSiteCustomerController;
-use App\Http\Controllers\WorkSiteItemController;
-use App\Http\Controllers\WorkSitePaymentController;
+use App\Http\Controllers\WorksiteController;
+use App\Http\Controllers\WorksiteCustomerController;
+use App\Http\Controllers\WorksiteItemController;
+use App\Http\Controllers\WorksitePaymentController;
 use App\Http\Middleware\CheckWorkSiteAttendance;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::group(['middleware' => 'auth:sanctum'], function () {
-        Route::group(['prefix' => 'workSite'], function () {
-            Route::post('create', [WorkSiteController::class, 'store'])
-                ->middleware('can:workSite-create')
-                ->name('workSite.create');
+        Route::group(['prefix' => 'worksite'], function () {
+            Route::post('create', [WorksiteController::class, 'store'])
+                ->middleware('can:worksite-create')
+                ->name('worksite.create');
 
-            Route::get('list', [WorkSiteController::class, 'list'])
-                ->middleware('can:workSite-list')
-                ->name('workSite.list');
+            Route::get('list', [WorksiteController::class, 'list'])
+                ->middleware('can:worksite-list')
+                ->name('worksite.list');
 
-            Route::get('show/{id}', [WorkSiteController::class, 'show'])
-                ->middleware('can:workSite-show')
-                ->name('workSite.show');
+            Route::get('show/{id}', [WorksiteController::class, 'show'])
+                ->middleware('can:worksite-show')
+                ->name('worksite.show');
 
-            Route::put('update/{id}', [WorkSiteController::class, 'update'])
-                ->middleware('can:workSite-update')
-                ->name('workSite.update');
+            Route::put('update/{id}', [WorksiteController::class, 'update'])
+                ->middleware('can:worksite-update')
+                ->name('worksite.update');
 
-            Route::post('close/{id}', [WorkSiteController::class, 'close'])
-                ->middleware('can:workSite-close')
-                ->name('workSite.close');
+            Route::post('close/{id}', [WorksiteController::class, 'close'])
+                ->middleware('can:worksite-close')
+                ->name('worksite.close');
 
-            Route::delete('delete/{id}', [WorkSiteController::class, 'delete'])
-                ->middleware('can:workSite-delete')
-                ->name('workSite.delete');
+            Route::delete('delete/{id}', [WorksiteController::class, 'delete'])
+                ->middleware('can:worksite-delete')
+                ->name('worksite.delete');
 
             Route::group(['prefix' => 'category'], function () {
 
                 Route::get('/list', [WorkSiteCategoryController::class, 'list'])
-                    ->middleware('can:workSite-category-list')
-                    ->name('workSite.category.list');
+                    ->middleware('can:worksite-category-list')
+                    ->name('worksite.category.list');
 
                 Route::get('/show/{id}', [WorkSiteCategoryController::class, 'show'])
-                    ->middleware('can:workSite-category-show')
-                    ->name('workSite.category.show');
+                    ->middleware('can:worksite-category-show')
+                    ->name('worksite.category.show');
 
                 Route::post('/store', [WorkSiteCategoryController::class, 'store'])
-                    ->middleware('can:workSite-category-create')
-                    ->name('workSite.category.create');
+                    ->middleware('can:worksite-category-create')
+                    ->name('worksite.category.create');
 
                 Route::put('/update/{id}', [WorkSiteCategoryController::class, 'update'])
-                    ->middleware('can:workSite-category-update')
-                    ->name('workSite.category.update');
+                    ->middleware('can:worksite-category-update')
+                    ->name('worksite.category.update');
 
                 Route::delete('/delete/{id}', [WorkSiteCategoryController::class, 'destroy'])
-                    ->middleware('can:workSite-category-delete')
-                    ->name('workSite.category.delete');
+                    ->middleware('can:worksite-category-delete')
+                    ->name('worksite.category.delete');
             });
 
             Route::group(['prefix' => '{worksiteId}/payment'], function () {
 
-                Route::post('create', [WorkSitePaymentController::class, 'create'])
+                Route::post('create', [WorksitePaymentController::class, 'create'])
                     ->middleware('can:payment-create')
-                    ->name('workSite.payment.create');
+                    ->name('worksite.payment.create');
 
-                Route::get('list', [WorkSitePaymentController::class, 'list'])
+                Route::get('list', [WorksitePaymentController::class, 'list'])
                     ->middleware('can:payment-list')
-                    ->name('workSite.payment.list');
+                    ->name('worksite.payment.list');
                 //
-                //                Route::post('show/{id}', WorkSitePaymentController::class)
+                //                Route::post('show/{id}', WorksitePaymentController::class)
                 //                    ->middleware('can:payment-show')
-                //                    ->name('workSite.payment.show');
+                //                    ->name('worksite.payment.show');
             });
 
             Route::group(['prefix' => '{worksiteId}/item'], function () {
-                Route::post('/add', [WorkSiteItemController::class, 'addItems'])
-                    ->middleware('can:workSite-item-add')
-                    ->name('workSite.item.add');
+                Route::post('/add', [WorksiteItemController::class, 'addItems'])
+                    ->middleware('can:worksite-item-add')
+                    ->name('worksite.item.add');
 
-                Route::get('/list', [WorkSiteItemController::class, 'list'])
-                    ->middleware('can:workSite-item-list')
-                    ->name('workSite.item.list');
+                Route::get('/list', [WorksiteItemController::class, 'list'])
+                    ->middleware('can:worksite-item-list')
+                    ->name('worksite.item.list');
                 //
-                //                Route::post('update/{id}', WorkSitePaymentController::class)
-                //                    ->middleware('can:workSite-item-update')
-                //                    ->name('workSite.item.update');
+                //                Route::post('update/{id}', WorksitePaymentController::class)
+                //                    ->middleware('can:worksite-item-update')
+                //                    ->name('worksite.item.update');
                 //
-                //                Route::post('show/{id}', WorkSitePaymentController::class)
-                //                    ->middleware('can:workSite-item-show')
-                //                    ->name('workSite.item.show');
+                //                Route::post('show/{id}', WorksitePaymentController::class)
+                //                    ->middleware('can:worksite-item-show')
+                //                    ->name('worksite.item.show');
                 //
-                //                Route::post('delete/{id}', WorkSitePaymentController::class)
-                //                    ->middleware('can:workSite-item-delete')
-                //                    ->name('workSite.item.delete');
+                //                Route::post('delete/{id}', WorksitePaymentController::class)
+                //                    ->middleware('can:worksite-item-delete')
+                //                    ->name('worksite.item.delete');
             });
 
             Route::group(['prefix' => '{worksiteId}/employee'], function () {
-                Route::post('assign', [WorkSiteController::class, 'assignEmployee'])
-                    ->middleware('can:workSite-employee-assign')
-                    ->name('workSite.employee.assign');
+                Route::post('assign', [WorksiteController::class, 'assignEmployee'])
+                    ->middleware('can:worksite-employee-assign')
+                    ->name('worksite.employee.assign');
 
-                //                Route::post('list', WorkSitePaymentController::class)
-                //                    ->middleware('can:workSite-item-list')
-                //                    ->name('workSite.item.list');
+                //                Route::post('list', WorksitePaymentController::class)
+                //                    ->middleware('can:worksite-item-list')
+                //                    ->name('worksite.item.list');
                 //
-                //                Route::post('update/{id}', WorkSitePaymentController::class)
-                //                    ->middleware('can:workSite-item-update')
-                //                    ->name('workSite.item.update');
+                //                Route::post('update/{id}', WorksitePaymentController::class)
+                //                    ->middleware('can:worksite-item-update')
+                //                    ->name('worksite.item.update');
                 //
-                //                Route::post('show/{id}', WorkSitePaymentController::class)
-                //                    ->middleware('can:workSite-item-show')
-                //                    ->name('workSite.item.show');
+                //                Route::post('show/{id}', WorksitePaymentController::class)
+                //                    ->middleware('can:worksite-item-show')
+                //                    ->name('worksite.item.show');
                 //
-                //                Route::post('delete/{id}', WorkSitePaymentController::class)
-                //                    ->middleware('can:workSite-item-delete')
-                //                    ->name('workSite.item.delete');
+                //                Route::post('delete/{id}', WorksitePaymentController::class)
+                //                    ->middleware('can:worksite-item-delete')
+                //                    ->name('worksite.item.delete');
             });
 
             Route::group(['prefix' => '{worksiteId}/contractor'], function () {
-                Route::put('{contractorId}/assign', [WorkSiteController::class, 'assignContractor'])
-                    ->middleware('can:workSite-contractor-assign')
-                    ->name('workSite.contractor.assign');
+                Route::put('{contractorId}/assign', [WorksiteController::class, 'assignContractor'])
+                    ->middleware('can:worksite-contractor-assign')
+                    ->name('worksite.contractor.assign');
 
-                Route::put('{contractorId}/unAssign', [WorkSiteController::class, 'unAssignContractor'])
-                    ->middleware('can:workSite-contractor-assign')
-                    ->name('workSite.contractor.assign');
+                Route::put('{contractorId}/unAssign', [WorksiteController::class, 'unAssignContractor'])
+                    ->middleware('can:worksite-contractor-assign')
+                    ->name('worksite.contractor.unAssign');
             });
 
             Route::group(['prefix' => '{worksiteId}/customer'], function () {
-                Route::post('/{customerId}/assign', [WorkSiteCustomerController::class, 'assignCustomer'])
-                    ->middleware('can:workSite-customer-assign')
-                    ->name('workSite.customer.assign');
+                Route::post('/{customerId}/assign', [WorksiteCustomerController::class, 'assignCustomer'])
+                    ->middleware('can:worksite-customer-assign')
+                    ->name('worksite.customer.assign');
             });
         });
         Route::group(['prefix' => 'item'], function () {
@@ -222,7 +223,7 @@ Route::prefix('v1')->group(function () {
 
         });
         Route::group(['prefix' => 'employee'], function () {
-            Route::get('/list', [EmployeeController::class, 'list'])
+            Route::post('/list', [EmployeeController::class, 'list'])
                 ->middleware('can:employee-list')
                 ->name('employee.list');
 
@@ -310,16 +311,23 @@ Route::prefix('v1')->group(function () {
                 ->middleware('can:order-show')
                 ->name('order.show');
         });
-        //        Route::group(['prefix' => 'payment'], function () {
-        //            Route::get('/list', [PaymentController::class, 'list'])
-        //                ->middleware('can:payment-list')
-        //                ->name('payment.list');
-        //
-        //            Route::get('/show/{id}', [PaymentController::class, 'show'])
-        //                ->middleware('can:payment-show')
-        //                ->name('payment.show');
-        //
-        //        });
+        Route::group(['prefix' => 'city'], function () {
+            Route::post('/create', [CityController::class, 'create'])
+                ->middleware('can:city-create')
+                ->name('city.create');
+            Route::put('/update/{cityId}', [CityController::class, 'update'])
+                ->middleware('can:city-update')
+                ->name('city.update');
+            Route::get('/list', [CityController::class, 'list'])
+                ->middleware('can:city-list')
+                ->name('city.list');
+            Route::get('/show/{cityId}', [CityController::class, 'show'])
+                ->middleware('can:city-show')
+                ->name('city.show');
+            Route::delete('/delete/{cityId}', [CityController::class, 'delete'])
+                ->middleware('can:city-delete')
+                ->name('city.delete');
+        });
     });
     Route::group(['prefix' => 'auth'], function () {
         Route::post('login', LoginController::class)->name('login');

@@ -12,19 +12,20 @@ class PermissionGroupsSeeder extends Seeder
      */
     public function run(): void
     {
+        PermissionGroup::query()->truncate();
         /*
         |--------------------------------------------------------------------------
         | Dashboard
         |--------------------------------------------------------------------------
         */
-        // WorkSite
-        PermissionGroup::query()->updateOrCreate(['name' => 'work-site', 'display_name' => 'WorkSite'], ['name' => 'workSite']);
+        // Worksite
+        PermissionGroup::query()->updateOrCreate(['name' => 'work-site', 'display_name' => 'Worksite'], ['name' => 'worksite']);
         /*
         |--------------------------------------------------------------------------
-        | WorkSite Category
+        | Worksite Category
         |--------------------------------------------------------------------------
         */
-        PermissionGroup::query()->updateOrCreate(['name' => 'workSite-category', 'display_name' => 'WorkSite Category'], ['name' => 'ws-category']);
+        PermissionGroup::query()->updateOrCreate(['name' => 'worksite-category', 'display_name' => 'Worksite Category'], ['name' => 'ws-category']);
 
         /*
        |--------------------------------------------------------------------------

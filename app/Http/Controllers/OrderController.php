@@ -29,7 +29,7 @@ class OrderController extends Controller
     {
         /**
          * @var array{
-         *     work_site_id: int,
+         *     worksite_id: int,
          *     items:array<string,array{
          *     item_id:int,
          *     quantity:int
@@ -41,7 +41,7 @@ class OrderController extends Controller
         $requestedData = $request->validated();
         DB::transaction(callback: function () use ($requestedData, &$order) {
             $order = Order::query()->create([
-                'work_site_id' => $requestedData['work_site_id'],
+                'worksite_id' => $requestedData['worksite_id'],
                 'priority' => $requestedData['priority'] ?? OrderPriorityEnum::NORMAL->value,
                 'status' => $requestedData['status'] ?? OrderStatusEnum::PENDING->value,
                 'created_by' => Auth::id(),
@@ -77,7 +77,7 @@ class OrderController extends Controller
 
             /**
              * @var array{
-             *     work_site_id: int|null,
+             *     worksite_id: int|null,
              *     total_amount:float|null,
              *     status:int|null,
              *     items:array<string,array{

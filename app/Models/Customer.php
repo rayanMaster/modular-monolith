@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
+ * @property string $uuid
  * @property string $first_name
  * @property string|null $last_name
  * @property string|null $phone
@@ -45,7 +46,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Customer whereStatus($value)
  * @method static Builder|Customer whereUpdatedAt($value)
  *
- * @property-read \App\Models\WorkSite|null $workSite
+ * @property-read \App\Models\Worksite|null $workSite
  *
  * @method static Builder|Customer onlyTrashed()
  * @method static Builder|Customer withTrashed()
@@ -102,10 +103,10 @@ class Customer extends Model
     }
 
     /**
-     * @return HasOne<WorkSite>
+     * @return HasOne<Worksite>
      */
-    public function workSite(): HasOne
+    public function worksite(): HasOne
     {
-        return $this->hasOne(WorkSite::class);
+        return $this->hasOne(Worksite::class);
     }
 }

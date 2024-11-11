@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property mixed $first_name
+ * @property mixed $full_name
+ * @property int $id
  */
 class EmployeeListResource extends JsonResource
 {
@@ -18,7 +19,8 @@ class EmployeeListResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'first_name' => $this->first_name,
+            'id' => $this->id,
+            'name' => $this->full_name,
         ];
     }
 }
