@@ -9,6 +9,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -38,6 +39,16 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->expectsJson()) {
                 return ApiResponseHelper::sendResponse(new Result(null,
                     null, 'UnAuthenticated', false, Response::HTTP_UNAUTHORIZED));
+            }
+
+            return back(Response::HTTP_UNPROCESSABLE_ENTITY);
+        });
+        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+
+            if ($request->is('api/*')) {
+                return ApiResponseHelper::sendResponse(new Result(null,
+                    null, $e->getMessage() ?? 'Record not found.', false,
+                    Response::HTTP_NOT_FOUND));
             }
 
             return back(Response::HTTP_UNPROCESSABLE_ENTITY);

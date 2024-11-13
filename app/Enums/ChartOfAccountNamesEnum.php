@@ -27,4 +27,13 @@ enum ChartOfAccountNamesEnum: string
     case OTHER_EXPENSES = 'other_expenses';
     case SALES = 'sales';
     case OTHER_REVENUES = 'other_revenues';
+
+    public static function payableAccounts(): array
+    {
+        return [
+            self::CLIENTS,
+            self::CONTRACTORS,
+            self::SUPPLIERS
+        ];
+    }
 }

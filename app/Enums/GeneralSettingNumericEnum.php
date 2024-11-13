@@ -2,7 +2,8 @@
 
 namespace App\Enums;
 
-enum GeneralSettingEnum : int
+enum GeneralSettingNumericEnum: int
 {
     case PER_PAGE = 10;
+    case TTL = 3600;
 }

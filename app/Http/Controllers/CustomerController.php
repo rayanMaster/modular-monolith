@@ -80,6 +80,8 @@ class CustomerController extends Controller
         return ApiResponseHelper::sendSuccessResponse(new Result(CustomerDetailsResource::make($customer)));
     }
 
+
+
     public function update(CustomerUpdateRequest $request, int $id): void
     {
         $customer = Customer::query()->findOrFail($id);

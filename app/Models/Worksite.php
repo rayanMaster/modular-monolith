@@ -73,7 +73,6 @@ use Illuminate\Support\Carbon;
  *
  * @property-read Collection<int, Item> $items
  * @property-read int|null $items_count
- * @property string $totalPaymentsAmount
  *
  * @mixin Eloquent
  */

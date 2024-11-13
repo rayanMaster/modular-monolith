@@ -8,6 +8,5 @@ pest()
     ->in(
         './Feature',
     )->beforeEach(function () {
-        Config::preventStrayRequests();
         Http::preventStrayRequests();
     });
