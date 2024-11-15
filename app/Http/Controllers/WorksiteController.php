@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\GeneralSettingEnum;
+use App\Enums\GeneralSettingNumericEnum;
 use App\Enums\PaymentTypesEnum;
 use App\Enums\WarehouseItemThresholdsEnum;
 use App\Enums\WorksiteCompletionStatusEnum;
@@ -11,9 +11,11 @@ use App\Events\PaymentCreatedEvent;
 use App\Exceptions\UnAbleToCloseWorksiteException;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
+use App\Helpers\CacheHelper;
 use App\Http\Integrations\Accounting\Requests\WorksiteSync\WorksiteSyncDTO;
 use App\Http\Requests\WorksiteCreateRequest;
 use App\Http\Requests\WorksiteUpdateRequest;
+use App\Http\Resources\PaginationResource;
 use App\Http\Resources\WorksiteDetailsResource;
 use App\Http\Resources\WorksiteListResource;
 use App\Models\Address;
@@ -26,6 +28,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -46,25 +49,24 @@ class WorksiteController extends Controller
     {
     }
 
-    /**
-     * @throws FatalRequestException
-     * @throws RequestException
-     * @throws JsonException
-     */
     public function list(): JsonResponse
     {
         $workSites = Worksite::query()
             ->with(['payments', 'address', 'pendingOrders'])
             ->orderBy('created_at', 'DESC')
-            ->paginate(GeneralSettingEnum::PER_PAGE->value);
+            ->paginate(GeneralSettingNumericEnum::PER_PAGE->value);
 
         foreach ($workSites as $workSite) {
             $payments = $this->paymentSyncService->getPaymentsForWorksite($workSite);
             $workSite->customerPayments = $payments;
         }
+        $pagination = PaginationResource::make($workSites);
 
 
-        return ApiResponseHelper::sendSuccessResponse(new Result(WorksiteListResource::collection($workSites)));
+        return ApiResponseHelper::sendSuccessResponse(new Result(
+            result: WorksiteListResource::collection($workSites),
+            paginate: $pagination
+        ));
     }
 
     /**
@@ -181,7 +183,6 @@ class WorksiteController extends Controller
                         }
                     }
                 }
-
                 // Perform bulk insert
                 if (!empty($paymentData)) {
                     $payments = $workSite->payments()->createMany($paymentData);
@@ -237,9 +238,10 @@ class WorksiteController extends Controller
             ->findOrFail($id);
 
         $payments = $this->paymentSyncService->getPaymentsForWorksite($worksite);
+
         $worksite->customerPayments = $payments;
 
-        $worksite->totalPaymentsAmount = number_format((float)$worksite->payments->sum('amount'), 2);
+        $worksite->totalPaymentsAmount = number_format((float)$payments->sum('amount'), 2);
 
 
         $worksite->items->map(function (Item $item) use ($payments) {

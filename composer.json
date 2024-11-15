@@ -13,6 +13,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "nwidart/laravel-modules": "^11.0",
+        "predis/predis": "^2.0",
         "saloonphp/laravel-plugin": "^3.0",
         "spatie/laravel-data": "^4.5",
         "spatie/laravel-permission": "^6.7"
@@ -58,7 +59,7 @@
             "./vendor/bin/phpstan analyse --memory-limit=1G"
         ],
         "test": [
-            "./vendor/bin/pest"
+            "sail artisan test"
         ],
         "mutate": [
             "./vendor/bin/pest --mutate --parallel"
