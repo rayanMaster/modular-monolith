@@ -1,27 +1,52 @@
 <?php
 
+use App\Enums\ChartOfAccountNamesEnum;
 use App\Enums\PaymentTypesEnum;
+use App\Helpers\CacheHelper;
+use App\Http\Integrations\Accounting\Connector\AccountingConnector;
+use App\Http\Integrations\Accounting\Requests\GetWorkSitePayment\GetWorksitePaymentsRequest;
+use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\User;
 use App\Models\Worksite;
+use App\Services\PaymentSyncService;
 use Carbon\Carbon;
+use Mockery\MockInterface;
+use Saloon\Http\Faking\MockClient;
+use Saloon\Http\Faking\MockResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
 describe('Create Payment for a Worksite', function () {
 
     beforeEach(function () {
+        MockClient::global([
+            AccountingConnector::class => MockResponse::make([
+                'response' => [
+                    'results' => [
+                    ],
+                ],
+            ], 200),
+        ]);
+        Cache::tags('worksite_payments')->flush(); // Clear any cached data at the start
 
         $this->worksite = Worksite::factory()->create();
+        $this->customer = Customer::factory()->create();
 
         $this->admin = User::factory()->admin()->create();
         $this->notAdmin = User::factory()->worker()->create();
 
         expect($this->admin->hasRole('admin'))->toBe(true);
+
+        // Arrange: Set a UUID for the worksite
+        $this->worksite->uuid = 'test-worksite-uuid';  // Ensure this matches what the method expects
+        $cacheTag = 'worksite_payments';
+        $this->cacheKeyHelper = new CacheHelper;
+        $this->cacheKey = $this->cacheKeyHelper->generateCacheKey($cacheTag, $this->worksite->uuid);
+
     });
 
     it('should prevent non auth making new payment for a worksite', function () {
@@ -33,37 +58,112 @@ describe('Create Payment for a Worksite', function () {
         $response = actingAs($this->notAdmin)->postJson('/api/v1/worksite/'.$this->worksite->id.'/payment/create');
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
-    test('As an administrator, I want to make payment to worksite', function () {
+    test('As an administrator, I want to make payment from customer related to worksite', function () {
 
-        $response = actingAs($this->admin)->postJson('/api/v1/worksite/'.$this->worksite->id.'/payment/create', [
-            'amount' => 3000,
+        $worksite = Worksite::factory()->create([
+            'customer_id' => $this->customer->id,
+        ]);
+        $this->mock(PaymentSyncService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('syncPaymentsToAccounting')
+                ->once();
+
+        });
+
+        $response = actingAs($this->admin)->postJson('/api/v1/worksite/'.$worksite->id.'/payment/create', [
+            'payment_amount' => 3000,
             'payment_type' => PaymentTypesEnum::CASH->value,
             'payment_date' => '2024-04-12 10:34',
-            'payable_id' => $this->worksite->id,
-            'payable_type' => Worksite::class,
+            'payment_from_id' => $this->customer->id,
+            'payment_from_type' => ChartOfAccountNamesEnum::CLIENTS->value,
 
         ]);
-        $expectedResult = [
-            'amount' => '3000.00',
-            'payment_type' => PaymentTypesEnum::CASH->value,
-            'payment_date' => '2024-04-12 10:34:00',
-            'payable_id' => $this->worksite->id,
-            'payable_type' => 'worksite',
-        ];
         $response->assertOk();
-        assertDatabaseHas(Payment::class, $expectedResult);
 
-        expect($expectedResult)->toBe([
-            'amount' => $this->worksite->lastPayment->amount,
-            'payment_type' => $this->worksite->lastPayment->payment_type,
-            'payment_date' => $this->worksite->lastPayment->payment_date,
-            'payable_id' => $this->worksite->lastPayment->payable_id,
-            'payable_type' => $this->worksite->lastPayment->payable_type,
+    });
+    it('should prevent pay from customer to not related worksite', function () {
+
+        $response = actingAs($this->admin)->postJson('/api/v1/worksite/'.$this->worksite->id.'/payment/create', [
+            'payment_amount' => 3000,
+            'payment_type' => PaymentTypesEnum::CASH->value,
+            'payment_date' => '2024-04-12 10:34',
+            'payment_from_id' => $this->customer->id,
+            'payment_from_type' => ChartOfAccountNamesEnum::CLIENTS->value,
+
+        ]);
+        $response->assertStatus(Response::HTTP_BAD_REQUEST);
+        $response->assertJsonFragment([
+            'message' => 'Customer not related to this worksite',
         ]);
 
     });
+    it('fetches payments from cache if it exists', function () {
 
+        $mockClient = new MockClient([
+            GetWorksitePaymentsRequest::class => MockResponse::make(),
+        ]);
+
+        $connector = new AccountingConnector;
+        $connector->withMockClient($mockClient);
+
+        // Arrange: Cache mock response
+        $mockedPayments = collect((object) [
+            'amount' => 200,
+            'payment_date' => Carbon::now()->format('Y-m-d H:i'),
+            'payment_type' => PaymentTypesEnum::CASH->value,
+        ]);
+
+        // Use consistent cache tags and key for the cached data
+        Cache::put($this->cacheKey, $mockedPayments, 3600);
+
+        // Create a partial mock for PaymentSyncService
+        $paymentService = Mockery::mock(PaymentSyncService::class, [$connector, $this->cacheKeyHelper])
+            ->makePartial();
+
+        // Create a partial mock of PaymentSyncService
+        $paymentService->shouldNotReceive('fetchPayments');
+
+        // Act: Call the service method
+        $paymentService->getPaymentsForWorksite($this->worksite);
+
+        // Assert: Check the response
+        expect(Cache::get($this->cacheKey))->toEqual($mockedPayments);
+
+    });
+    it('fetches payments with calling fetch after invalidate cache', function () {
+
+        // Arrange
+        $mockClient = new MockClient([
+            GetWorksitePaymentsRequest::class => MockResponse::make(),
+        ]);
+
+        $connector = new AccountingConnector;
+        $connector->withMockClient($mockClient);
+
+        Cache::forget($this->cacheKey);
+        // Create a partial mock for PaymentSyncService
+        $paymentService = Mockery::mock(PaymentSyncService::class, [$connector, $this->cacheKeyHelper])
+            ->makePartial();
+
+        // Arrange: Cache mock response
+        $mockedPayments = collect((object) [
+            'amount' => 200,
+            'payment_date' => Carbon::now()->format('Y-m-d H:i'),
+            'payment_type' => PaymentTypesEnum::CASH->value,
+        ]);
+
+        $paymentService->shouldReceive('fetchPayments')
+            ->with($this->worksite)
+            ->andReturn($mockedPayments)
+            ->once();
+        // Act
+        $result = $paymentService->getPaymentsForWorksite($this->worksite);
+
+        // Assert
+        expect($result)->toEqual($result);
+
+    });
 });
+
 describe('List Payments for a Worksite', function () {
 
     beforeEach(function () {

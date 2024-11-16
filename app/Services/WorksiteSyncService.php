@@ -24,5 +24,4 @@ readonly class WorksiteSyncService
 
         $this->accountingConnector->send($request);
     }
-
 }

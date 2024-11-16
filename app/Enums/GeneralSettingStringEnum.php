@@ -2,7 +2,4 @@
 
 namespace App\Enums;
 
-enum GeneralSettingStringEnum: string
-{
-
-}
+enum GeneralSettingStringEnum: string {}

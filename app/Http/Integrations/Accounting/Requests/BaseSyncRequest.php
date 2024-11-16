@@ -3,7 +3,6 @@
 namespace App\Http\Integrations\Accounting\Requests;
 
 use App\Http\Integrations\Accounting\BaseDTO\BaseSyncDTO;
-use App\Http\Integrations\Accounting\Requests\WorksiteSync\WorksiteSyncDTO;
 use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;

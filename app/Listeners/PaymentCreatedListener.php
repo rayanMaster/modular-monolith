@@ -7,8 +7,6 @@ use App\Http\Integrations\Accounting\Connector\AccountingConnector;
 use App\Http\Integrations\Accounting\Requests\PaymentSync\PaymentSyncDTO;
 use App\Http\Integrations\Accounting\Requests\PaymentSync\PaymentSyncRequest;
 use App\Models\Worksite;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Log;
 use Saloon\Exceptions\Request\FatalRequestException;
 use Saloon\Exceptions\Request\RequestException;
@@ -20,13 +18,13 @@ readonly class PaymentCreatedListener
      */
     public function __construct(
         private AccountingConnector $accountingConnector
-    )
-    {
+    ) {
         //
     }
 
     /**
      * Handle the event.
+     *
      * @throws RequestException
      */
     public function handle(PaymentCreatedEvent $event): void

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Enums;
@@ -33,7 +34,7 @@ enum ChartOfAccountNamesEnum: string
         return [
             self::CLIENTS,
             self::CONTRACTORS,
-            self::SUPPLIERS
+            self::SUPPLIERS,
         ];
     }
 }

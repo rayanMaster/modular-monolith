@@ -5,8 +5,6 @@ namespace App\Services;
 use App\Http\Integrations\Accounting\Connector\AccountingConnector;
 use App\Http\Integrations\Accounting\Requests\CustomerSync\CustomerSyncDTO;
 use App\Http\Integrations\Accounting\Requests\CustomerSync\CustomerSyncRequest;
-use App\Http\Integrations\Accounting\Requests\WorksiteSync\WorksiteSyncDTO;
-use App\Http\Integrations\Accounting\Requests\WorksiteSync\WorksiteSyncRequest;
 use Saloon\Exceptions\Request\FatalRequestException;
 use Saloon\Exceptions\Request\RequestException;
 
@@ -26,5 +24,4 @@ readonly class CustomerSyncService
 
         $this->accountingConnector->send($request);
     }
-
 }

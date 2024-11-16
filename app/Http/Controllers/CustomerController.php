@@ -25,10 +25,8 @@ class CustomerController extends Controller
 {
     public function __construct(
         private readonly CustomerSyncService $customerSyncService
-    )
-    {
+    ) {}
 
-    }
     public function list(): JsonResponse
     {
         $customers = Customer::query()->get();
@@ -51,11 +49,11 @@ class CustomerController extends Controller
             'uuid' => Str::uuid()->toString(),
             'first_name' => $requestData['first_name'],
             'last_name' => $requestData['last_name'] ?? null,
-        ], fn($value) => $value != null);
+        ], fn ($value) => $value != null);
 
         $customer = Customer::query()->create($filteredData);
         try {
-            $connector = new AccountingConnector();
+            $connector = new AccountingConnector;
             $customerSyncDTO = new CustomerSyncDTO(
                 uuid: $customer->uuid,
                 name: $customer->fullName
@@ -63,10 +61,10 @@ class CustomerController extends Controller
             $request = new CustomerSyncRequest($customerSyncDTO);
 
             $connector->send($request);
-//            $this->customerSyncService->syncCustomerToAccounting($customerSyncDTO);
+            //            $this->customerSyncService->syncCustomerToAccounting($customerSyncDTO);
 
         } catch (FatalRequestException $exception) {
-            Log::info("customer sync", [$exception->getMessage()]);
+            Log::info('customer sync', [$exception->getMessage()]);
         }
 
         return ApiResponseHelper::sendSuccessResponse();
@@ -79,8 +77,6 @@ class CustomerController extends Controller
 
         return ApiResponseHelper::sendSuccessResponse(new Result(CustomerDetailsResource::make($customer)));
     }
-
-
 
     public function update(CustomerUpdateRequest $request, int $id): void
     {

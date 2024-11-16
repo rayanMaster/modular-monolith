@@ -14,9 +14,7 @@ class PaymentSyncRequest extends Request implements HasBody
 {
     use HasJsonBody;
 
-    public function __construct(private readonly PaymentSyncDTO $DTO)
-    {
-    }
+    public function __construct(private readonly PaymentSyncDTO $DTO) {}
 
     /**
      * The HTTP method of the request
@@ -51,7 +49,7 @@ class PaymentSyncRequest extends Request implements HasBody
             'pay_to_uuid' => $this->DTO->worksite_uuid,
             'pay_to_type' => Relation::getMorphAlias(Worksite::class),
             'payment_date' => $this->DTO->payment_date,
-            'payment_amount' => $this->DTO->payment_amount
+            'payment_amount' => $this->DTO->payment_amount,
         ];
     }
 }

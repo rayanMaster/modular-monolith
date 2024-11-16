@@ -94,7 +94,7 @@ class EmployeeController extends Controller
             'last_name' => $requestedData['last_name'] ?? null,
             'phone' => $requestedData['phone'],
             'password' => $requestedData['password'] ?? '123456',
-        ], fn($value) => $value != null);
+        ], fn ($value) => $value != null);
         DB::transaction(function () use ($dataToSave, $requestedData) {
             $user = User::query()->create($dataToSave);
             $role = $requestedData['role'] ?? RolesEnum::WORKER->value;
@@ -123,7 +123,7 @@ class EmployeeController extends Controller
             'first_name' => $requestedData['first_name'] ?? null,
             'last_name' => $requestedData['last_name'] ?? null,
             'phone' => $requestedData['phone'] ?? null,
-        ], fn($value) => $value != null);
+        ], fn ($value) => $value != null);
 
         $worker->update($dataToSave);
 

@@ -11,7 +11,6 @@ use App\Events\PaymentCreatedEvent;
 use App\Exceptions\UnAbleToCloseWorksiteException;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
-use App\Helpers\CacheHelper;
 use App\Http\Integrations\Accounting\Requests\WorksiteSync\WorksiteSyncDTO;
 use App\Http\Requests\WorksiteCreateRequest;
 use App\Http\Requests\WorksiteUpdateRequest;
@@ -28,7 +27,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -44,11 +42,14 @@ class WorksiteController extends Controller
 {
     public function __construct(
         private readonly WorksiteSyncService $worksiteSyncService,
-        private readonly PaymentSyncService  $paymentSyncService
-    )
-    {
-    }
+        private readonly PaymentSyncService $paymentSyncService
+    ) {}
 
+    /**
+     * @throws FatalRequestException
+     * @throws RequestException
+     * @throws JsonException
+     */
     public function list(): JsonResponse
     {
         $workSites = Worksite::query()
@@ -61,7 +62,6 @@ class WorksiteController extends Controller
             $workSite->customerPayments = $payments;
         }
         $pagination = PaginationResource::make($workSites);
-
 
         return ApiResponseHelper::sendSuccessResponse(new Result(
             result: WorksiteListResource::collection($workSites),
@@ -139,7 +139,7 @@ class WorksiteController extends Controller
                     'deliver_date' => $requestedData['deliver_date'] ?? null,
                     'reception_status' => $requestedData['reception_status'] ?? WorkSiteReceptionStatusEnum::SCRATCH->value,
                     'completion_status' => $requestedData['completion_status'] ?? WorkSiteCompletionStatusEnum::PENDING->value,
-                ], fn($value) => $value != null);
+                ], fn ($value) => $value != null);
 
                 $workSite = Worksite::query()->create($dataToSave);
                 try {
@@ -184,7 +184,7 @@ class WorksiteController extends Controller
                     }
                 }
                 // Perform bulk insert
-                if (!empty($paymentData)) {
+                if (! empty($paymentData)) {
                     $payments = $workSite->payments()->createMany($paymentData);
                     PaymentCreatedEvent::dispatch($payments, $workSite->customer?->uuid);
                 }
@@ -195,14 +195,14 @@ class WorksiteController extends Controller
                         $fileNameParts = explode('.', $file->getClientOriginalName());
                         $fileName = $fileNameParts[0];
                         $path = lcfirst('Worksite');
-                        $name = $fileName . '_' . now()->format('YmdH');
-                        $relativeName = $path . '/' . $name . '.webp';
+                        $name = $fileName.'_'.now()->format('YmdH');
+                        $relativeName = $path.'/'.$name.'.webp';
 
-                        if (!File::exists(public_path('storage/' . $path))) {
-                            File::makeDirectory(public_path('storage/' . $path));
+                        if (! File::exists(public_path('storage/'.$path))) {
+                            File::makeDirectory(public_path('storage/'.$path));
                         }
 
-                        $fullPath = public_path('storage/' . $path) . '/' . $name . '.webp';
+                        $fullPath = public_path('storage/'.$path).'/'.$name.'.webp';
 
                         // create new manager instance with desired driver
                         $manager = new ImageManager(new Driver);
@@ -229,7 +229,7 @@ class WorksiteController extends Controller
      * @throws FatalRequestException
      * @throws RequestException
      * @throws JsonException
-     * /
+     *                       /
      */
     public function show(int $id): JsonResponse
     {
@@ -241,10 +241,9 @@ class WorksiteController extends Controller
 
         $worksite->customerPayments = $payments;
 
-        $worksite->totalPaymentsAmount = number_format((float)$payments->sum('amount'), 2);
+        $worksite->totalPaymentsAmount = number_format((float) $payments->sum('amount'), 2);
 
-
-        $worksite->items->map(function (Item $item) use ($payments) {
+        $worksite->items->map(function (Item $item) {
 
             $item->quantityInWarehouse = $item->warehouse->quantity;
             $item->inStock = $item->warehouse->quantity > WarehouseItemThresholdsEnum::LOW->value ?
@@ -314,7 +313,7 @@ class WorksiteController extends Controller
                     $addressDataToUpdate = array_filter([
                         'city_id' => $requestedData['city_id'] ?? null,
                         'title' => $requestedData['address'] ?? null,
-                    ], fn($value) => $value != null);
+                    ], fn ($value) => $value != null);
                     $address->update($addressDataToUpdate);
                 } else {
                     $newAddress = Address::query()->create([
@@ -340,7 +339,7 @@ class WorksiteController extends Controller
                     'deliver_date' => $requestedData['deliver_date'] ?? null,
                     'reception_status' => $requestedData['reception_status'] ?? null,
                     'completion_status' => $requestedData['completion_status'] ?? null,
-                ], fn($value) => $value != null);
+                ], fn ($value) => $value != null);
 
                 $workSite->update($dataToSave);
 

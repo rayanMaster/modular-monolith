@@ -3,8 +3,6 @@
 namespace App\Http\Integrations\Accounting\Requests\GetWorkSitePayment;
 
 use App\Enums\ChartOfAccountNamesEnum;
-use App\Http\Integrations\Accounting\Requests\BaseSyncRequest;
-use App\Http\Integrations\Accounting\Requests\WorksiteSync\WorksiteSyncDTO;
 use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
@@ -14,10 +12,7 @@ class GetWorksitePaymentsRequest extends Request implements HasBody
 {
     use HasJsonBody;
 
-    public function __construct(public readonly GetWorksitePaymentsDTO $getWorksitePaymentsDTO)
-    {
-
-    }
+    public function __construct(public readonly GetWorksitePaymentsDTO $getWorksitePaymentsDTO) {}
 
     /**
      * The HTTP method of the request
@@ -41,7 +36,7 @@ class GetWorksitePaymentsRequest extends Request implements HasBody
     {
         $paymentFromUUIDs = [];
         foreach ($this->getWorksitePaymentsDTO->customerUUIDs as $customerUUID) {
-            if (!is_null($customerUUID)) {
+            if (! is_null($customerUUID)) {
                 $customers = [
                     'source' => ChartOfAccountNamesEnum::CLIENTS->value,
                     'uuid' => $customerUUID,
@@ -49,10 +44,10 @@ class GetWorksitePaymentsRequest extends Request implements HasBody
                 $paymentFromUUIDs[] = $customers;
             }
         }
-       return [
+
+        return [
             'uuid' => $this->getWorksitePaymentsDTO->worksiteUUID,
-            'payment_from_uuids' => $paymentFromUUIDs
+            'payment_from_uuids' => $paymentFromUUIDs,
         ];
     }
-
 }

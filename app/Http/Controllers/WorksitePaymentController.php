@@ -8,8 +8,6 @@ use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
 use App\Helpers\CacheHelper;
 use App\Http\Integrations\Accounting\Requests\PaymentSync\PaymentSyncDTO;
-use App\Http\Integrations\Accounting\Requests\PaymentSync\PaymentSyncRequest;
-use App\Http\Requests\PaymentCreateRequest;
 use App\Http\Requests\PaymentListRequest;
 use App\Http\Requests\WorksitePaymentCreateRequest;
 use App\Http\Resources\WorksitePaymentListResource;
@@ -25,13 +23,9 @@ use Throwable;
 
 class WorksitePaymentController extends Controller
 {
-
     public function __construct(
         private readonly PaymentSyncService $paymentSyncService
-    )
-    {
-
-    }
+    ) {}
 
     public function list(int $workSiteId, PaymentListRequest $request): JsonResponse
     {
@@ -76,6 +70,7 @@ class WorksitePaymentController extends Controller
 
     /**
      * Handle the incoming request.
+     *
      * @throws Throwable
      */
     public function create(WorksitePaymentCreateRequest $request, int $workSiteId): JsonResponse
@@ -93,8 +88,9 @@ class WorksitePaymentController extends Controller
         $requestedData = $request->validated();
         $customer = Customer::query()->findOrFail(id: $requestedData['payment_from_id']);
 
-        if ($worksite->customer_id !== $customer->id)
-            throw new CustomerNotRelatedToWorksiteException(message: "Customer not related to this worksite");
+        if ($worksite->customer_id !== $customer->id) {
+            throw new CustomerNotRelatedToWorksiteException(message: 'Customer not related to this worksite');
+        }
 
         DB::transaction(function () use ($worksite, $requestedData, $customer) {
             if ($requestedData['payment_from_type'] == ChartOfAccountNamesEnum::CLIENTS->value) {
@@ -104,8 +100,8 @@ class WorksitePaymentController extends Controller
                     payment_date: $requestedData['payment_date'],
                     payment_amount: $requestedData['payment_amount']);
                 $this->paymentSyncService->syncPaymentsToAccounting($makePaymentDTO);
-                $cache = new CacheHelper();
-                $cache->flushPayments('worksite_payments', $worksite->uuid);
+                $cache = new CacheHelper;
+                $cache->flushCache('worksite_payments', $worksite->uuid);
             }
         });
 
