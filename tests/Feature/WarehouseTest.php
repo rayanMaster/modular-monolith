@@ -83,7 +83,7 @@ describe('Warehouse Update Test', function () {
             'address_id' => $this->address->id,
         ]);
         $newAddress = Address::factory()->create();
-        actingAs($this->admin)->putJson('/api/v1/warehouse/update/'.$wareHouse->id, [
+        actingAs($this->admin)->putJson('/api/v1/warehouse/update/' . $wareHouse->id, [
             'name' => 'Main Warehouse Updated',
             'address_id' => $newAddress->id,
         ])->assertStatus(Response::HTTP_OK);
@@ -137,7 +137,8 @@ describe('Warehouse List Test', function () {
                     'title' => $this->otherAddress->title,
                 ],
             ]);
-        assertDatabaseCount(Warehouse::class, 2);
+        //2 created and 1 created when worksite created
+        assertDatabaseCount(Warehouse::class, 2 + 1);
     });
 });
 describe('Warehouse Details Test', function () {
@@ -157,11 +158,11 @@ describe('Warehouse Details Test', function () {
     });
     it('should return not found error if warehouse nof found', function () {
         $unExistedWarehouseId = rand(2222, 3333);
-        actingAs($this->admin)->getJson('/api/v1/warehouse/show/'.$unExistedWarehouseId)
+        actingAs($this->admin)->getJson('/api/v1/warehouse/show/' . $unExistedWarehouseId)
             ->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should get a warehouse details', function () {
-        actingAs($this->admin)->getJson('/api/v1/warehouse/show/'.$this->warehouse->id)
+        actingAs($this->admin)->getJson('/api/v1/warehouse/show/' . $this->warehouse->id)
             ->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment([
                 'name' => 'Main Warehouse',
@@ -189,11 +190,11 @@ describe('Warehouse Delete Test', function () {
     });
     it('should return not found error if warehouse nof found', function () {
         $unExistedWarehouseId = rand(220, 330);
-        actingAs($this->admin)->deleteJson('/api/v1/warehouse/delete/'.$unExistedWarehouseId)
+        actingAs($this->admin)->deleteJson('/api/v1/warehouse/delete/' . $unExistedWarehouseId)
             ->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should delete a warehouse', function () {
-        actingAs($this->admin)->deleteJson('/api/v1/warehouse/delete/'.$this->wareHouse->id)
+        actingAs($this->admin)->deleteJson('/api/v1/warehouse/delete/' . $this->wareHouse->id)
             ->assertStatus(Response::HTTP_OK);
         assertSoftDeleted(Warehouse::class, ['id' => $this->wareHouse->id]);
     });

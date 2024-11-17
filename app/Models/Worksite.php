@@ -22,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property string $uuid
  * @property string $description
  * @property int|null $customer_id
+ * @property int $warehouse_id
  * @property int|null $category_id
  * @property int|null $parent_worksite_id
  * @property string $starting_budget
