@@ -58,7 +58,7 @@ class WorksiteItemController extends Controller
                         ->first()
                         ?->quantity;
                     if ($currentItemQtyInWarehouse < $item['quantity']) {
-                        throw new InValidWarehouseItemMoveException('Not enough items in warehouse', Response::HTTP_BAD_REQUEST);
+                        throw new InValidWarehouseItemMoveException('Insufficient quantity in warehouse.', Response::HTTP_BAD_REQUEST);
                     }
                     $itemsData = [
                         $item['item_id'] => [

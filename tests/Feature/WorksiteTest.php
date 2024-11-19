@@ -20,6 +20,7 @@ use App\Models\Warehouse;
 use App\Models\WarehouseItem;
 use App\Models\Worksite;
 use App\Models\WorksiteCategory;
+use App\Models\WorksiteItem;
 use App\Services\PaymentSyncService;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
@@ -29,12 +30,15 @@ use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-use function Pest\Laravel\actingAs;
-use function Pest\Laravel\assertDatabaseCount;
-use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\getJson;
-use function Pest\Laravel\postJson;
-use function Pest\Laravel\putJson;
+use function Pest\Laravel\{actingAs,
+    assertDatabaseCount,
+    assertDatabaseHas,
+    getJson,
+    postJson,
+    putJson,
+    assertDatabaseMissing
+};
+
 
 describe('Worksite entity fields check', function () {
     beforeEach(function () {
@@ -44,10 +48,10 @@ describe('Worksite entity fields check', function () {
             'title',
             'description',
             'manager_id',
+            'customer_id',
         ];
         $this->nullableFields = [
             'warehouse_id',
-            'customer_id',
             'category_id',
             'parent_worksite_id',
             'contractor_id',
@@ -213,6 +217,7 @@ describe('Create Worksite', function () {
             ],
             'images' => [$files],
         ]);
+
         $response->assertOk();
 
         // Assert the file was stored...
@@ -237,19 +242,10 @@ describe('Create Worksite', function () {
             'manager_id' => $this->manager->id,
             'warehouse_id' => $workSite->warehouse_id
         ]);
+
         expect($workSite->parentWorksite)->toBeNull('that indicates that worksite is main')
             ->and($workSite?->title)->toBe('worksite A')
             ->and($workSite?->description)->toBe('this worksite is for freeTown')
-            ->and($workSite?->items[0]->pivot->getAttributes())->toBe(
-                ['worksite_id' => $workSite->id,
-                    'item_id' => $workSiteResource1->id,
-                    'quantity' => 23,
-                    'price' => '34.00'])
-            ->and($workSite?->items[1]->pivot->getAttributes())->toBe(
-                ['worksite_id' => $workSite->id,
-                    'item_id' => $workSiteResource2->id,
-                    'quantity' => 30,
-                    'price' => '30.00'])
             ->and($workSite->lastPayment->payable_id)->toBe($workSite->id)
             ->and($workSite->lastPayment->payable_type)->toBe('worksite')
             ->and($workSite->lastPayment->amount)->toBe('3000.00')
@@ -257,7 +253,57 @@ describe('Create Worksite', function () {
             ->and($workSite->lastPayment->payment_type)->toBe(PaymentTypesEnum::CASH->value)
             ->and($workSite->address->city->id)->toBe($city->id)
             ->and($workSite->address->title)->toBe('town center');
+
+        // this will ensure that items moved to the worksite warehouse.
+        assertDatabaseHas(WarehouseItem::class, [
+            'warehouse_id' => $workSite->warehouse->id,
+            'item_id' => $workSiteResource1->id
+        ]);
+        assertDatabaseHas(WarehouseItem::class, [
+            'warehouse_id' => $workSite->warehouse->id,
+            'item_id' => $workSiteResource2->id
+        ]);
+
+        // this will ensure that items not consumed in the worksite at creation level
+        assertDatabaseHas(WorksiteItem::class, [
+            'worksite_id' => $workSite->id,
+            'item_id' => $workSiteResource1->id,
+            'quantity' => 0
+        ]);
+        assertDatabaseHas(WorksiteItem::class, [
+            'worksite_id' => $workSite->id,
+            'item_id' => $workSiteResource2->id,
+            'quantity' => 0
+        ]);
     });
+    test('As an administrator, I want to create a main worksite with only required fields', function () {
+
+
+        $customer = Customer::factory()->create();
+
+        $this->manager = User::factory()->siteManager()->create();
+        expect($this->manager->hasRole('site_manager'))->toBe(true);
+
+
+        $admin = User::factory()->admin()->create();
+        expect($admin->hasRole('admin'))->toBe(true);
+
+        $response = $this->actingAs($admin)->postJson('/api/v1/worksite/create', [
+            'title' => 'worksite A',
+            'description' => 'this worksite is for freeTown',
+            'manager_id' => $this->manager->id,
+            'customer_id' => $customer->id,
+        ]);
+        $response->assertOk();
+        $workSite = Worksite::query()->latest('id')->with(['lastPayment'])->first();
+
+        assertDatabaseHas(Worksite::class, [
+            'manager_id' => $this->manager->id,
+            'warehouse_id' => $workSite->warehouse_id
+        ]);
+
+    });
+
     test('As a non-authenticated, I cant create a main worksite', function () {
 
         $response = $this->postJson('/api/v1/worksite/create', [
@@ -297,10 +343,13 @@ describe('Create Worksite', function () {
         $this->manager = User::factory()->siteManager()->create();
         expect($admin->hasRole('admin'))->toBe(true);
 
+
+        $customer = Customer::factory()->create();
         $response = $this->actingAs($admin)->postJson('/api/v1/worksite/create', [
             'title' => 'worksite A',
             'description' => 'this worksite is for freeTown',
             'manager_id' => $this->manager->id,
+            'customer_id' => $customer->id,
             'items' => [
                 [
                     'id' => rand(2000, 3000),
@@ -470,11 +519,12 @@ describe('List WorkSites', function () {
     test('As an admin, I can show list of worksites without customer and category while creating', function () {
         $address = Address::factory()->create();
         $manager = User::factory()->siteManager()->create();
+        $customer = Customer::factory()->create();
         $data = [
             'title' => 'worksite A',
             'description' => 'this worksite is for freeTown',
             'manager_id' => $manager->id,
-            'customer_id' => null,
+            'customer_id' => $customer->id,
             'category_id' => null, // construction
             'parent_worksite_id' => null, // this is main worksite == top level worksite
             'starting_budget' => 15,
@@ -662,6 +712,8 @@ describe('Show WorkSites Details', function () {
         $this->wsCategory = WorksiteCategory::factory()->create();
         $this->customer = Customer::factory()->create();
         $this->address = Address::factory()->create();
+
+
         $data = [
             'title' => 'worksite sub',
             'description' => 'this worksite is for freeTown sub',
@@ -751,9 +803,7 @@ describe('Show WorkSites Details', function () {
         $workSiteResource1 = Item::factory()->create([
             'item_category_id' => $workSiteResourceCategory->id,
         ]);
-        $workSiteResource2 = Item::factory()->create([
-            'item_category_id' => $workSiteResourceCategory->id,
-        ]);
+
         $data = [
             'title' => 'worksite sub',
             'description' => 'this worksite is for freeTown sub',
@@ -783,17 +833,17 @@ describe('Show WorkSites Details', function () {
 
         $workSite->items()->syncWithoutDetaching([
             $workSiteResource1->id => [
-                'quantity' => 10,
+                'quantity' => 0,
                 'price' => '34.00',
             ],
         ]);
 
         //add the item to the warehouse then pick some of them to the worksite
-        $this->warehouse = Warehouse::factory()->create();
+
         WarehouseItem::factory()->create([
-            'warehouse_id' => $this->warehouse->id,
+            'warehouse_id' => $workSite->warehouse->id,
             'item_id' => $workSiteResource1->id,
-            'quantity' => 23,
+            'quantity' => 30,
             'price' => '34.00',
         ]);
 
@@ -844,8 +894,8 @@ describe('Show WorkSites Details', function () {
                     [
                         'id' => $workSiteResource1->id,
                         'name' => $workSiteResource1->name,
-                        'quantity_in_warehouse' => 23,
-                        'quantity_in_worksite' => 10,
+                        'quantity_in_warehouse' => 30,
+                        'quantity_in_worksite' => 0,
                         'in_stock' => 'In-Stock',
                         'price' => '34.00',
                     ],

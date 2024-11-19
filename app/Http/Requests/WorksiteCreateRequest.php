@@ -21,7 +21,7 @@ class WorksiteCreateRequest extends FormRequest
             'title' => ['required', 'string'],
             'description' => ['required', 'string'],
             'manager_id' => ['required', 'integer', 'exists:users,id'],
-            'customer_id' => ['sometimes', 'integer', 'exists:customers,id'],
+            'customer_id' => ['required', 'integer', 'exists:customers,id'],
             'category_id' => ['sometimes', 'integer', 'exists:worksite_categories,id'],
             'parent_worksite_id' => ['nullable', 'integer', 'exists:worksites,id'],
             'contractor_id' => ['nullable', 'integer', 'exists:contractors,id'],

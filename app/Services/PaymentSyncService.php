@@ -13,6 +13,7 @@ use App\Http\Integrations\Accounting\Requests\PaymentSync\PaymentSyncRequest;
 use App\Models\Worksite;
 use Cache;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use JsonException;
 use Saloon\Exceptions\Request\FatalRequestException;
 use Saloon\Exceptions\Request\RequestException;
@@ -43,11 +44,11 @@ class PaymentSyncService
     public function getPaymentsForWorksite(Worksite $worksite): Collection
     {
         $tag = 'worksite_payments';
-
         return Cache::remember(
             key: $this->cacheHelper->generateCacheKey(tag: $tag, key: $worksite->uuid),
             ttl: GeneralSettingNumericEnum::TTL->value,
             callback: function () use ($worksite) {
+                \Log::info("herrrr");
                 return $this->fetchPayments($worksite);
             });
 
@@ -61,6 +62,7 @@ class PaymentSyncService
         }
         $requestDTO = new GetWorksitePaymentsDTO(worksiteUUID: $worksite->uuid, customerUUIDs: $customerUUIDs);
         $request = new GetWorksitePaymentsRequest($requestDTO);
+
         $jsonResponse = [];
         if (! empty($customerUUIDs)) {
             $jsonResponse = $this->accountingConnector->send($request)?->json();
@@ -74,7 +76,7 @@ class PaymentSyncService
 
         $payments = collect();
 
-        $mainData = ! empty($response) ? $response['data'] : [];
+        $mainData = ! empty($response) && array_key_exists('data',$response) ? $response['data'] : [];
         if (is_array($mainData) && count($mainData) > 0) {
             $data = $mainData[0]['data'];
             $payments = collect($data)->map(function ($item) {

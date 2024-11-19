@@ -18,6 +18,9 @@ use Illuminate\Support\Carbon;
  * @property string|null $description
  * @property int $resource_category_id
  * @property int $status
+ * @property WarehouseItem $warehouse
+ * @property int $quantityInWarehouse
+ * @property string $inStock
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at

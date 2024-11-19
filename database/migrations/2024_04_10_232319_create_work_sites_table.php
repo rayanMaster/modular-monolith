@@ -23,7 +23,7 @@ return new class extends Migration
             $table->uuid();
             $table->string('title');
             $table->string('description');
-            $table->foreignIdFor(Customer::class)->nullable();
+            $table->foreignIdFor(Customer::class)->constrained('customers');
             $table->foreignIdFor(WorksiteCategory::class, 'category_id')->nullable();
             $table->foreignIdFor(Worksite::class, 'parent_worksite_id')->nullable();
             $table->foreignIdFor(Contractor::class)->nullable();

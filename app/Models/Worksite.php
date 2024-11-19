@@ -179,4 +179,12 @@ class Worksite extends Model
     {
         return $this->morphMany(Media::class, 'model');
     }
+
+    /**
+     * @return BelongsTo<Warehouse>
+     */
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
 }

@@ -61,9 +61,9 @@ class WorksiteController extends Controller
             ->orderBy('created_at', 'DESC')
             ->paginate(GeneralSettingNumericEnum::PER_PAGE->value);
 
-        foreach ($workSites as $workSite) {
-            $payments = $this->paymentSyncService->getPaymentsForWorksite($workSite);
-            $workSite->customerPayments = $payments;
+        foreach ($workSites as $worksite) {
+            $payments = $this->paymentSyncService->getPaymentsForWorksite($worksite);
+            $worksite->customerPayments = $payments;
         }
         $pagination = PaginationResource::make($workSites);
 
@@ -80,6 +80,7 @@ class WorksiteController extends Controller
      */
     public function store(WorkSiteCreateRequest $request): JsonResponse
     {
+
         DB::transaction(
             callback: function () use ($request) {
                 /**
@@ -122,7 +123,6 @@ class WorksiteController extends Controller
                         'city_id' => $requestedData['city_id'],
                         'title' => $requestedData['address'] ?? null,
                     ]);
-
                 }
 
                 $dataToSave = array_filter([
@@ -145,22 +145,22 @@ class WorksiteController extends Controller
                     'completion_status' => $requestedData['completion_status'] ?? WorkSiteCompletionStatusEnum::PENDING->value,
                 ], fn($value) => $value != null);
 
-                $workSite = Worksite::query()->create($dataToSave);
+                $worksite = Worksite::query()->create($dataToSave);
                 try {
-                    $this->worksiteSyncService->syncWorksiteToAccounting(new WorksiteSyncDTO($workSite->uuid, $workSite->title));
+                    $this->worksiteSyncService->syncWorksiteToAccounting(new WorksiteSyncDTO($worksite->uuid, $worksite->title));
 
                 } catch (FatalRequestException $exception) {
                     Log::info('problem', [$exception->getMessage()]);
                 }
 
                 // Create related warehouse to the main worksite
-                if ($workSite->parentWorksite == null) {
+                if ($worksite->parentWorksite == null) {
                     $warehouse = Warehouse::query()->create([
                         'address_id' => $address?->id,
-                        'name' => $workSite->title . ' warehouse'
+                        'name' => $worksite->title . ' warehouse'
                     ]);
-                    $workSite->warehouse_id = $warehouse->id;
-                    $workSite->save();
+                    $worksite->warehouse_id = $warehouse->id;
+                    $worksite->save();
                 }
 
                 $resourcesData = [];
@@ -170,7 +170,7 @@ class WorksiteController extends Controller
                     foreach ($requestedData['items'] as $resource) {
                         if (is_array($resource)) {
                             $item = [
-                                'quantity' => $resource['quantity'],
+                                'quantity' => 0,
                                 'price' => $resource['price'],
                             ];
                             $resourcesData[$resource['id']] = $item;
@@ -183,19 +183,18 @@ class WorksiteController extends Controller
                         ]);
                     }
                 }
-                $workSite->items()->syncWithoutDetaching($resourcesData);
-
+                // here we are adding items with 0 quantity
+                $worksite->items()->syncWithoutDetaching($resourcesData);
 
                 // prepare payment data
                 $paymentData = [];
-
                 if (array_key_exists('payments', $requestedData) &&
                     is_array($requestedData['payments']) && count($requestedData['payments']) > 0) {
                     foreach ($requestedData['payments'] as $payment) {
                         if (is_array($payment)) {
                             $item = [
                                 'payable_type' => Relation::getMorphAlias(Worksite::class),
-                                'payable_id' => $workSite->uuid,
+                                'payable_id' => $worksite->uuid,
                                 'amount' => $payment['payment_amount'],
                                 'payment_date' => Carbon::parse($payment['payment_date']),
                                 'payment_type' => PaymentTypesEnum::CASH->value,
@@ -208,8 +207,8 @@ class WorksiteController extends Controller
                 }
                 // Perform bulk insert
                 if (!empty($paymentData)) {
-                    $payments = $workSite->payments()->createMany($paymentData);
-                    PaymentCreatedEvent::dispatch($payments, $workSite->customer?->uuid);
+                    $payments = $worksite->payments()->createMany($paymentData);
+                    PaymentCreatedEvent::dispatch($payments, $worksite->customer?->uuid);
                 }
 
                 $files = $request->file('images');
@@ -232,7 +231,7 @@ class WorksiteController extends Controller
 
                         // read image from filesystem
                         $manager->read($file)->save($fullPath);
-                        $workSite->media()->create([
+                        $worksite->media()->create([
                             'name' => $name,
                             'file_name' => $relativeName,
                         ]);
@@ -262,15 +261,17 @@ class WorksiteController extends Controller
 
         $payments = $this->paymentSyncService->getPaymentsForWorksite($worksite);
 
+
         $worksite->customerPayments = $payments;
 
         $worksite->totalPaymentsAmount = number_format((float)$payments->sum('amount'), 2);
+
 
         $worksite->items->map(function (Item $item) {
             $item->quantityInWarehouse = $item->warehouse->quantity;
             $item->inStock = $item->warehouse->quantity > WarehouseItemThresholdsEnum::LOW->value ?
                 'In-Stock' :
-                ($item->warehouse->quantity > 0 ? 'Low-Stock' : 'Off-Stock');
+                ($item->warehouse->quantity > 0 ? 'Low-Stock' : 'Out-OFF-Stock');
         });
 
 
@@ -319,7 +320,7 @@ class WorksiteController extends Controller
                  *  } $requestedData
                  */
                 $requestedData = $request->validated();
-                $workSite = Worksite::query()->findOrFail($id);
+                $worksite = Worksite::query()->findOrFail($id);
 
                 // update address
                 $newAddress = null;
@@ -364,7 +365,7 @@ class WorksiteController extends Controller
                     'completion_status' => $requestedData['completion_status'] ?? null,
                 ], fn($value) => $value != null);
 
-                $workSite->update($dataToSave);
+                $worksite->update($dataToSave);
 
             },
             attempts: 3);
@@ -378,8 +379,8 @@ class WorksiteController extends Controller
      */
     public function close(int $id): JsonResponse
     {
-        $workSite = Worksite::query()->with(['subWorksites'])->findOrFail($id);
-        $relatedActiveSubWorkSitesCount = $workSite->whereHas('subWorksites', function (Builder $query) {
+        $worksite = Worksite::query()->with(['subWorksites'])->findOrFail($id);
+        $relatedActiveSubWorkSitesCount = $worksite->whereHas('subWorksites', function (Builder $query) {
             return $query->where(
                 column: 'completion_status',
                 operator: '<>',
@@ -387,17 +388,17 @@ class WorksiteController extends Controller
             );
         })->count();
 
-        $workSitePayments = $workSite->payments->sum('amount');
+        $workSitePayments = $worksite->payments->sum('amount');
 
         if ($relatedActiveSubWorkSitesCount > 0) {
             throw new UnAbleToCloseWorkSiteException("You can't close a worksite with active sub-worksites");
         }
 
-        if ($workSitePayments < $workSite->cost) {
+        if ($workSitePayments < $worksite->cost) {
             throw new UnAbleToCloseWorkSiteException("You can't close a worksite with unpaid payment");
         }
 
-        $workSite->update([
+        $worksite->update([
             'completion_status' => WorkSiteCompletionStatusEnum::CLOSED,
         ]);
 
@@ -409,9 +410,9 @@ class WorksiteController extends Controller
      */
     public function assignContractor(int $workSiteId, int $contractorId): JsonResponse
     {
-        $workSite = Worksite::query()->findOrFail($workSiteId);
+        $worksite = Worksite::query()->findOrFail($workSiteId);
         Contractor::query()->findOrFail($contractorId);
-        $workSite->update([
+        $worksite->update([
             'contractor_id' => $contractorId,
         ]);
 
@@ -420,10 +421,10 @@ class WorksiteController extends Controller
 
     public function unAssignContractor(int $workSiteId, int $contractorId): JsonResponse
     {
-        $workSite = Worksite::query()->findOrFail($workSiteId);
+        $worksite = Worksite::query()->findOrFail($workSiteId);
         Contractor::query()->findOrFail($contractorId);
 
-        $workSite->update([
+        $worksite->update([
             'contractor_id' => null,
         ]);
 
