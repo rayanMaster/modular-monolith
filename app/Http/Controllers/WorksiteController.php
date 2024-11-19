@@ -24,6 +24,7 @@ use App\Models\Warehouse;
 use App\Models\WarehouseItem;
 use App\Models\Worksite;
 use App\Services\PaymentSyncService;
+use App\Services\Worksite\WorksiteService;
 use App\Services\WorksiteSyncService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -44,7 +45,8 @@ class WorksiteController extends Controller
 {
     public function __construct(
         private readonly WorksiteSyncService $worksiteSyncService,
-        private readonly PaymentSyncService  $paymentSyncService
+        private readonly PaymentSyncService  $paymentSyncService,
+        private readonly WorksiteService $worksiteService
     )
     {
     }
@@ -81,7 +83,7 @@ class WorksiteController extends Controller
     public function store(WorkSiteCreateRequest $request): JsonResponse
     {
 
-        DB::transaction(
+        $worksite = DB::transaction(
             callback: function () use ($request) {
                 /**
                  * @var array{
@@ -238,11 +240,13 @@ class WorksiteController extends Controller
                     }
                 }
                 //        $this->fileManager->upload($files);
+                return $worksite;
             },
             attempts: 3);
 
+        $worksiteDetails = $this->worksiteService->getDetails($worksite->id);
         return ApiResponseHelper::sendSuccessResponse(
-            new Result);
+            new Result(WorksiteDetailsResource::make($worksiteDetails)));
     }
 
     /**
@@ -256,24 +260,7 @@ class WorksiteController extends Controller
     public function show(int $id): JsonResponse
     {
 
-        $worksite = Worksite::query()->with(['customer', 'items.warehouse', 'media', 'address', 'pendingOrders'])
-            ->findOrFail($id);
-
-        $payments = $this->paymentSyncService->getPaymentsForWorksite($worksite);
-
-
-        $worksite->customerPayments = $payments;
-
-        $worksite->totalPaymentsAmount = number_format((float)$payments->sum('amount'), 2);
-
-
-        $worksite->items->map(function (Item $item) {
-            $item->quantityInWarehouse = $item->warehouse->quantity;
-            $item->inStock = $item->warehouse->quantity > WarehouseItemThresholdsEnum::LOW->value ?
-                'In-Stock' :
-                ($item->warehouse->quantity > 0 ? 'Low-Stock' : 'Out-OFF-Stock');
-        });
-
+        $worksite = $this->worksiteService->getDetails($id);
 
         return ApiResponseHelper::sendSuccessResponse(new Result(WorksiteDetailsResource::make($worksite)));
     }

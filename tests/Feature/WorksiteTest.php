@@ -295,11 +295,32 @@ describe('Create Worksite', function () {
             'customer_id' => $customer->id,
         ]);
         $response->assertOk();
-        $workSite = Worksite::query()->latest('id')->with(['lastPayment'])->first();
+
+        $worksite = Worksite::query()->latest('id')->with(['lastPayment'])->first();
+
+        $response->assertJsonFragment([
+            'id' => $worksite->id,
+            'title' => $worksite->title,
+            'description' => $worksite->description,
+            'manager' => $worksite->manager?->fullName,
+            'customer' => $worksite->customer?->fullName,
+            'category' => $worksite->category?->name, // construction
+            'starting_budget' => number_format($worksite->starting_budget, 2),
+            'cost' => number_format($worksite->cost, 2),
+            'pending_orders_count' => $worksite->pendingOrders?->count(),
+            'workers_count' => $worksite->workers_count,
+            'receipt_date' => $worksite->receipt_date,
+            'starting_date' => $worksite->starting_date,
+            'deliver_date' => $worksite->deliver_date,
+            'reception_status' => WorkSiteReceptionStatusEnum::from($worksite->reception_status)->name,
+            'created_at' => Carbon::parse($worksite->created_at)->toDateTimeString(),
+            'updated_at' => Carbon::parse($worksite->updated_at)->toDateTimeString(),
+        ]);
+
 
         assertDatabaseHas(Worksite::class, [
             'manager_id' => $this->manager->id,
-            'warehouse_id' => $workSite->warehouse_id
+            'warehouse_id' => $worksite->warehouse_id
         ]);
 
     });
