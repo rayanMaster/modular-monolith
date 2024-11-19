@@ -13,7 +13,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('worksites', function (Blueprint $table) {
-            $table->foreignIdFor(Warehouse::class)->nullable()->constrained('warehouses');
+            $table->after('customer_id',function (Blueprint $blueprint){
+               $blueprint->foreignIdFor(Warehouse::class)->nullable()->constrained('warehouses');
+            });
         });
     }
 
