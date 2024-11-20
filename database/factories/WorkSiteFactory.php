@@ -44,8 +44,7 @@ class WorkSiteFactory extends Factory
             'parent_worksite_id' => null, // this is main worksite == top level worksite
             'starting_budget' => 15,
             'cost' => 20,
-            'address_id' => fn () => Address::query()->first() != null ?
-                Address::query()->first()->id : Address::factory()->create()->id,
+            'address_id' => Address::factory()->create()->id,
             'workers_count' => 20,
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',

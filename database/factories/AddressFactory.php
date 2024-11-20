@@ -25,8 +25,7 @@ class AddressFactory extends Factory
             'zipcode' => fake()->postcode(),
             'street' => fake()->streetName(),
             'state' => fake()->city,
-            'city_id' => fn () => City::query()->first() != null ?
-                City::query()->first()->id : City::factory()->create()->id,
+            'city_id' => fn() => City::factory()->create()->id,
         ];
     }
 }

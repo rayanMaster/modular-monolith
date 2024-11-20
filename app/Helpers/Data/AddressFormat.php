@@ -7,7 +7,8 @@ use App\Models\Address;
 class AddressFormat
 {
     /**
-     * @param  Address|array  $address
+     * @param array $address
+     * @return string
      */
     public static function format(array $address): string
     {

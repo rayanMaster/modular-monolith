@@ -560,6 +560,7 @@ describe('List WorkSites', function () {
             'updated_at' => now(),
         ];
         $workSite = Worksite::factory()->create($data);
+
         assertDatabaseCount(Worksite::class, 1);
         actingAs($this->admin)->getJson('/api/v1/worksite/list')
             ->assertStatus(Response::HTTP_OK)
@@ -577,14 +578,13 @@ describe('List WorkSites', function () {
                 'sub_worksites' => [],
                 'starting_budget' => number_format($workSite->starting_budget, 2),
                 'cost' => number_format($workSite->cost, 2),
-                'address' => [
-                    'id' => $address->id,
-                    'title' => $address->title,
-                    'city' => $address->city?->name,
-                    'street' => $address->street,
-                    'state' => $address->state,
-                    'zipCode' => $address->zipcode,
-                ],
+                'address' => AddressFormat::format([
+                    'title' => $address?->title,
+                    'state' => $address?->state,
+                    'city' => $address?->city?->name,
+                    'street' => $address?->street,
+                    'zipcode' => $address?->zipcode,
+                ]),
                 'workers_count' => $workSite->workers_count,
                 'receipt_date' => $workSite->receipt_date,
                 'starting_date' => $workSite->starting_date,
@@ -662,14 +662,13 @@ describe('List WorkSites', function () {
                 'sub_worksites' => $workSite->subWorkSites,
                 'starting_budget' => number_format($workSite->starting_budget, 2),
                 'cost' => number_format($workSite->cost, 2),
-                'address' => [
-                    'id' => $address->id,
-                    'city' => $address->city?->name,
-                    'title' => $address->title,
-                    'street' => $address->street,
-                    'state' => $address->state,
-                    'zipCode' => $address->zipcode,
-                ],
+                'address' => AddressFormat::format([
+                    'title' => $address?->title,
+                    'state' => $address?->state,
+                    'city' => $address?->city?->name,
+                    'street' => $address?->street,
+                    'zipcode' => $address?->zipcode,
+                ]),
                 'pending_orders_count' => 1,
                 'workers_count' => $workSite->workers_count,
                 'receipt_date' => $workSite->receipt_date,

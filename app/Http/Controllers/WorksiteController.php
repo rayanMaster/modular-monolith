@@ -83,7 +83,7 @@ class WorksiteController extends Controller
     public function store(WorkSiteCreateRequest $request): JsonResponse
     {
 
-        $worksite = DB::transaction(
+        DB::transaction(
             callback: function () use ($request) {
                 /**
                  * @var array{

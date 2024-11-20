@@ -56,7 +56,7 @@ class WorksiteListResource extends JsonResource
             'sub_worksites' => $this->subWorksites,
             'starting_budget' => $this->starting_budget,
             'cost' => $this->cost,
-            'address' => AddressDetailsResource::make($this->address),
+            'address' => $this->address?->rawAddress,
             'pending_orders_count' => $this->pendingOrders?->count(),
             'workers_count' => $this->workers_count,
             'receipt_date' => $this->receipt_date,
