@@ -27,6 +27,9 @@ describe('Login', function () {
             'user_name' => $this->user->phone,
             'password' => 'admin12',
         ]);
-        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED)
+        ->assertJsonFragment([
+            'message'=>'Invalid username or password.'
+        ]);
     });
 });
