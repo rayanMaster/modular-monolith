@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends Factory<WorksiteItem>
  */
-class WorkSiteItemFactory extends Factory
+class WorksiteItemFactory extends Factory
 {
     protected $model = WorksiteItem::class;
 

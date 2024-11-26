@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use Database\Factories\WorkSiteItemFactory;
+use Database\Factories\WorksiteItemFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @method static WorkSiteItemFactory factory($count = null, $state = [])
+ * @method static WorksiteItemFactory factory($count = null, $state = [])
  * @method static Builder|WorksiteItem newModelQuery()
  * @method static Builder|WorksiteItem newQuery()
  * @method static Builder|WorksiteItem query()
@@ -29,8 +29,8 @@ class WorksiteItem extends Model
 
     protected $guarded = [];
 
-    protected static function newFactory(): WorkSiteItemFactory
+    protected static function newFactory(): WorksiteItemFactory
     {
-        return WorkSiteItemFactory::new();
+        return WorksiteItemFactory::new();
     }
 }

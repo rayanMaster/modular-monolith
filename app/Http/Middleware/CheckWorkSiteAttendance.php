@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
-class CheckWorkSiteAttendance
+class CheckWorksiteAttendance
 {
     /**
      * Handle an incoming request.
@@ -49,13 +49,13 @@ class CheckWorkSiteAttendance
             $date = Carbon::parse($dateInput)->toDateString();
         }
 
-        $doesUserPresentAtWorkSite = DailyAttendance::query()
+        $doesUserPresentAtWorksite = DailyAttendance::query()
             ->where('employee_id', $authUser?->id)
             ->where('worksite_id', $request->input('worksite_id'))
             ->whereDate('date', $date)
             ->exists();
 
-        if (! $doesUserPresentAtWorkSite) {
+        if (! $doesUserPresentAtWorksite) {
             throw new UserAttendanceException('Employee attendance does not present at work site');
         }
 

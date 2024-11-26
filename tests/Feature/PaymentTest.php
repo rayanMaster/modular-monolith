@@ -4,7 +4,7 @@ use App\Enums\ChartOfAccountNamesEnum;
 use App\Enums\PaymentTypesEnum;
 use App\Helpers\CacheHelper;
 use App\Http\Integrations\Accounting\Connector\AccountingConnector;
-use App\Http\Integrations\Accounting\Requests\GetWorkSitePayment\GetWorksitePaymentsRequest;
+use App\Http\Integrations\Accounting\Requests\GetWorksitePayment\GetWorksitePaymentsRequest;
 use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\User;

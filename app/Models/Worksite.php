@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OrderStatusEnum;
-use Database\Factories\WorkSiteFactory;
+use Database\Factories\WorksiteFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -46,11 +46,11 @@ use Illuminate\Support\Carbon;
  * @property-read int|null $payments_count
  * @property-read Collection<int, Item> $resources
  * @property-read int|null $resources_count
- * @property-read Collection<int, Worksite> $subWorkSites
+ * @property-read Collection<int, Worksite> $subWorksites
  * @property-read int|null $sub_worksites_count
  * @property-read Model|Eloquent $model
  *
- * @method static WorkSiteFactory factory($count = null, $state = [])
+ * @method static WorksiteFactory factory($count = null, $state = [])
  * @method static Builder|Worksite newModelQuery()
  * @method static Builder|Worksite newQuery()
  * @method static Builder|Worksite query()
@@ -86,9 +86,9 @@ class Worksite extends Model
      */
     protected $guarded = [];
 
-    protected static function newFactory(): WorkSiteFactory
+    protected static function newFactory(): WorksiteFactory
     {
-        return WorkSiteFactory::new();
+        return WorksiteFactory::new();
     }
 
     /**
@@ -102,7 +102,7 @@ class Worksite extends Model
     /**
      * @return HasMany<Worksite>
      */
-    public function subWorkSites(): HasMany
+    public function subWorksites(): HasMany
     {
         return $this->hasMany(Worksite::class, 'parent_worksite_id');
     }

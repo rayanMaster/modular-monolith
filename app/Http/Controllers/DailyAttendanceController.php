@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\InvalidSubWorkSiteAttendanceException;
+use App\Exceptions\InvalidSubWorksiteAttendanceException;
 use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
 use App\Http\Requests\DailyAttendanceCreateRequest;
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 class DailyAttendanceController extends Controller
 {
     /**
-     * @throws InvalidSubWorkSiteAttendanceException
+     * @throws InvalidSubWorksiteAttendanceException
      */
     public function store(int $employeeId, DailyAttendanceCreateRequest $request): JsonResponse
     {
@@ -49,13 +49,13 @@ class DailyAttendanceController extends Controller
                 value: $dateTo)
             ->exists();
         if ($alreadyHasDailyAttendance) {
-            throw new InvalidSubWorkSiteAttendanceException('You already have a daily attendance for a work site', Response::HTTP_FORBIDDEN);
+            throw new InvalidSubWorksiteAttendanceException('You already have a daily attendance for a work site', Response::HTTP_FORBIDDEN);
         }
         $workSite = Worksite::query()->findOrFail($requestedData['worksite_id']);
 
         // test if work site is a sub-worksite
         if ($workSite->parent_worksite_id != null) {
-            throw new InvalidSubWorkSiteAttendanceException('Cant Assign employee to work site', Response::HTTP_FORBIDDEN);
+            throw new InvalidSubWorksiteAttendanceException('Cant Assign employee to work site', Response::HTTP_FORBIDDEN);
         }
 
         $dates = $this->getDates($dateFrom, $dateTo);
@@ -75,7 +75,7 @@ class DailyAttendanceController extends Controller
     }
 
     /**
-     * @throws InvalidSubWorkSiteAttendanceException
+     * @throws InvalidSubWorksiteAttendanceException
      */
     public function update(int $employeeId, DailyAttendanceUpdateRequest $request): JsonResponse
     {
@@ -105,7 +105,7 @@ class DailyAttendanceController extends Controller
                 value: $dateTo)
             ->exists();
         if ($alreadyHasDailyAttendance) {
-            throw new InvalidSubWorkSiteAttendanceException('You already have a daily attendance for a work site', Response::HTTP_FORBIDDEN);
+            throw new InvalidSubWorksiteAttendanceException('You already have a daily attendance for a work site', Response::HTTP_FORBIDDEN);
         }
 
         $dates = $this->getDates($dateFrom, $dateTo);
@@ -130,7 +130,7 @@ class DailyAttendanceController extends Controller
 
             // test if work site is a sub-worksite
             if ($workSite->parent_worksite_id != null) {
-                throw new InvalidSubWorkSiteAttendanceException('Cant Assign employee to work site', Response::HTTP_FORBIDDEN);
+                throw new InvalidSubWorksiteAttendanceException('Cant Assign employee to work site', Response::HTTP_FORBIDDEN);
             }
 
             DailyAttendance::query()->upsert(

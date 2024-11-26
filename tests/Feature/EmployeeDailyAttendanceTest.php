@@ -45,14 +45,14 @@ describe('EmployeeDailyAttendance Create', function () {
         $this->worker = User::factory()->worker()->create();
         $this->admin = User::factory()->admin()->create();
         $this->worksite = Worksite::factory()->create();
-        $this->subWorkSite = Worksite::factory()->create([
+        $this->subWorksite = Worksite::factory()->create([
             'parent_worksite_id' => $this->worksite->id,
         ]);
     });
 
     it('should prevent adding attendance for an employee for a sub-worksite', function () {
         $response = actingAs($this->admin)->postJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/create', [
-            'worksite_id' => $this->subWorkSite->id,
+            'worksite_id' => $this->subWorksite->id,
         ]);
         $response->assertStatus(Response::HTTP_FORBIDDEN)
             ->assertJsonFragment([
@@ -100,7 +100,7 @@ describe('EmployeeDailyAttendance Create', function () {
         );
     });
     it('should prevent assigning an employee to same or multiple workSites in a same day', function () {
-        $otherWorkSite = Worksite::factory()->create();
+        $otherWorksite = Worksite::factory()->create();
 
         actingAs($this->admin)->postJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/create', [
             'worksite_id' => $this->worksite->id,
@@ -111,7 +111,7 @@ describe('EmployeeDailyAttendance Create', function () {
         ])->assertStatus(Response::HTTP_FORBIDDEN);
 
         actingAs($this->admin)->postJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/create', [
-            'worksite_id' => $otherWorkSite->id,
+            'worksite_id' => $otherWorksite->id,
         ])->assertStatus(Response::HTTP_FORBIDDEN);
 
         assertDatabaseCount(DailyAttendance::class, 1);
@@ -125,18 +125,18 @@ describe('EmployeeDailyAttendance Create', function () {
         assertDatabaseMissing(DailyAttendance::class, [
             'employee_id' => $this->worker->id,
             'date' => Carbon::today()->format('Y-m-d'),
-            'worksite_id' => $otherWorkSite->id,
+            'worksite_id' => $otherWorksite->id,
         ]);
     });
     it('should prevent assigning an employee to same or multiple workSites in for date range', function () {
-        $otherWorkSite = Worksite::factory()->create();
+        $otherWorksite = Worksite::factory()->create();
 
         actingAs($this->admin)->postJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/create', [
             'worksite_id' => $this->worksite->id,
         ])->assertStatus(Response::HTTP_OK);
 
         actingAs($this->admin)->postJson('api/v1/employee/'.$this->worker->id.'/daily_attendance/create', [
-            'worksite_id' => $otherWorkSite->id,
+            'worksite_id' => $otherWorksite->id,
             'date_from' => Carbon::today()->subDay(2)->format('Y-m-d'),
             'date_to' => Carbon::today()->addDays(2)->format('Y-m-d'),
         ])->assertStatus(Response::HTTP_FORBIDDEN);
@@ -152,7 +152,7 @@ describe('EmployeeDailyAttendance Create', function () {
         assertDatabaseMissing(DailyAttendance::class, [
             'employee_id' => $this->worker->id,
             'date' => Carbon::today()->format('Y-m-d'),
-            'worksite_id' => $otherWorkSite->id,
+            'worksite_id' => $otherWorksite->id,
         ]);
     });
 });
@@ -164,7 +164,7 @@ describe('EmployeeDailyAttendance Update', function () {
         $this->admin = User::factory()->admin()->create();
         $this->workSite1 = Worksite::factory()->create();
         $this->workSite2 = Worksite::factory()->create();
-        $this->subWorkSite = Worksite::factory()->create([
+        $this->subWorksite = Worksite::factory()->create([
             'parent_worksite_id' => $this->workSite1->id,
         ]);
         $this->employeeAttendance = DailyAttendance::factory()->create([

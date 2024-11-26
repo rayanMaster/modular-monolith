@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources;
 
-use App\Enums\WorkSiteCompletionStatusEnum;
-use App\Enums\WorkSiteReceptionStatusEnum;
+use App\Enums\WorksiteCompletionStatusEnum;
+use App\Enums\WorksiteReceptionStatusEnum;
 use App\Models\Address;
 use App\Models\Customer;
 use App\Models\Order;
@@ -65,8 +65,8 @@ class WorksiteDetailsResource extends JsonResource
             'receipt_date' => $this->receipt_date,
             'starting_date' => $this->starting_date,
             'deliver_date' => $this->deliver_date,
-            'reception_status' => WorkSiteReceptionStatusEnum::from($this->reception_status)->name,
-            'completion_status' => WorkSiteCompletionStatusEnum::from($this->completion_status)->name,
+            'reception_status' => WorksiteReceptionStatusEnum::from($this->reception_status)->name,
+            'completion_status' => WorksiteCompletionStatusEnum::from($this->completion_status)->name,
             'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
             'updated_at' => Carbon::parse($this->updated_at)->toDateTimeString(),
             'payments' => WorksitePaymentListResource::collection($this->customerPayments ?? collect()),

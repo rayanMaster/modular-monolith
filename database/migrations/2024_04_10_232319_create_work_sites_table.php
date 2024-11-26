@@ -1,7 +1,7 @@
 <?php
 
-use App\Enums\WorkSiteCompletionStatusEnum;
-use App\Enums\WorkSiteReceptionStatusEnum;
+use App\Enums\WorksiteCompletionStatusEnum;
+use App\Enums\WorksiteReceptionStatusEnum;
 use App\Models\Address;
 use App\Models\Contractor;
 use App\Models\Customer;
@@ -34,8 +34,8 @@ return new class extends Migration
             $table->date('receipt_date')->nullable();
             $table->date('starting_date')->nullable();
             $table->date('deliver_date')->nullable();
-            $table->tinyInteger('reception_status')->nullable()->default(WorkSiteReceptionStatusEnum::SCRATCH->value);
-            $table->tinyInteger('completion_status')->nullable()->default(WorkSiteCompletionStatusEnum::STARTED->value);
+            $table->tinyInteger('reception_status')->nullable()->default(WorksiteReceptionStatusEnum::SCRATCH->value);
+            $table->tinyInteger('completion_status')->nullable()->default(WorksiteCompletionStatusEnum::STARTED->value);
 
             $table->timestamps();
             $table->softDeletes();

@@ -38,7 +38,7 @@ class WorksiteCreateRequest extends FormRequest
             'items' => ['sometimes', 'array'],
             'items.*.quantity' => ['required', 'numeric'],
             'items.*.price' => ['required', 'numeric'],
-            'items.*.id' => ['required', 'integer','exists:items,id'],
+            'items.*.id' => ['required', 'integer', 'exists:items,id'],
             'payments' => ['sometimes', 'array'],
             'payments.*.payment_amount' => ['sometimes', 'numeric'],
             'payments.*.payment_date' => ['sometimes', 'date_format:Y-m-d H:i'],

@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum WorkSiteReceptionStatusEnum: int
+enum WorksiteReceptionStatusEnum: int
 {
     case SCRATCH = 1;
     case REPAIR = 2;

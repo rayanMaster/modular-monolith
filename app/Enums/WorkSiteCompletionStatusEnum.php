@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum WorkSiteCompletionStatusEnum: int
+enum WorksiteCompletionStatusEnum: int
 {
     case PENDING = 1;
     case ASSIGNED = 2;

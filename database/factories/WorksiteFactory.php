@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Enums\WorkSiteCompletionStatusEnum;
-use App\Enums\WorkSiteReceptionStatusEnum;
+use App\Enums\WorksiteCompletionStatusEnum;
+use App\Enums\WorksiteReceptionStatusEnum;
 use App\Models\Address;
 use App\Models\Contractor;
 use App\Models\Customer;
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
-class WorkSiteFactory extends Factory
+class WorksiteFactory extends Factory
 {
     protected $model = Worksite::class;
 
@@ -49,8 +49,8 @@ class WorkSiteFactory extends Factory
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
             'deliver_date' => '2024-04-12',
-            'reception_status' => WorkSiteReceptionStatusEnum::SCRATCH->value,
-            'completion_status' => WorkSiteCompletionStatusEnum::PENDING->value,
+            'reception_status' => WorksiteReceptionStatusEnum::SCRATCH->value,
+            'completion_status' => WorksiteCompletionStatusEnum::PENDING->value,
             'created_at' => now(),
             'updated_at' => now(),
         ];

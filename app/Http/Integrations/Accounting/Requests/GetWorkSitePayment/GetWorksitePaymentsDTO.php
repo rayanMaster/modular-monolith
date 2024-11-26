@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Integrations\Accounting\Requests\GetWorkSitePayment;
+namespace App\Http\Integrations\Accounting\Requests\GetWorksitePayment;
 
 use Date;
 

@@ -6,10 +6,6 @@ use App\Models\Address;
 
 class AddressFormat
 {
-    /**
-     * @param array $address
-     * @return string
-     */
     public static function format(array $address): string
     {
 

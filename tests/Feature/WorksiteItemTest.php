@@ -63,9 +63,9 @@ describe('Worksite Item assign', function () {
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found error when worksite not found', function () {
-        $undefinedWorkSiteId = rand(222, 333);
+        $undefinedWorksiteId = rand(222, 333);
         $response = actingAs($this->admin)
-            ->postJson('/api/v1/worksite/'.$undefinedWorkSiteId.'/item/add', [
+            ->postJson('/api/v1/worksite/'.$undefinedWorksiteId.'/item/add', [
                 'warehouse_id' => $this->warehouse->id,
                 'items' => [
                     [
@@ -182,9 +182,9 @@ describe('Worksite Item list', function () {
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found error when worksite not found', function () {
-        $undefinedWorkSiteId = rand(222, 333);
+        $undefinedWorksiteId = rand(222, 333);
         $response = actingAs($this->admin)
-            ->getJson('/api/v1/worksite/'.$undefinedWorkSiteId.'/item/list');
+            ->getJson('/api/v1/worksite/'.$undefinedWorksiteId.'/item/list');
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should return list of items of a  valid worksite', function () {

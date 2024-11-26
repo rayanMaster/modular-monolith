@@ -41,7 +41,7 @@ class LoginController extends Controller
         $user = User::query()->where('phone', $requestedData['user_name'])->first();
 
         if (! $user || ! Hash::check($requestedData['password'], $user->password)) {
-            throw new AuthenticationException(message: "Invalid username or password.");
+            throw new AuthenticationException(message: 'Invalid username or password.');
         }
 
         $result->user = $user;

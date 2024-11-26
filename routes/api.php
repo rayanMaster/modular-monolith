@@ -10,12 +10,12 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\WarehouseController;
-use App\Http\Controllers\WorkSiteCategoryController;
+use App\Http\Controllers\WorksiteCategoryController;
 use App\Http\Controllers\WorksiteController;
 use App\Http\Controllers\WorksiteCustomerController;
 use App\Http\Controllers\WorksiteItemController;
 use App\Http\Controllers\WorksitePaymentController;
-use App\Http\Middleware\CheckWorkSiteAttendance;
+use App\Http\Middleware\CheckWorksiteAttendance;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -47,23 +47,23 @@ Route::prefix('v1')->group(function () {
 
             Route::group(['prefix' => 'category'], function () {
 
-                Route::get('/list', [WorkSiteCategoryController::class, 'list'])
+                Route::get('/list', [WorksiteCategoryController::class, 'list'])
                     ->middleware('can:worksite-category-list')
                     ->name('worksite.category.list');
 
-                Route::get('/show/{id}', [WorkSiteCategoryController::class, 'show'])
+                Route::get('/show/{id}', [WorksiteCategoryController::class, 'show'])
                     ->middleware('can:worksite-category-show')
                     ->name('worksite.category.show');
 
-                Route::post('/store', [WorkSiteCategoryController::class, 'store'])
+                Route::post('/store', [WorksiteCategoryController::class, 'store'])
                     ->middleware('can:worksite-category-create')
                     ->name('worksite.category.create');
 
-                Route::put('/update/{id}', [WorkSiteCategoryController::class, 'update'])
+                Route::put('/update/{id}', [WorksiteCategoryController::class, 'update'])
                     ->middleware('can:worksite-category-update')
                     ->name('worksite.category.update');
 
-                Route::delete('/delete/{id}', [WorkSiteCategoryController::class, 'destroy'])
+                Route::delete('/delete/{id}', [WorksiteCategoryController::class, 'destroy'])
                     ->middleware('can:worksite-category-delete')
                     ->name('worksite.category.delete');
             });
@@ -299,7 +299,7 @@ Route::prefix('v1')->group(function () {
         });
         Route::group(['prefix' => 'order'], function () {
             Route::post('/create', [OrderController::class, 'store'])
-                ->middleware(['can:order-create', CheckWorkSiteAttendance::class])
+                ->middleware(['can:order-create', CheckWorksiteAttendance::class])
                 ->name('order.create');
             Route::put('/update/{orderId}', [OrderController::class, 'update'])
                 ->middleware('can:order-update')

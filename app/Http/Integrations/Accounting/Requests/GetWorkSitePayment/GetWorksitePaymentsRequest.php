@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Integrations\Accounting\Requests\GetWorkSitePayment;
+namespace App\Http\Integrations\Accounting\Requests\GetWorksitePayment;
 
 use App\Enums\ChartOfAccountNamesEnum;
 use Saloon\Contracts\Body\HasBody;

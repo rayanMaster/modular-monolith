@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Database\Factories\WorkSiteCategoryFactory;
+use Database\Factories\WorksiteCategoryFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
- * @method static \Database\Factories\WorkSiteCategoryFactory factory($count = null, $state = [])
+ * @method static \Database\Factories\WorksiteCategoryFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|WorksiteCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|WorksiteCategory newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|WorksiteCategory onlyTrashed()
@@ -40,8 +40,8 @@ class WorksiteCategory extends Model
      */
     protected $guarded = [];
 
-    protected static function newFactory(): WorkSiteCategoryFactory
+    protected static function newFactory(): WorksiteCategoryFactory
     {
-        return WorkSiteCategoryFactory::new();
+        return WorksiteCategoryFactory::new();
     }
 }

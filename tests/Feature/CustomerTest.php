@@ -1,7 +1,7 @@
 <?php
 
 use App\Enums\PaymentTypesEnum;
-use App\Enums\WorkSiteCompletionStatusEnum;
+use App\Enums\WorksiteCompletionStatusEnum;
 use App\Http\Integrations\Accounting\Connector\AccountingConnector;
 use App\Models\Customer;
 use App\Models\Payment;
@@ -260,7 +260,7 @@ describe('Customer Delete', function () {
     it('should prevent delete a Customer related to un closed worksite', function () {
         $worksite = Worksite::factory()->create([
             'customer_id' => $this->customer->id,
-            'completion_status' => WorkSiteCompletionStatusEnum::STARTED->value,
+            'completion_status' => WorksiteCompletionStatusEnum::STARTED->value,
         ]);
         $response = actingAs($this->admin)->deleteJson('/api/v1/customer/delete/'.$this->customer->id);
         $response->assertStatus(Response::HTTP_CONFLICT)

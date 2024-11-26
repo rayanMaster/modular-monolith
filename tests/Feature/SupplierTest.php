@@ -1,7 +1,7 @@
 <?php
 
 use App\Enums\PaymentTypesEnum;
-use App\Enums\WorkSiteCompletionStatusEnum;
+use App\Enums\WorksiteCompletionStatusEnum;
 use App\Models\Payment;
 use App\Models\Supplier;
 use App\Models\User;
@@ -221,7 +221,7 @@ use function Pest\Laravel\putJson;
 //    it('should prevent delete a Supplier related to un closed worksite', function () {
 //        $worksite = Worksite::factory()->create([
 //            'customer_id' => $this->supplier->id,
-//            'completion_status' => WorkSiteCompletionStatusEnum::STARTED->value,
+//            'completion_status' => WorksiteCompletionStatusEnum::STARTED->value,
 //        ]);
 //        $response = actingAs($this->admin)->deleteJson('/api/v1/supplier/delete/'.$this->supplier->id);
 //        $response->assertStatus(Response::HTTP_CONFLICT)

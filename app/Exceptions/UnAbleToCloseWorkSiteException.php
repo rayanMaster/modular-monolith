@@ -8,7 +8,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class UnAbleToCloseWorkSiteException extends Exception
+class UnAbleToCloseWorksiteException extends Exception
 {
     /**
      * Report the exception.

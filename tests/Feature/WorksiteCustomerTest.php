@@ -31,9 +31,9 @@ describe('Worksite Customer assign', function () {
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found error when worksite not found', function () {
-        $undefinedWorkSiteId = rand(222, 333);
+        $undefinedWorksiteId = rand(222, 333);
         $response = actingAs($this->admin)
-            ->postJson('/api/v1/worksite/'.$undefinedWorkSiteId.'/customer/'.$this->customer->id.'/assign');
+            ->postJson('/api/v1/worksite/'.$undefinedWorksiteId.'/customer/'.$this->customer->id.'/assign');
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should return not found error when customer not found', function () {

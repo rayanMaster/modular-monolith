@@ -5,7 +5,7 @@ namespace Database\Factories;
 use App\Models\WorksiteCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class WorkSiteCategoryFactory extends Factory
+class WorksiteCategoryFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.

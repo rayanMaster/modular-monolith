@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\GeneralSettingNumericEnum;
 use App\Enums\PaymentTypesEnum;
-use App\Enums\WarehouseItemThresholdsEnum;
 use App\Enums\WorksiteCompletionStatusEnum;
 use App\Enums\WorksiteReceptionStatusEnum;
 use App\Events\PaymentCreatedEvent;
@@ -19,7 +18,6 @@ use App\Http\Resources\WorksiteDetailsResource;
 use App\Http\Resources\WorksiteListResource;
 use App\Models\Address;
 use App\Models\Contractor;
-use App\Models\Item;
 use App\Models\Warehouse;
 use App\Models\WarehouseItem;
 use App\Models\Worksite;
@@ -45,11 +43,9 @@ class WorksiteController extends Controller
 {
     public function __construct(
         private readonly WorksiteSyncService $worksiteSyncService,
-        private readonly PaymentSyncService  $paymentSyncService,
+        private readonly PaymentSyncService $paymentSyncService,
         private readonly WorksiteService $worksiteService
-    )
-    {
-    }
+    ) {}
 
     /**
      * @throws FatalRequestException
@@ -80,10 +76,10 @@ class WorksiteController extends Controller
      *
      * @throws Throwable
      */
-    public function store(WorkSiteCreateRequest $request): JsonResponse
+    public function store(WorksiteCreateRequest $request): JsonResponse
     {
 
-        DB::transaction(
+        $worksite = DB::transaction(
             callback: function () use ($request) {
                 /**
                  * @var array{
@@ -143,9 +139,9 @@ class WorksiteController extends Controller
                     'receipt_date' => $requestedData['receipt_date'] ?? null,
                     'starting_date' => $requestedData['starting_date'] ?? null,
                     'deliver_date' => $requestedData['deliver_date'] ?? null,
-                    'reception_status' => $requestedData['reception_status'] ?? WorkSiteReceptionStatusEnum::SCRATCH->value,
-                    'completion_status' => $requestedData['completion_status'] ?? WorkSiteCompletionStatusEnum::PENDING->value,
-                ], fn($value) => $value != null);
+                    'reception_status' => $requestedData['reception_status'] ?? WorksiteReceptionStatusEnum::SCRATCH->value,
+                    'completion_status' => $requestedData['completion_status'] ?? WorksiteCompletionStatusEnum::PENDING->value,
+                ], fn ($value) => $value != null);
 
                 $worksite = Worksite::query()->create($dataToSave);
                 try {
@@ -159,7 +155,7 @@ class WorksiteController extends Controller
                 if ($worksite->parentWorksite == null) {
                     $warehouse = Warehouse::query()->create([
                         'address_id' => $address?->id,
-                        'name' => $worksite->title . ' warehouse'
+                        'name' => $worksite->title.' warehouse',
                     ]);
                     $worksite->warehouse_id = $warehouse->id;
                     $worksite->save();
@@ -208,7 +204,7 @@ class WorksiteController extends Controller
                     }
                 }
                 // Perform bulk insert
-                if (!empty($paymentData)) {
+                if (! empty($paymentData)) {
                     $payments = $worksite->payments()->createMany($paymentData);
                     PaymentCreatedEvent::dispatch($payments, $worksite->customer?->uuid);
                 }
@@ -219,14 +215,14 @@ class WorksiteController extends Controller
                         $fileNameParts = explode('.', $file->getClientOriginalName());
                         $fileName = $fileNameParts[0];
                         $path = lcfirst('Worksite');
-                        $name = $fileName . '_' . now()->format('YmdH');
-                        $relativeName = $path . '/' . $name . '.webp';
+                        $name = $fileName.'_'.now()->format('YmdH');
+                        $relativeName = $path.'/'.$name.'.webp';
 
-                        if (!File::exists(public_path('storage/' . $path))) {
-                            File::makeDirectory(public_path('storage/' . $path));
+                        if (! File::exists(public_path('storage/'.$path))) {
+                            File::makeDirectory(public_path('storage/'.$path));
                         }
 
-                        $fullPath = public_path('storage/' . $path) . '/' . $name . '.webp';
+                        $fullPath = public_path('storage/'.$path).'/'.$name.'.webp';
 
                         // create new manager instance with desired driver
                         $manager = new ImageManager(new Driver);
@@ -239,12 +235,14 @@ class WorksiteController extends Controller
                         ]);
                     }
                 }
+
                 //        $this->fileManager->upload($files);
                 return $worksite;
             },
             attempts: 3);
 
         $worksiteDetails = $this->worksiteService->getDetails($worksite->id);
+
         return ApiResponseHelper::sendSuccessResponse(
             new Result(WorksiteDetailsResource::make($worksiteDetails)));
     }
@@ -255,7 +253,6 @@ class WorksiteController extends Controller
      * @throws FatalRequestException
      * @throws RequestException
      * @throws JsonException
-     *
      */
     public function show(int $id): JsonResponse
     {
@@ -324,7 +321,7 @@ class WorksiteController extends Controller
                     $addressDataToUpdate = array_filter([
                         'city_id' => $requestedData['city_id'] ?? null,
                         'title' => $requestedData['address'] ?? null,
-                    ], fn($value) => $value != null);
+                    ], fn ($value) => $value != null);
                     $address->update($addressDataToUpdate);
                 } else {
                     $newAddress = Address::query()->create([
@@ -350,7 +347,7 @@ class WorksiteController extends Controller
                     'deliver_date' => $requestedData['deliver_date'] ?? null,
                     'reception_status' => $requestedData['reception_status'] ?? null,
                     'completion_status' => $requestedData['completion_status'] ?? null,
-                ], fn($value) => $value != null);
+                ], fn ($value) => $value != null);
 
                 $worksite->update($dataToSave);
 
@@ -362,31 +359,31 @@ class WorksiteController extends Controller
     }
 
     /**
-     * @throws UnAbleToCloseWorkSiteException
+     * @throws UnAbleToCloseWorksiteException
      */
     public function close(int $id): JsonResponse
     {
         $worksite = Worksite::query()->with(['subWorksites'])->findOrFail($id);
-        $relatedActiveSubWorkSitesCount = $worksite->whereHas('subWorksites', function (Builder $query) {
+        $relatedActiveSubWorksitesCount = $worksite->whereHas('subWorksites', function (Builder $query) {
             return $query->where(
                 column: 'completion_status',
                 operator: '<>',
-                value: WorkSiteCompletionStatusEnum::CLOSED
+                value: WorksiteCompletionStatusEnum::CLOSED
             );
         })->count();
 
         $workSitePayments = $worksite->payments->sum('amount');
 
-        if ($relatedActiveSubWorkSitesCount > 0) {
-            throw new UnAbleToCloseWorkSiteException("You can't close a worksite with active sub-worksites");
+        if ($relatedActiveSubWorksitesCount > 0) {
+            throw new UnAbleToCloseWorksiteException("You can't close a worksite with active sub-worksites");
         }
 
         if ($workSitePayments < $worksite->cost) {
-            throw new UnAbleToCloseWorkSiteException("You can't close a worksite with unpaid payment");
+            throw new UnAbleToCloseWorksiteException("You can't close a worksite with unpaid payment");
         }
 
         $worksite->update([
-            'completion_status' => WorkSiteCompletionStatusEnum::CLOSED,
+            'completion_status' => WorksiteCompletionStatusEnum::CLOSED,
         ]);
 
         return ApiResponseHelper::sendSuccessResponse();

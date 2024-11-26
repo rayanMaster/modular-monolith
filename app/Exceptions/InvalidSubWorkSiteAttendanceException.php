@@ -8,7 +8,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class InvalidSubWorkSiteAttendanceException extends Exception
+class InvalidSubWorksiteAttendanceException extends Exception
 {
     private ?int $statusCode;
 

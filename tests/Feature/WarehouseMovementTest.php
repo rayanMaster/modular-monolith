@@ -9,7 +9,8 @@ use App\Models\WarehouseItem;
 use App\Models\Worksite;
 use App\Models\WorksiteItem;
 use Symfony\Component\HttpFoundation\Response;
-use function Pest\Laravel\{actingAs, assertDatabaseHas};
+
+use function Pest\Laravel\actingAs;
 
 describe('Warehouse Movements', function () {
     beforeEach(function () {
@@ -37,25 +38,25 @@ describe('Warehouse Movements', function () {
         WarehouseItem::factory()->create([
             'warehouse_id' => $this->warehouse->id,
             'item_id' => $this->item1->id,
-            'quantity' => 5
+            'quantity' => 5,
         ]);
 
         // Act
         $response = actingAs($this->admin)
-            ->postJson('/api/v1/worksite/' . $this->worksite->id . '/item/add', [
+            ->postJson('/api/v1/worksite/'.$this->worksite->id.'/item/add', [
                 'warehouse_id' => $this->warehouse->id,
                 'items' => [
                     [
                         'item_id' => $this->item1->id,
                         'quantity' => 6,
-                        'price' => 20
-                    ]
-                ]
+                        'price' => 20,
+                    ],
+                ],
             ]);
         // Assert
         expect($response->status())->toBe(Response::HTTP_BAD_REQUEST);
         $response->assertJsonFragment([
-            'message' => 'Insufficient quantity in warehouse.'
+            'message' => 'Insufficient quantity in warehouse.',
         ]);
 
     });
@@ -64,20 +65,20 @@ describe('Warehouse Movements', function () {
         WarehouseItem::factory()->create([
             'warehouse_id' => $this->warehouse->id,
             'item_id' => $this->item1->id,
-            'quantity' => 50
+            'quantity' => 50,
         ]);
 
         // Act
         actingAs($this->admin)
-            ->postJson('/api/v1/worksite/' . $this->worksite->id . '/item/add', [
+            ->postJson('/api/v1/worksite/'.$this->worksite->id.'/item/add', [
                 'warehouse_id' => $this->warehouse->id,
                 'items' => [
                     [
                         'item_id' => $this->item1->id,
                         'quantity' => 20,
-                        'price' => 20
-                    ]
-                ]
+                        'price' => 20,
+                    ],
+                ],
             ]);
         // Assert
         $itemsInWarehouse = WarehouseItem::query()->where('item_id', $this->item1->id)
@@ -85,10 +86,9 @@ describe('Warehouse Movements', function () {
         $itemMovedToWorksite = WorksiteItem::query()->where('worksite_id', $this->worksite->id)
             ->where('item_id', $this->item1->id)->value('quantity');
 
-        expect((int)$itemsInWarehouse)->toBe(50 - 20)
-            ->and((int)$itemMovedToWorksite)->toBe(20);
+        expect((int) $itemsInWarehouse)->toBe(50 - 20)
+            ->and((int) $itemMovedToWorksite)->toBe(20);
     });
-
 
     //    it('should be adding items between supplier and warehouse', function() {});
     //    it('should be dropping items between warehouse and worksite', function() {});

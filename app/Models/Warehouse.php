@@ -11,9 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
- *
  * @property-read Address|null $address
+ *
  * @method static WareHouseFactory factory($count = null, $state = [])
  * @method static Builder|Warehouse newModelQuery()
  * @method static Builder|Warehouse newQuery()
@@ -21,18 +20,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static Builder|Warehouse query()
  * @method static Builder|Warehouse withTrashed()
  * @method static Builder|Warehouse withoutTrashed()
+ *
  * @property int $id
  * @property string $name
  * @property int|null $address_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
  * @method static Builder<static>|Warehouse whereAddressId($value)
  * @method static Builder<static>|Warehouse whereCreatedAt($value)
  * @method static Builder<static>|Warehouse whereDeletedAt($value)
  * @method static Builder<static>|Warehouse whereId($value)
  * @method static Builder<static>|Warehouse whereName($value)
  * @method static Builder<static>|Warehouse whereUpdatedAt($value)
+ *
  * @mixin Eloquent
  */
 class Warehouse extends Model

@@ -30,15 +30,12 @@ use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-use function Pest\Laravel\{actingAs,
-    assertDatabaseCount,
-    assertDatabaseHas,
-    getJson,
-    postJson,
-    putJson,
-    assertDatabaseMissing
-};
-
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
 
 describe('Worksite entity fields check', function () {
     beforeEach(function () {
@@ -74,7 +71,7 @@ describe('Worksite entity fields check', function () {
         $tableColumns = collect(Schema::getColumns('worksites'));
 
         $requiredColumns = $tableColumns->filter(function ($item) {
-            return !$item['nullable'];
+            return ! $item['nullable'];
         })->map(function ($subItem) {
             return $subItem['name'];
         })->toArray();
@@ -222,8 +219,8 @@ describe('Create Worksite', function () {
 
         // Assert the file was stored...
         $path = 'worksite';
-        $name = 'test' . '_' . now()->format('YmdH');
-        $fullPath = public_path('storage/' . $path) . '/' . $name . '.webp';
+        $name = 'test'.'_'.now()->format('YmdH');
+        $fullPath = public_path('storage/'.$path).'/'.$name.'.webp';
 
         $this->assertFileExists($fullPath);
 
@@ -240,7 +237,7 @@ describe('Create Worksite', function () {
             'completion_status' => WorksiteCompletionStatusEnum::PENDING->value,
             'contractor_id' => $contractor->id,
             'manager_id' => $this->manager->id,
-            'warehouse_id' => $workSite->warehouse_id
+            'warehouse_id' => $workSite->warehouse_id,
         ]);
 
         expect($workSite->parentWorksite)->toBeNull('that indicates that worksite is main')
@@ -257,33 +254,31 @@ describe('Create Worksite', function () {
         // this will ensure that items moved to the worksite warehouse.
         assertDatabaseHas(WarehouseItem::class, [
             'warehouse_id' => $workSite->warehouse->id,
-            'item_id' => $workSiteResource1->id
+            'item_id' => $workSiteResource1->id,
         ]);
         assertDatabaseHas(WarehouseItem::class, [
             'warehouse_id' => $workSite->warehouse->id,
-            'item_id' => $workSiteResource2->id
+            'item_id' => $workSiteResource2->id,
         ]);
 
         // this will ensure that items not consumed in the worksite at creation level
         assertDatabaseHas(WorksiteItem::class, [
             'worksite_id' => $workSite->id,
             'item_id' => $workSiteResource1->id,
-            'quantity' => 0
+            'quantity' => 0,
         ]);
         assertDatabaseHas(WorksiteItem::class, [
             'worksite_id' => $workSite->id,
             'item_id' => $workSiteResource2->id,
-            'quantity' => 0
+            'quantity' => 0,
         ]);
     });
     test('As an administrator, I want to create a main worksite with only required fields', function () {
-
 
         $customer = Customer::factory()->create();
 
         $this->manager = User::factory()->siteManager()->create();
         expect($this->manager->hasRole('site_manager'))->toBe(true);
-
 
         $admin = User::factory()->admin()->create();
         expect($admin->hasRole('admin'))->toBe(true);
@@ -312,15 +307,14 @@ describe('Create Worksite', function () {
             'receipt_date' => $worksite->receipt_date,
             'starting_date' => $worksite->starting_date,
             'deliver_date' => $worksite->deliver_date,
-            'reception_status' => WorkSiteReceptionStatusEnum::from($worksite->reception_status)->name,
+            'reception_status' => WorksiteReceptionStatusEnum::from($worksite->reception_status)->name,
             'created_at' => Carbon::parse($worksite->created_at)->toDateTimeString(),
             'updated_at' => Carbon::parse($worksite->updated_at)->toDateTimeString(),
         ]);
 
-
         assertDatabaseHas(Worksite::class, [
             'manager_id' => $this->manager->id,
-            'warehouse_id' => $worksite->warehouse_id
+            'warehouse_id' => $worksite->warehouse_id,
         ]);
 
     });
@@ -364,7 +358,6 @@ describe('Create Worksite', function () {
         $this->manager = User::factory()->siteManager()->create();
         expect($admin->hasRole('admin'))->toBe(true);
 
-
         $customer = Customer::factory()->create();
         $response = $this->actingAs($admin)->postJson('/api/v1/worksite/create', [
             'title' => 'worksite A',
@@ -375,8 +368,8 @@ describe('Create Worksite', function () {
                 [
                     'id' => rand(2000, 3000),
                     'quantity' => 2,
-                    'price' => 233
-                ]
+                    'price' => 233,
+                ],
             ],
         ]);
 
@@ -460,7 +453,7 @@ describe('Update Worksite', function () {
     });
 
     test('As a non-authenticated, I cant update a main worksite', function () {
-        $response = putJson('/api/v1/worksite/update/' . $this->worksite->id, []);
+        $response = putJson('/api/v1/worksite/update/'.$this->worksite->id, []);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
 
     });
@@ -469,14 +462,14 @@ describe('Update Worksite', function () {
         $siteManager = User::factory()->siteManager()->create();
         expect($siteManager->hasRole('site_manager'))->toBe(true);
 
-        $response = actingAs($siteManager)->putJson('/api/v1/worksite/update/' . $this->worksite->id, []);
+        $response = actingAs($siteManager)->putJson('/api/v1/worksite/update/'.$this->worksite->id, []);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
 
     });
     test('As an administrator, I want to update worksite main info', function () {
 
         assertDatabaseCount(Worksite::class, 1);
-        $response = actingAs($this->admin)->putJson('/api/v1/worksite/update/' . $this->worksite->id, [
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/update/'.$this->worksite->id, [
             'address' => 'Free town',
             'city_id' => $this->city->id,
             'title' => 'worksite AB',
@@ -495,7 +488,7 @@ describe('Update Worksite', function () {
     test('As an administrator, I want to update worksite address', function () {
 
         assertDatabaseCount(Worksite::class, 1);
-        $response = actingAs($this->admin)->putJson('/api/v1/worksite/update/' . $this->worksite->id, [
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/update/'.$this->worksite->id, [
             'address' => 'Free town new',
             'city_id' => $this->city->id,
             'title' => 'worksite AB',
@@ -510,10 +503,9 @@ describe('Update Worksite', function () {
         ]);
 
     });
-    test('As an administrator, I want to update worksite contractor before worksite finished', function () {
-    });
+    test('As an administrator, I want to update worksite contractor before worksite finished', function () {});
 });
-describe('List WorkSites', function () {
+describe('List Worksites', function () {
 
     beforeEach(function () {
         MockClient::global([
@@ -555,7 +547,7 @@ describe('List WorkSites', function () {
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
             'deliver_date' => '2024-04-12',
-            'reception_status' => WorkSiteReceptionStatusEnum::SCRATCH->value,
+            'reception_status' => WorksiteReceptionStatusEnum::SCRATCH->value,
             'created_at' => now(),
             'updated_at' => now(),
         ];
@@ -589,7 +581,7 @@ describe('List WorkSites', function () {
                 'receipt_date' => $workSite->receipt_date,
                 'starting_date' => $workSite->starting_date,
                 'deliver_date' => $workSite->deliver_date,
-                'reception_status' => WorkSiteReceptionStatusEnum::from($workSite->reception_status)->name,
+                'reception_status' => WorksiteReceptionStatusEnum::from($workSite->reception_status)->name,
                 'completion_status' => 'PENDING',
                 'created_at' => Carbon::parse($workSite->created_at)->toDateTimeString(),
                 'updated_at' => Carbon::parse($workSite->updated_at)->toDateTimeString(),
@@ -616,7 +608,7 @@ describe('List WorkSites', function () {
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
             'deliver_date' => '2024-04-12',
-            'reception_status' => WorkSiteReceptionStatusEnum::SCRATCH->value,
+            'reception_status' => WorksiteReceptionStatusEnum::SCRATCH->value,
             'created_at' => now(),
             'updated_at' => now(),
         ];
@@ -633,13 +625,13 @@ describe('List WorkSites', function () {
             'status' => OrderStatusEnum::APPROVED->value,
         ]);
         $paymentDate = Carbon::now()->format('Y-m-d h:i');
-        $fakePaymentObject = (object)[
+        $fakePaymentObject = (object) [
             'amount' => 200,
             'payment_date' => $paymentDate,
             'payment_type' => PaymentTypesEnum::CASH->value,
         ];
 
-        $fakeResourcePaymentObject = (object)[
+        $fakeResourcePaymentObject = (object) [
             'amount' => 200,
             'payment_date' => $paymentDate,
             'payment_type' => PaymentTypesEnum::CASH->name,
@@ -659,7 +651,7 @@ describe('List WorkSites', function () {
                 'manager' => $workSite->manager->fullName,
                 'customer' => $workSite->customer->fullName,
                 'category' => $workSite->category->name,
-                'sub_worksites' => $workSite->subWorkSites,
+                'sub_worksites' => $workSite->subWorksites,
                 'starting_budget' => number_format($workSite->starting_budget, 2),
                 'cost' => number_format($workSite->cost, 2),
                 'address' => AddressFormat::format([
@@ -674,7 +666,7 @@ describe('List WorkSites', function () {
                 'receipt_date' => $workSite->receipt_date,
                 'starting_date' => $workSite->starting_date,
                 'deliver_date' => $workSite->deliver_date,
-                'reception_status' => WorkSiteReceptionStatusEnum::from($workSite->reception_status)->name,
+                'reception_status' => WorksiteReceptionStatusEnum::from($workSite->reception_status)->name,
                 'created_at' => Carbon::parse($workSite->created_at)->toDateTimeString(),
                 'updated_at' => Carbon::parse($workSite->updated_at)->toDateTimeString(),
                 'payments' => [$fakeResourcePaymentObject],
@@ -690,7 +682,7 @@ describe('List WorkSites', function () {
         assertDatabaseCount(Worksite::class, 2);
 
         $paymentDate = Carbon::now()->format('Y-m-d h:i');
-        $fakePaymentObject = (object)[
+        $fakePaymentObject = (object) [
             'amount' => 200,
             'payment_date' => $paymentDate,
             'payment_type' => PaymentTypesEnum::CASH->value,
@@ -711,7 +703,7 @@ describe('List WorkSites', function () {
     });
 
 });
-describe('Show WorkSites Details', function () {
+describe('Show Worksites Details', function () {
 
     beforeEach(function () {
 
@@ -733,7 +725,6 @@ describe('Show WorkSites Details', function () {
         $this->customer = Customer::factory()->create();
         $this->address = Address::factory()->create();
 
-
         $data = [
             'title' => 'worksite sub',
             'description' => 'this worksite is for freeTown sub',
@@ -747,11 +738,11 @@ describe('Show WorkSites Details', function () {
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
             'deliver_date' => '2024-04-12',
-            'reception_status' => WorkSiteReceptionStatusEnum::SCRATCH->value,
+            'reception_status' => WorksiteReceptionStatusEnum::SCRATCH->value,
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        $this->subWorkSite = Worksite::factory()->create($data);
+        $this->subWorksite = Worksite::factory()->create($data);
 
         Order::factory()->create([
             'worksite_id' => $this->worksite->id,
@@ -760,23 +751,23 @@ describe('Show WorkSites Details', function () {
 
     });
     test('As a non-authenticated, I cant show details of a worksite', function () {
-        $response = getJson('/api/v1/worksite/show/' . $this->worksite->id);
+        $response = getJson('/api/v1/worksite/show/'.$this->worksite->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     test('As not admin, I cant show details of a worksite', function () {
-        $response = actingAs($this->notAdmin)->getJson('/api/v1/worksite/show/' . $this->worksite->id);
+        $response = actingAs($this->notAdmin)->getJson('/api/v1/worksite/show/'.$this->worksite->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found error if worksite not existed in database', function () {
-        $unExistedWorkSiteId = rand(200, 333);
-        $response = actingAs($this->admin)->getJson('/api/v1/worksite/show/' . $unExistedWorkSiteId);
+        $unExistedWorksiteId = rand(200, 333);
+        $response = actingAs($this->admin)->getJson('/api/v1/worksite/show/'.$unExistedWorksiteId);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     test('As an admin, I can show details of a worksite', function () {
 
         // add payment to this worksite
         $paymentDate = Carbon::now()->format('Y-m-d h:i');
-        $fakePaymentObject = (object)[
+        $fakePaymentObject = (object) [
             'amount' => 200,
             'payment_date' => $paymentDate,
             'payment_type' => PaymentTypesEnum::CASH->value,
@@ -786,7 +777,7 @@ describe('Show WorkSites Details', function () {
                 ->once()
                 ->andReturn(collect([$fakePaymentObject]));
         });
-        $response = actingAs($this->admin)->getJson('/api/v1/worksite/show/' . $this->worksite->id);
+        $response = actingAs($this->admin)->getJson('/api/v1/worksite/show/'.$this->worksite->id);
 
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment([
@@ -811,7 +802,7 @@ describe('Show WorkSites Details', function () {
                 'receipt_date' => $this->worksite->receipt_date,
                 'starting_date' => $this->worksite->starting_date,
                 'deliver_date' => $this->worksite->deliver_date,
-                'reception_status' => WorkSiteReceptionStatusEnum::from($this->worksite->reception_status)->name,
+                'reception_status' => WorksiteReceptionStatusEnum::from($this->worksite->reception_status)->name,
                 'created_at' => Carbon::parse($this->worksite->created_at)->toDateTimeString(),
                 'updated_at' => Carbon::parse($this->worksite->updated_at)->toDateTimeString(),
             ]);
@@ -837,7 +828,7 @@ describe('Show WorkSites Details', function () {
             'receipt_date' => '2024-04-12',
             'starting_date' => '2024-04-12',
             'deliver_date' => '2024-04-12',
-            'reception_status' => WorkSiteReceptionStatusEnum::SCRATCH->value,
+            'reception_status' => WorksiteReceptionStatusEnum::SCRATCH->value,
             'created_at' => now(),
             'updated_at' => now(),
         ];
@@ -869,12 +860,12 @@ describe('Show WorkSites Details', function () {
 
         // add payment to this worksite
         $paymentDate = Carbon::now()->format('Y-m-d h:i');
-        $fakePaymentObject = (object)[
+        $fakePaymentObject = (object) [
             'amount' => 200,
             'payment_date' => $paymentDate,
             'payment_type' => PaymentTypesEnum::CASH->value,
         ];
-        $fakeResourcePaymentObject = (object)[
+        $fakeResourcePaymentObject = (object) [
             'amount' => 200,
             'payment_date' => $paymentDate,
             'payment_type' => PaymentTypesEnum::CASH->name,
@@ -883,7 +874,7 @@ describe('Show WorkSites Details', function () {
             $mock->shouldReceive('getPaymentsForWorksite')
                 ->once()->andReturn(collect([$fakePaymentObject]));
         });
-        $response = actingAs($this->admin)->getJson('/api/v1/worksite/show/' . $workSite->id);
+        $response = actingAs($this->admin)->getJson('/api/v1/worksite/show/'.$workSite->id);
 
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment([
@@ -905,8 +896,8 @@ describe('Show WorkSites Details', function () {
                 'receipt_date' => $workSite->receipt_date,
                 'starting_date' => $workSite->starting_date,
                 'deliver_date' => $workSite->deliver_date,
-                'reception_status' => WorkSiteReceptionStatusEnum::from($workSite->reception_status)->name,
-                'completion_status' => WorkSiteCompletionStatusEnum::from($workSite->completion_status)->name,
+                'reception_status' => WorksiteReceptionStatusEnum::from($workSite->reception_status)->name,
+                'completion_status' => WorksiteCompletionStatusEnum::from($workSite->completion_status)->name,
                 'created_at' => Carbon::parse($workSite->created_at)->toDateTimeString(),
                 'updated_at' => Carbon::parse($workSite->updated_at)->toDateTimeString(),
                 'payments' => collect([$fakeResourcePaymentObject]),
@@ -930,7 +921,7 @@ describe('Show WorkSites Details', function () {
     });
 
 });
-describe('Close WorkSites', function () {
+describe('Close Worksites', function () {
 
     beforeEach(function () {
 
@@ -944,24 +935,24 @@ describe('Close WorkSites', function () {
 
     });
     test('As a non-authenticated, I cant close a worksite', function () {
-        $response = postJson('/api/v1/worksite/close/' . $this->worksite->id);
+        $response = postJson('/api/v1/worksite/close/'.$this->worksite->id);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     test('As not admin, I cant close a worksite', function () {
-        $response = actingAs($this->notAdmin)->postJson('/api/v1/worksite/close/' . $this->worksite->id);
+        $response = actingAs($this->notAdmin)->postJson('/api/v1/worksite/close/'.$this->worksite->id);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found error if worksite not existed in database', function () {
-        $unExistedWorkSiteId = rand(200, 333);
-        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/' . $unExistedWorkSiteId);
+        $unExistedWorksiteId = rand(200, 333);
+        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/'.$unExistedWorksiteId);
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should prevent me closing worksite with active worksites', function () {
         Worksite::factory()->create([
-            'completion_status' => WorkSiteCompletionStatusEnum::STARTED,
+            'completion_status' => WorksiteCompletionStatusEnum::STARTED,
             'parent_worksite_id' => $this->worksite->id,
         ]);
-        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/' . $this->worksite->id);
+        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/'.$this->worksite->id);
         $response->assertStatus(Response::HTTP_CONFLICT)
             ->assertJson([
                 'message' => "You can't close a worksite with active sub-worksites",
@@ -983,7 +974,7 @@ describe('Close WorkSites', function () {
             'payment_date' => Carbon::now(),
             'payment_type' => PaymentTypesEnum::CASH->value,
         ]);
-        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/' . $this->worksite->id);
+        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/'.$this->worksite->id);
 
         $response->assertStatus(Response::HTTP_CONFLICT)
             ->assertJson([
@@ -999,19 +990,19 @@ describe('Close WorkSites', function () {
             'payment_type' => PaymentTypesEnum::CASH->value,
         ]);
         Worksite::factory()->create([
-            'completion_status' => WorkSiteCompletionStatusEnum::CLOSED,
+            'completion_status' => WorksiteCompletionStatusEnum::CLOSED,
             'parent_worksite_id' => $this->worksite->id,
         ]);
-        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/' . $this->worksite->id);
+        $response = actingAs($this->admin)->postJson('/api/v1/worksite/close/'.$this->worksite->id);
         $response->assertStatus(Response::HTTP_OK);
 
         assertDatabaseHas(Worksite::class, [
-            'completion_status' => WorkSiteCompletionStatusEnum::CLOSED,
+            'completion_status' => WorksiteCompletionStatusEnum::CLOSED,
         ]);
     });
 
 });
-describe('Assign Contractor to WorkSites', function () {
+describe('Assign Contractor to Worksites', function () {
 
     beforeEach(function () {
 
@@ -1024,24 +1015,24 @@ describe('Assign Contractor to WorkSites', function () {
 
     });
     test('As a non-authenticated, I cant assign contractor to a worksite', function () {
-        $response = putJson('/api/v1/worksite/' . $this->worksite->id . '/contractor/' . $this->contractor->id . '/assign');
+        $response = putJson('/api/v1/worksite/'.$this->worksite->id.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     });
     test('As not admin, I cant assign contractor to a worksite', function () {
-        $response = actingAs($this->notAdmin)->putJson('/api/v1/worksite/' . $this->worksite->id . '/contractor/' . $this->contractor->id . '/assign');
+        $response = actingAs($this->notAdmin)->putJson('/api/v1/worksite/'.$this->worksite->id.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     });
     it('should return not found error if worksite not existed in database and if contractor not existed', function () {
-        $unExistedWorkSiteId = rand(200, 333);
+        $unExistedWorksiteId = rand(200, 333);
         $unExistedContractorId = rand(200, 333);
-        $response = actingAs($this->admin)->putJson('/api/v1/worksite/' . $unExistedWorkSiteId . '/contractor/' . $this->contractor->id . '/assign');
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/'.$unExistedWorksiteId.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_NOT_FOUND);
 
-        $otherResponse = actingAs($this->admin)->putJson('/api/v1/worksite/' . $this->worksite->id . '/contractor/' . $unExistedContractorId . '/assign');
+        $otherResponse = actingAs($this->admin)->putJson('/api/v1/worksite/'.$this->worksite->id.'/contractor/'.$unExistedContractorId.'/assign');
         $otherResponse->assertStatus(Response::HTTP_NOT_FOUND);
     });
     it('should add contractor of a worksite', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/worksite/' . $this->worksite->id . '/contractor/' . $this->contractor->id . '/assign');
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/'.$this->worksite->id.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(Worksite::class, [
             'contractor_id' => $this->contractor->id,
@@ -1049,7 +1040,7 @@ describe('Assign Contractor to WorkSites', function () {
 
     });
     it('should update contractor of a worksite', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/worksite/' . $this->worksite->id . '/contractor/' . $this->contractor->id . '/assign');
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/'.$this->worksite->id.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(Worksite::class, [
             'contractor_id' => $this->contractor->id,
@@ -1057,7 +1048,7 @@ describe('Assign Contractor to WorkSites', function () {
 
         $otherContractor = Contractor::factory()->create();
 
-        $response = actingAs($this->admin)->putJson('/api/v1/worksite/' . $this->worksite->id . '/contractor/' . $otherContractor->id . '/assign');
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/'.$this->worksite->id.'/contractor/'.$otherContractor->id.'/assign');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(Worksite::class, [
             'contractor_id' => $otherContractor->id,
@@ -1065,13 +1056,13 @@ describe('Assign Contractor to WorkSites', function () {
 
     });
     test('As an admin i can remove contractor of a worksite ', function () {
-        $response = actingAs($this->admin)->putJson('/api/v1/worksite/' . $this->worksite->id . '/contractor/' . $this->contractor->id . '/assign');
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/'.$this->worksite->id.'/contractor/'.$this->contractor->id.'/assign');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(Worksite::class, [
             'contractor_id' => $this->contractor->id,
         ]);
 
-        $response = actingAs($this->admin)->putJson('/api/v1/worksite/' . $this->worksite->id . '/contractor/' . $this->contractor->id . '/unAssign');
+        $response = actingAs($this->admin)->putJson('/api/v1/worksite/'.$this->worksite->id.'/contractor/'.$this->contractor->id.'/unAssign');
         $response->assertStatus(Response::HTTP_OK);
         assertDatabaseHas(Worksite::class, [
             'contractor_id' => null,
@@ -1080,52 +1071,31 @@ describe('Assign Contractor to WorkSites', function () {
     });
 });
 describe('Manage items of the worksite', function () {
-    test('As a non-authenticated, I cant manage resource of a worksite', function () {
-    });
-    test('As not admin, I cant manage resource of a worksite', function () {
-    });
+    test('As a non-authenticated, I cant manage resource of a worksite', function () {});
+    test('As not admin, I cant manage resource of a worksite', function () {});
 
-    it('should add new resource to a worksite', function () {
-    });
-    it('should update existed resource of a worksite', function () {
-    });
-    it('should delete items of a worksite', function () {
-    });
-    it('should show all items a worksite', function () {
-    });
-    it('should show details of a resource in the worksite', function () {
-    });
+    it('should add new resource to a worksite', function () {});
+    it('should update existed resource of a worksite', function () {});
+    it('should delete items of a worksite', function () {});
+    it('should show all items a worksite', function () {});
+    it('should show details of a resource in the worksite', function () {});
 });
 describe('Manage employees of the worksite', function () {
-    test('As a non-authenticated, I cant manage workers of a worksite', function () {
-    });
-    test('As not admin, I cant manage workers of a worksite', function () {
-    });
-    it('should add new worker to a worksite', function () {
-    });
-    it('should update a worker of a worksite', function () {
-    });
-    it('should delete a worker of a worksite', function () {
-    });
-    it('should show all workers of the worksite', function () {
-    });
-    it('should show details of a worker in a worksite', function () {
-    });
+    test('As a non-authenticated, I cant manage workers of a worksite', function () {});
+    test('As not admin, I cant manage workers of a worksite', function () {});
+    it('should add new worker to a worksite', function () {});
+    it('should update a worker of a worksite', function () {});
+    it('should delete a worker of a worksite', function () {});
+    it('should show all workers of the worksite', function () {});
+    it('should show details of a worker in a worksite', function () {});
 });
 describe('manage customer of the worksite', function () {
-    test('As a non-authenticated, I cant manage resource of a worksite', function () {
-    });
-    test('As not admin, I cant manage resource of a worksite', function () {
-    });
+    test('As a non-authenticated, I cant manage resource of a worksite', function () {});
+    test('As not admin, I cant manage resource of a worksite', function () {});
 
-    it('should add new customer to a worksite', function () {
-    });
-    it('should update a customer details of a worksite', function () {
-    });
-    it('should prevent delete a customer of an active worksite', function () {
-    });
-    it('should delete a customer of a closed worksite', function () {
-    });
-    it('should show details of a customer in a worksite', function () {
-    });
+    it('should add new customer to a worksite', function () {});
+    it('should update a customer details of a worksite', function () {});
+    it('should prevent delete a customer of an active worksite', function () {});
+    it('should delete a customer of a closed worksite', function () {});
+    it('should show details of a customer in a worksite', function () {});
 });

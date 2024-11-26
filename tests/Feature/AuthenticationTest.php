@@ -28,8 +28,8 @@ describe('Login', function () {
             'password' => 'admin12',
         ]);
         $response->assertStatus(Response::HTTP_UNAUTHORIZED)
-        ->assertJsonFragment([
-            'message'=>'Invalid username or password.'
-        ]);
+            ->assertJsonFragment([
+                'message' => 'Invalid username or password.',
+            ]);
     });
 });

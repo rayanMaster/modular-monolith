@@ -11,13 +11,9 @@ use Saloon\Exceptions\Request\RequestException;
 
 class WorksiteService
 {
-
     public function __construct(
         private readonly PaymentSyncService $paymentSyncService
-    )
-    {
-
-    }
+    ) {}
 
     /**
      * @throws FatalRequestException
@@ -31,11 +27,9 @@ class WorksiteService
 
         $payments = $this->paymentSyncService->getPaymentsForWorksite($worksite);
 
-
         $worksite->customerPayments = $payments;
 
-        $worksite->totalPaymentsAmount = number_format((float)$payments->sum('amount'), 2);
-
+        $worksite->totalPaymentsAmount = number_format((float) $payments->sum('amount'), 2);
 
         $worksite->items->map(function (Item $item) {
             $item->quantityInWarehouse = $item->warehouse->quantity;
@@ -46,5 +40,4 @@ class WorksiteService
 
         return $worksite;
     }
-
 }
