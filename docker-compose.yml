@@ -21,8 +21,8 @@ services:
         networks:
             - app-shared
         depends_on:
-            - mysql
-    mysql:
+            - wsm.mysql
+    wsm.mysql:
         image: 'mysql/mysql-server:8.0'
         container_name: mysql-wsm
         ports:
