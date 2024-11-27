@@ -6,10 +6,13 @@ use App\Http\Integrations\BaseConnector\BaseConnector;
 
 class AccountingConnector extends BaseConnector
 {
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     public function resolveBaseUrl(): string
     {
-        return 'http://accounting_api/api/v1';
+        $baseUrl = config('external-service-api.accounting');
+        return 'http://' . $baseUrl . '/api/v1';
     }
 }
