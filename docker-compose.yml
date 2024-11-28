@@ -1,16 +1,16 @@
 services:
-    backend.main:
+    laravel.test:
         build:
             context: './docker/8.3'
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
         image: 'sail-8.3/app'
-        container_name: main_backend
+        container_name: main-backend
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
-            - '8000:80'
+            - '${APP_PORT:-80}:80'
         environment:
             WWWUSER: '${WWWUSER}'
             LARAVEL_SAIL: 1
@@ -20,16 +20,16 @@ services:
         volumes:
             - '.:/var/www/html'
         networks:
-            - main_network
+            - sail
             - app-shared
         depends_on:
             - mysql
             - redis
     mysql:
         image: 'mysql/mysql-server:8.0'
-        container_name: main_mysql
+        container_name: main-mysql
         ports:
-            - '3308:3306'
+            - '${FORWARD_DB_PORT:-3306}:3306'
         environment:
             MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
             MYSQL_ROOT_HOST: '%'
@@ -38,10 +38,10 @@ services:
             MYSQL_PASSWORD: '${DB_PASSWORD}'
             MYSQL_ALLOW_EMPTY_PASSWORD: 1
         volumes:
-            - 'main-mysql:/var/lib/mysql'
-            - './docker/mysql/create-database.sh:/docker-entrypoint-initdb.d/10-create-database.sh'
+            - 'sail-mysql:/var/lib/mysql'
+            - './docker/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
         networks:
-            - main_network
+            - sail
             - app-shared
         healthcheck:
             test:
@@ -53,13 +53,12 @@ services:
             timeout: 5s
     redis:
         image: 'redis:alpine'
-        container_name: main_redis
         ports:
             - '${FORWARD_REDIS_PORT:-6379}:6379'
         volumes:
             - 'sail-redis:/data'
         networks:
-            - main_network
+            - sail
             - app-shared
         healthcheck:
             test:
@@ -69,11 +68,12 @@ services:
             retries: 3
             timeout: 5s
 networks:
-    main_network:
+    sail:
+        driver: bridge
     app-shared:
         external: true
 volumes:
-    main-mysql:
+    sail-mysql:
         driver: local
     sail-redis:
         driver: local
