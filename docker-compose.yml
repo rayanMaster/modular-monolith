@@ -21,7 +21,7 @@ services:
             - '.:/var/www/html'
         networks:
             - sail
-            - accounting_app-shared
+            - app-shared
         depends_on:
             - mysql
             - redis
@@ -42,7 +42,7 @@ services:
             - './docker/mysql/create-database.sh:/docker-entrypoint-initdb.d/10-create-database.sh'
         networks:
             - sail
-            - accounting_app-shared
+            - app-shared
         healthcheck:
             test:
                 - CMD
@@ -60,7 +60,7 @@ services:
             - 'sail-redis:/data'
         networks:
             - sail
-            - accounting_app-shared
+            - app-shared
         healthcheck:
             test:
                 - CMD
@@ -70,7 +70,7 @@ services:
             timeout: 5s
 networks:
     sail:
-    accounting_app-shared:
+    app-shared:
         external: true
 volumes:
     sail-mysql:
