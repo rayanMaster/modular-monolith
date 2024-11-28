@@ -5,16 +5,44 @@ if [ "$SUPERVISOR_PHP_USER" != "root" ] && [ "$SUPERVISOR_PHP_USER" != "sail" ];
     exit 1
 fi
 
+# Adjust user ID if provided
 if [ ! -z "$WWWUSER" ]; then
     usermod -u $WWWUSER sail
 fi
 
+# Ensure /.composer exists and has appropriate permissions
 if [ ! -d /.composer ]; then
     mkdir /.composer
 fi
 
 chmod -R ugo+rw /.composer
 
+# Fix permissions for Laravel directories
+if [ -d /var/www/html/storage ] && [ -d /var/www/html/bootstrap/cache ]; then
+    echo "Adjusting permissions for Laravel directories..."
+    chown -R sail:sail /var/www/html/storage /var/www/html/bootstrap/cache
+    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+else
+    echo "Laravel directories not found. Skipping permission adjustments."
+fi
+
+# Check MySQL status and grant privileges if MySQL is ready
+echo "Waiting for MySQL to be ready..."
+until mysqladmin ping -h mysql --silent; do
+    echo "Waiting for MySQL..."
+    sleep 2
+done
+
+echo "MySQL is ready. Granting privileges to 'sail' user."
+
+# Attempt to create a user if not exists and grant privileges explicitly
+mysql -u root -p$MYSQL_ROOT_PASSWORD -e "
+    CREATE USER IF NOT EXISTS 'sail'@'%' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';
+    GRANT ALL PRIVILEGES ON worksites.* TO 'sail'@'%';
+    FLUSH PRIVILEGES;
+"
+
+# Run commands if provided as arguments
 if [ $# -gt 0 ]; then
     if [ "$SUPERVISOR_PHP_USER" = "root" ]; then
         exec "$@"
@@ -22,5 +50,6 @@ if [ $# -gt 0 ]; then
         exec gosu $WWWUSER "$@"
     fi
 else
+    # Start Supervisor
     exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
 fi
