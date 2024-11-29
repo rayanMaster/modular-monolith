@@ -12,6 +12,7 @@ use App\Helpers\ApiResponse\ApiResponseHelper;
 use App\Helpers\ApiResponse\Result;
 use App\Http\Integrations\Accounting\Requests\WorksiteSync\WorksiteSyncDTO;
 use App\Http\Requests\WorksiteCreateRequest;
+use App\Http\Requests\WorksiteListRequest;
 use App\Http\Requests\WorksiteUpdateRequest;
 use App\Http\Resources\PaginationResource;
 use App\Http\Resources\WorksiteDetailsResource;
@@ -43,27 +44,44 @@ class WorksiteController extends Controller
 {
     public function __construct(
         private readonly WorksiteSyncService $worksiteSyncService,
-        private readonly PaymentSyncService $paymentSyncService,
-        private readonly WorksiteService $worksiteService
-    ) {}
+        private readonly PaymentSyncService  $paymentSyncService,
+        private readonly WorksiteService     $worksiteService
+    )
+    {
+    }
 
     /**
      * @throws FatalRequestException
      * @throws RequestException
      * @throws JsonException
      */
-    public function list(): JsonResponse
+    public function list(WorksiteListRequest $request): JsonResponse
     {
-        $workSites = Worksite::query()
-            ->with(['payments', 'address', 'pendingOrders'])
-            ->orderBy('created_at', 'DESC')
-            ->paginate(GeneralSettingNumericEnum::PER_PAGE->value);
+        /**
+         * @var array{
+         *   getAll:bool | null
+         * } $requestedData
+         */
+        $requestedData = $request->validated();
+        if (array_key_exists('getAll', $requestedData)) {
+            $workSites = Worksite::query()
+                ->with(['payments', 'address', 'pendingOrders'])
+                ->orderBy('created_at', 'DESC')
+                ->get();
+            $pagination = null;
+        } else {
+            $workSites = Worksite::query()
+                ->with(['payments', 'address', 'pendingOrders'])
+                ->orderBy('created_at', 'DESC')
+                ->paginate(GeneralSettingNumericEnum::PER_PAGE->value);
+            $pagination = PaginationResource::make($workSites);
+        }
 
         foreach ($workSites as $worksite) {
             $payments = $this->paymentSyncService->getPaymentsForWorksite($worksite);
             $worksite->customerPayments = $payments;
         }
-        $pagination = PaginationResource::make($workSites);
+
 
         return ApiResponseHelper::sendSuccessResponse(new Result(
             result: WorksiteListResource::collection($workSites),
@@ -141,7 +159,7 @@ class WorksiteController extends Controller
                     'deliver_date' => $requestedData['deliver_date'] ?? null,
                     'reception_status' => $requestedData['reception_status'] ?? WorksiteReceptionStatusEnum::SCRATCH->value,
                     'completion_status' => $requestedData['completion_status'] ?? WorksiteCompletionStatusEnum::PENDING->value,
-                ], fn ($value) => $value != null);
+                ], fn($value) => $value != null);
 
                 $worksite = Worksite::query()->create($dataToSave);
                 try {
@@ -155,7 +173,7 @@ class WorksiteController extends Controller
                 if ($worksite->parentWorksite == null) {
                     $warehouse = Warehouse::query()->create([
                         'address_id' => $address?->id,
-                        'name' => $worksite->title.' warehouse',
+                        'name' => $worksite->title . ' warehouse',
                     ]);
                     $worksite->warehouse_id = $warehouse->id;
                     $worksite->save();
@@ -204,7 +222,7 @@ class WorksiteController extends Controller
                     }
                 }
                 // Perform bulk insert
-                if (! empty($paymentData)) {
+                if (!empty($paymentData)) {
                     $payments = $worksite->payments()->createMany($paymentData);
                     PaymentCreatedEvent::dispatch($payments, $worksite->customer?->uuid);
                 }
@@ -215,14 +233,14 @@ class WorksiteController extends Controller
                         $fileNameParts = explode('.', $file->getClientOriginalName());
                         $fileName = $fileNameParts[0];
                         $path = lcfirst('Worksite');
-                        $name = $fileName.'_'.now()->format('YmdH');
-                        $relativeName = $path.'/'.$name.'.webp';
+                        $name = $fileName . '_' . now()->format('YmdH');
+                        $relativeName = $path . '/' . $name . '.webp';
 
-                        if (! File::exists(public_path('storage/'.$path))) {
-                            File::makeDirectory(public_path('storage/'.$path));
+                        if (!File::exists(public_path('storage/' . $path))) {
+                            File::makeDirectory(public_path('storage/' . $path));
                         }
 
-                        $fullPath = public_path('storage/'.$path).'/'.$name.'.webp';
+                        $fullPath = public_path('storage/' . $path) . '/' . $name . '.webp';
 
                         // create new manager instance with desired driver
                         $manager = new ImageManager(new Driver);
@@ -321,7 +339,7 @@ class WorksiteController extends Controller
                     $addressDataToUpdate = array_filter([
                         'city_id' => $requestedData['city_id'] ?? null,
                         'title' => $requestedData['address'] ?? null,
-                    ], fn ($value) => $value != null);
+                    ], fn($value) => $value != null);
                     $address->update($addressDataToUpdate);
                 } else {
                     $newAddress = Address::query()->create([
@@ -347,7 +365,7 @@ class WorksiteController extends Controller
                     'deliver_date' => $requestedData['deliver_date'] ?? null,
                     'reception_status' => $requestedData['reception_status'] ?? null,
                     'completion_status' => $requestedData['completion_status'] ?? null,
-                ], fn ($value) => $value != null);
+                ], fn($value) => $value != null);
 
                 $worksite->update($dataToSave);
 
