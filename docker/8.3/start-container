@@ -26,6 +26,14 @@ else
     echo "Laravel directories not found. Skipping permission adjustments."
 fi
 
+# Run php artisan storage:link
+if [ -f /var/www/html/artisan ]; then
+    echo "Running php artisan storage:link..."
+    su -c "php /var/www/html/artisan storage:link" sail || echo "storage:link command failed, skipping."
+else
+    echo "Artisan file not found. Skipping storage:link."
+fi
+
 # Check MySQL status and grant privileges if MySQL is ready
 echo "Waiting for MySQL to be ready..."
 until mysqladmin ping -h mysql --silent; do

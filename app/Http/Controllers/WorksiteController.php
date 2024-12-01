@@ -237,7 +237,7 @@ class WorksiteController extends Controller
                         $relativeName = $path . '/' . $name . '.webp';
 
                         if (!File::exists(public_path('storage/' . $path))) {
-                            File::makeDirectory(public_path('storage/' . $path));
+                            File::makeDirectory(public_path('storage/' . $path), 0755, true);
                         }
 
                         $fullPath = public_path('storage/' . $path) . '/' . $name . '.webp';
