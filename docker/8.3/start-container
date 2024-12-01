@@ -20,8 +20,8 @@ chmod -R ugo+rw /.composer
 # Fix permissions for Laravel directories
 if [ -d /var/www/html/storage ] && [ -d /var/www/html/bootstrap/cache ]; then
     echo "Adjusting permissions for Laravel directories..."
+    chmod -R ugo+rw /var/www/html/storage /var/www/html/bootstrap/cache
     chown -R sail:sail /var/www/html/storage /var/www/html/bootstrap/cache
-    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 else
     echo "Laravel directories not found. Skipping permission adjustments."
 fi
